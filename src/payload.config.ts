@@ -1,17 +1,27 @@
-// storage-adapter-import-placeholder
-import { sqliteAdapter } from '@payloadcms/db-sqlite'
-import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import path from 'path'
-import { buildConfig } from 'payload'
-import { fileURLToPath } from 'url'
-import sharp from 'sharp'
+import { Categories } from "@/collections/Categories";
+import { Industries } from "@/collections/Industries";
+import { Media } from "@/collections/Media";
+import { Notifications } from "@/collections/Notifications";
+import { Reviews } from "@/collections/Reviews";
+import { Technologies } from "@/collections/Technologies";
+import { DigitalProducts } from "@/collections/DigitalProducts";
+import { Transactions } from "@/collections/Transactions";
+import { Users } from "@/collections/Users";
+import { SiteSettings } from "@/globals/SiteSettings";
+import { mongooseAdapter } from "@payloadcms/db-mongodb";
+import { stripePlugin } from "@payloadcms/plugin-stripe";
+import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import path from "path";
+import { buildConfig } from "payload";
+import sharp from "sharp";
+import { fileURLToPath } from "url";
+import { ProductFiles } from "./collections/ProductFiles";
+import Carts from "./collections/Carts";
+import nodemailer from "nodemailer";
+import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
 
-import { Users } from './collections/Users'
-import { Media } from './collections/Media'
-
-const filename = fileURLToPath(import.meta.url)
-const dirname = path.dirname(filename)
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
 export default buildConfig({
   admin: {
@@ -19,21 +29,118 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
-  },
-  collections: [Users, Media],
-  editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || '',
-  typescript: {
-    outputFile: path.resolve(dirname, 'payload-types.ts'),
-  },
-  db: sqliteAdapter({
-    client: {
-      url: process.env.DATABASE_URI || '',
+    avatar: {
+      Component: "@/components/payload/avatar",
     },
+  },
+  collections: [
+    Users,
+    Media,
+    DigitalProducts,
+    Categories,
+    Technologies,
+    Industries,
+    Transactions,
+    Reviews,
+    Notifications,
+    ProductFiles,
+    Carts,
+  ],
+  globals: [SiteSettings],
+  editor: lexicalEditor(),
+  secret: process.env.PAYLOAD_SECRET || "",
+  typescript: {
+    outputFile: path.resolve(dirname, "payload-types.ts"),
+  },
+  db: mongooseAdapter({
+    url: process.env.DATABASE_URI || "",
   }),
   sharp,
   plugins: [
-    payloadCloudPlugin(),
-    // storage-adapter-placeholder
+    stripePlugin({
+      stripeSecretKey: process.env.STRIPE_SECRET_KEY || "",
+      stripeWebhooksEndpointSecret:
+        process.env.STRIPE_WEBHOOKS_ENDPOINT_SECRET || "",
+      sync: [
+        {
+          collection: "digital-products",
+          stripeResourceType: "products",
+          stripeResourceTypeSingular: "product",
+          fields: [
+            {
+              fieldPath: "name",
+              stripeProperty: "name",
+            },
+            {
+              fieldPath: "description",
+              stripeProperty: "description",
+            },
+          ],
+        },
+      ],
+    }),
   ],
-})
+  endpoints: [
+    {
+      path: "/secure-download/:productId",
+      method: "get",
+      handler: async (req) => {
+        try {
+          const user = req.user;
+          if (!user) {
+            return Response.json({ message: "Unauthorized" }, { status: 401 });
+          }
+
+          const productId = req.routeParams?.productId;
+
+          const transaction = await req.payload.find({
+            collection: "transactions",
+            where: {
+              "buyer.id": { equals: user.id },
+              "digital-products.id": { equals: productId },
+            },
+          });
+
+          if (transaction.docs.length === 0) {
+            return Response.json(
+              { message: "Forbidden: You have not purchased this product." },
+              { status: 403 },
+            );
+          }
+
+          // const product = await req.payload.findByID({
+          //   collection: "digital-products",
+          //   id: productId as string,
+          // });
+
+          // if (!product || !product.productFiles?.url) {
+          //   return Response.json({ message: "Product file not found." }, { status: 404 });
+          // }
+
+          // return Response.redirect(product.productFiles.url);
+          return Response.json(
+            { message: "product and transaction found. well done." },
+            { status: 200 },
+          );
+        } catch (error) {
+          console.error(error);
+          return Response.json(
+            { message: "Internal Server Error" },
+            { status: 500 },
+          );
+        }
+      },
+    },
+  ],
+  email: nodemailerAdapter({
+    defaultFromAddress: "hello@kilinc.digital",
+    defaultFromName: "Marketplace",
+    transport: nodemailer.createTransport({
+      service: "icloud",
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    }),
+  }),
+});

@@ -1,8 +1,24 @@
-import { withPayload } from '@payloadcms/next/withPayload'
+import { withPayload } from "@payloadcms/next/withPayload";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Your Next.js config here
-}
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+      },
+      {
+        protocol: "https",
+        hostname: "aceternity.com",
+      },
+    ],
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
+  },
+};
 
-export default withPayload(nextConfig)
+export default withPayload(nextConfig);

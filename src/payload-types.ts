@@ -13,16 +13,56 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    'digital-products': DigitalProduct;
+    categories: Category;
+    technologies: Technology;
+    industries: Industry;
+    transactions: Transaction;
+    reviews: Review;
+    notifications: Notification;
+    'product-files': ProductFile;
+    carts: Cart;
+    'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
+  };
+  collectionsJoins: {
+    users: {
+      transactions: 'transactions';
+    };
+  };
+  collectionsSelect: {
+    users: UsersSelect<false> | UsersSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
+    'digital-products': DigitalProductsSelect<false> | DigitalProductsSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    technologies: TechnologiesSelect<false> | TechnologiesSelect<true>;
+    industries: IndustriesSelect<false> | IndustriesSelect<true>;
+    transactions: TransactionsSelect<false> | TransactionsSelect<true>;
+    reviews: ReviewsSelect<false> | ReviewsSelect<true>;
+    notifications: NotificationsSelect<false> | NotificationsSelect<true>;
+    'product-files': ProductFilesSelect<false> | ProductFilesSelect<true>;
+    carts: CartsSelect<false> | CartsSelect<true>;
+    'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
+    'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
+    'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
     defaultIDType: string;
   };
-  globals: {};
+  globals: {
+    'site-settings': SiteSetting;
+  };
+  globalsSelect: {
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+  };
   locale: null;
   user: User & {
     collection: 'users';
+  };
+  jobs: {
+    tasks: unknown;
+    workflows: unknown;
   };
 }
 export interface UserAuthOperations {
@@ -49,8 +89,58 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: string;
+  avatar?: (string | null) | Media;
+  firstName: string;
+  lastName: string;
+  roles?: ('admin' | 'buyer')[] | null;
+  dateOfBirth?: string | null;
+  isActive?: boolean | null;
+  lastActive?: string | null;
+  phoneNumber?: string | null;
+  address?: {
+    street?: string | null;
+    city?: string | null;
+    state?: string | null;
+    zipCode?: string | null;
+    country?: string | null;
+  };
+  socialMedia?: {
+    facebook?: string | null;
+    twitter?: string | null;
+    instagram?: string | null;
+    linkedin?: string | null;
+  };
+  ratings?:
+    | {
+        rating: number;
+        review?: string | null;
+        reviewer: string | User;
+        date: string;
+        id?: string | null;
+      }[]
+    | null;
+  transactions?: {
+    docs?: (string | Transaction)[] | null;
+    hasNextPage?: boolean | null;
+  } | null;
+  sellerInfo?: {
+    companyName?: string | null;
+    website?: string | null;
+    bio?: string | null;
+    earnings?: number | null;
+  };
+  paymentMethod?: ('creditCard' | 'paypal' | 'bankTransfer') | null;
+  paymentDetails?: {
+    cardNumber?: string | null;
+    expiryDate?: string | null;
+    paypalEmail?: string | null;
+    bankAccount?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
   email: string;
   resetPasswordToken?: string | null;
   resetPasswordExpiration?: string | null;
@@ -78,6 +168,243 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions".
+ */
+export interface Transaction {
+  id: string;
+  orderId: string;
+  buyer: string | User;
+  'digital-products': string | DigitalProduct;
+  amount: number;
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  paymentMethod: string;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "digital-products".
+ */
+export interface DigitalProduct {
+  id: string;
+  name: string;
+  description: string;
+  productType: 'website-template' | 'design-asset' | '3d-model' | 'font' | 'cad-file' | 'ui-kit' | 'other';
+  category: string | Category;
+  technology: (string | Technology)[];
+  seller: string | User;
+  status: 'draft' | 'active' | 'inactive' | 'rejected';
+  compatibility?:
+    | {
+        softwareVersion?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  supportedFormats?:
+    | {
+        format?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  previewImages?:
+    | {
+        image?: (string | null) | Media;
+        imageDescription?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  tags?:
+    | {
+        tag?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  productFiles?:
+    | {
+        file: string | Media;
+        fileDescription?: string | null;
+        fileType?: ('main' | 'documentation' | 'additional' | 'example') | null;
+        id?: string | null;
+      }[]
+    | null;
+  price: number;
+  stripeProductType?: ('product' | 'subscription') | null;
+  licensingOptions?: ('single-use' | 'multiple-use' | 'commercial' | 'personal') | null;
+  discountEligibility?: boolean | null;
+  createdAt: string;
+  lastUpdated?: string | null;
+  salesCount?: number | null;
+  averageRating?: number | null;
+  stripeID?: string | null;
+  skipSync?: boolean | null;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  icon?: (string | null) | Media;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "technologies".
+ */
+export interface Technology {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  icon?: (string | null) | Media;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "industries".
+ */
+export interface Industry {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  icon?: (string | null) | Media;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews".
+ */
+export interface Review {
+  id: string;
+  template: string | DigitalProduct;
+  buyer: string | User;
+  rating: number;
+  comment?: string | null;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notifications".
+ */
+export interface Notification {
+  id: string;
+  user: string | User;
+  message: string;
+  type: 'order_update' | 'new_template' | 'message';
+  read?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-files".
+ */
+export interface ProductFile {
+  id: string;
+  name: string;
+  description: string;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "carts".
+ */
+export interface Cart {
+  id: string;
+  user: string | User;
+  items?:
+    | {
+        product: string | DigitalProduct;
+        quantity: number;
+        id?: string | null;
+      }[]
+    | null;
+  lastUpdated?: string | null;
+  abandonedEmailSent?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-locked-documents".
+ */
+export interface PayloadLockedDocument {
+  id: string;
+  document?:
+    | ({
+        relationTo: 'users';
+        value: string | User;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: string | Media;
+      } | null)
+    | ({
+        relationTo: 'digital-products';
+        value: string | DigitalProduct;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: string | Category;
+      } | null)
+    | ({
+        relationTo: 'technologies';
+        value: string | Technology;
+      } | null)
+    | ({
+        relationTo: 'industries';
+        value: string | Industry;
+      } | null)
+    | ({
+        relationTo: 'transactions';
+        value: string | Transaction;
+      } | null)
+    | ({
+        relationTo: 'reviews';
+        value: string | Review;
+      } | null)
+    | ({
+        relationTo: 'notifications';
+        value: string | Notification;
+      } | null)
+    | ({
+        relationTo: 'product-files';
+        value: string | ProductFile;
+      } | null)
+    | ({
+        relationTo: 'carts';
+        value: string | Cart;
+      } | null);
+  globalSlug?: string | null;
+  user: {
+    relationTo: 'users';
+    value: string | User;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -112,6 +439,319 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  avatar?: T;
+  firstName?: T;
+  lastName?: T;
+  roles?: T;
+  dateOfBirth?: T;
+  isActive?: T;
+  lastActive?: T;
+  phoneNumber?: T;
+  address?:
+    | T
+    | {
+        street?: T;
+        city?: T;
+        state?: T;
+        zipCode?: T;
+        country?: T;
+      };
+  socialMedia?:
+    | T
+    | {
+        facebook?: T;
+        twitter?: T;
+        instagram?: T;
+        linkedin?: T;
+      };
+  ratings?:
+    | T
+    | {
+        rating?: T;
+        review?: T;
+        reviewer?: T;
+        date?: T;
+        id?: T;
+      };
+  transactions?: T;
+  sellerInfo?:
+    | T
+    | {
+        companyName?: T;
+        website?: T;
+        bio?: T;
+        earnings?: T;
+      };
+  paymentMethod?: T;
+  paymentDetails?:
+    | T
+    | {
+        cardNumber?: T;
+        expiryDate?: T;
+        paypalEmail?: T;
+        bankAccount?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "digital-products_select".
+ */
+export interface DigitalProductsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  productType?: T;
+  category?: T;
+  technology?: T;
+  seller?: T;
+  status?: T;
+  compatibility?:
+    | T
+    | {
+        softwareVersion?: T;
+        id?: T;
+      };
+  supportedFormats?:
+    | T
+    | {
+        format?: T;
+        id?: T;
+      };
+  previewImages?:
+    | T
+    | {
+        image?: T;
+        imageDescription?: T;
+        id?: T;
+      };
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  productFiles?:
+    | T
+    | {
+        file?: T;
+        fileDescription?: T;
+        fileType?: T;
+        id?: T;
+      };
+  price?: T;
+  stripeProductType?: T;
+  licensingOptions?: T;
+  discountEligibility?: T;
+  createdAt?: T;
+  lastUpdated?: T;
+  salesCount?: T;
+  averageRating?: T;
+  stripeID?: T;
+  skipSync?: T;
+  updatedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  icon?: T;
+  createdAt?: T;
+  updatedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "technologies_select".
+ */
+export interface TechnologiesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  icon?: T;
+  createdAt?: T;
+  updatedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "industries_select".
+ */
+export interface IndustriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  icon?: T;
+  createdAt?: T;
+  updatedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "transactions_select".
+ */
+export interface TransactionsSelect<T extends boolean = true> {
+  orderId?: T;
+  buyer?: T;
+  'digital-products'?: T;
+  amount?: T;
+  status?: T;
+  paymentMethod?: T;
+  createdAt?: T;
+  updatedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews_select".
+ */
+export interface ReviewsSelect<T extends boolean = true> {
+  template?: T;
+  buyer?: T;
+  rating?: T;
+  comment?: T;
+  status?: T;
+  createdAt?: T;
+  updatedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notifications_select".
+ */
+export interface NotificationsSelect<T extends boolean = true> {
+  user?: T;
+  message?: T;
+  type?: T;
+  read?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-files_select".
+ */
+export interface ProductFilesSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "carts_select".
+ */
+export interface CartsSelect<T extends boolean = true> {
+  user?: T;
+  items?:
+    | T
+    | {
+        product?: T;
+        quantity?: T;
+        id?: T;
+      };
+  lastUpdated?: T;
+  abandonedEmailSent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-locked-documents_select".
+ */
+export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
+  document?: T;
+  globalSlug?: T;
+  user?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-preferences_select".
+ */
+export interface PayloadPreferencesSelect<T extends boolean = true> {
+  user?: T;
+  key?: T;
+  value?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-migrations_select".
+ */
+export interface PayloadMigrationsSelect<T extends boolean = true> {
+  name?: T;
+  batch?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: string;
+  commissionRate: number;
+  defaultCurrency: 'USD' | 'EUR' | 'GBP';
+  supportEmail: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  commissionRate?: T;
+  defaultCurrency?: T;
+  supportEmail?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
