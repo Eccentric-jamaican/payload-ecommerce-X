@@ -489,6 +489,10 @@ export interface Cart {
  */
 export interface DiscountCode {
   id: string;
+  /**
+   * The Stripe coupon ID for this discount code (optional, leave empty for Stripe to create a new coupon)
+   */
+  stripeCouponId?: string | null;
   code: string;
   type: 'percentage' | 'fixed';
   /**
@@ -877,6 +881,7 @@ export interface CartsSelect<T extends boolean = true> {
  * via the `definition` "discount-codes_select".
  */
 export interface DiscountCodesSelect<T extends boolean = true> {
+  stripeCouponId?: T;
   code?: T;
   type?: T;
   value?: T;

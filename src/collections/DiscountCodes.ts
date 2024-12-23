@@ -14,6 +14,16 @@ export const DiscountCodes: CollectionConfig = {
   },
   fields: [
     {
+      name: "stripeCouponId",
+      type: "text",
+      required: false,
+      admin: {
+        description:
+          "The Stripe coupon ID for this discount code (optional, leave empty for Stripe to create a new coupon)",
+        position: "sidebar",
+      },
+    },
+    {
       name: "code",
       type: "text",
       required: true,

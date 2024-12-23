@@ -33,15 +33,26 @@ export async function POST(req: Request) {
 
     // Verify all products exist and are active
     const productIds = cartItems.map((item: CartItem) => item.product.id);
+
     const products = await payload.find({
       collection: "products",
       where: {
         id: { in: productIds },
-        status: { equals: "published" },
       },
     });
 
     if (products.docs.length !== productIds.length) {
+      return NextResponse.json(
+        { error: "Some products are no longer available" },
+        { status: 400 },
+      );
+    }
+
+    // Check if any products are not active
+    const unavailableProducts = products.docs.filter(
+      (doc) => doc.status !== "active",
+    );
+    if (unavailableProducts.length > 0) {
       return NextResponse.json(
         { error: "Some products are no longer available" },
         { status: 400 },
@@ -55,13 +66,13 @@ export async function POST(req: Request) {
 
       return {
         price_data: {
-          currency: "usd",
+          currency: "gbp",
           product_data: {
             name: item.product.name,
             description: item.product.description,
             images: imageUrl ? [imageUrl] : undefined,
           },
-          unit_amount: item.product.price * 100, // Convert to cents
+          unit_amount: item.product.price * 100, // Convert to pence
         },
         quantity: item.quantity,
       };
@@ -71,26 +82,50 @@ export async function POST(req: Request) {
     let discountOptions = {};
     if (discount) {
       if (discount.type === "percentage") {
+        try {
+          const couponId = await getOrCreatePercentageCoupon(
+            discount.stripeCouponId,
+            discount.value,
+            discount.code,
+          );
+          discountOptions = {
+            discounts: [
+              {
+                coupon: couponId,
+              },
+            ],
+          };
+        } catch (error) {
+          console.error("Failed to create/retrieve coupon:", error);
+          // Create a one-time coupon for this session
+          const coupon = await stripe.coupons.create({
+            percent_off: discount.value,
+            duration: "once",
+            name: discount.code,
+          });
+          discountOptions = {
+            discounts: [
+              {
+                coupon: coupon.id,
+              },
+            ],
+          };
+        }
+      } else {
+        // For fixed amount discounts, create a one-time coupon
+        const coupon = await stripe.coupons.create({
+          amount_off: Math.round(discount.discountAmount * 100), // Convert to pence
+          currency: "gbp",
+          duration: "once",
+          name: discount.code,
+        });
         discountOptions = {
           discounts: [
             {
-              coupon: await getOrCreatePercentageCoupon(discount.value),
+              coupon: coupon.id,
             },
           ],
         };
-      } else {
-        // For fixed amount discounts, we'll apply it as a negative line item
-        lineItems.push({
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: "Discount",
-              description: `Discount code: ${discount.code}`,
-            },
-            unit_amount: -discount.discountAmount * 100, // Negative amount
-          },
-          quantity: 1,
-        });
       }
     }
 
@@ -103,6 +138,7 @@ export async function POST(req: Request) {
       metadata: {
         userId: user?.id || "guest",
         discountCode: discount?.code,
+        productIds: JSON.stringify(productIds),
       },
       customer_email: user?.email,
       ...discountOptions,
@@ -118,8 +154,20 @@ export async function POST(req: Request) {
   }
 }
 
-async function getOrCreatePercentageCoupon(percentage: number) {
-  const couponId = `PERCENT_${percentage}`;
+async function getOrCreatePercentageCoupon(
+  couponId: string,
+  percentage: number,
+  code: string,
+): Promise<string> {
+  if (!couponId) {
+    // Create a new one-time coupon if no ID is provided
+    const coupon = await stripe.coupons.create({
+      percent_off: percentage,
+      duration: "once",
+      name: code,
+    });
+    return coupon.id;
+  }
 
   try {
     // Try to retrieve existing coupon
@@ -131,6 +179,7 @@ async function getOrCreatePercentageCoupon(percentage: number) {
       id: couponId,
       percent_off: percentage,
       duration: "once",
+      name: code,
     });
     return coupon.id;
   }
