@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import type { User } from "@/payload-types";
 import { fetchWithAuth } from "@/lib/api";
 import { deleteCookie, setCookie } from "@/actions/auth";
+import { getServerUrl } from "@/lib/utils";
 
 interface AuthContextType {
   user: User | null;
@@ -22,14 +23,11 @@ interface AuthContextType {
 }
 
 async function loginToAuthServer(email: string, password: string) {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/login`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    },
-  );
+  const response = await fetch(`${getServerUrl()}/api/users/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
 
   if (!response.ok) {
     throw new Error("Login failed");
@@ -64,14 +62,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (user === null) {
         let login;
         const res = await fetchWithAuth(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/me?depth=10`,
+          `${getServerUrl()}/api/users/me?depth=10`,
         );
         if (res.ok) {
           const user = await res.json();
           setUser(user.user);
         } else {
           login = await fetchWithAuth(
-            `${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/refresh-token`,
+            `${getServerUrl()}/api/users/refresh-token`,
           );
           if (login.ok) {
             const user = await login.json();
@@ -111,12 +109,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/logout`,
-        {
-          method: "POST",
-        },
-      );
+      const res = await fetch(`${getServerUrl()}/api/users/logout`, {
+        method: "POST",
+      });
 
       if (res.ok) {
         setUser(null);
@@ -139,22 +134,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const firstName = formData.get("firstName") as string;
     const lastName = formData.get("lastName") as string;
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/users`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-            firstName,
-            lastName,
-            role: "user",
-          }),
+      const res = await fetch(`${getServerUrl()}/api/users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          email,
+          password,
+          firstName,
+          lastName,
+          role: "user",
+        }),
+      });
 
       if (!res.ok) {
         const error = await res.json();
@@ -165,16 +157,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(data.user);
 
       // After successful signup, log the user in
-      const loginRes = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
+      const loginRes = await fetch(`${getServerUrl()}/api/users/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({ email, password }),
+      });
 
       if (loginRes.ok) {
         const loginData = await loginRes.json();

@@ -1,14 +1,13 @@
 import { Metadata } from "next";
 import CategoryPageClient from "./page.client";
 import configPromise from "@/payload.config";
-import { getPayload } from "payload";
+import { BasePayload, getPayload } from "payload";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
 }
 
-const getCategory = async (slug: string) => {
-  const payload = await getPayload({ config: configPromise });
+const getCategory = async (payload: BasePayload, slug: string) => {
   const category = await payload.find({
     collection: "categories",
     where: { slug: { equals: slug } },
@@ -16,8 +15,7 @@ const getCategory = async (slug: string) => {
   return category.docs[0];
 };
 
-const getProducts = async (categoryId: string) => {
-  const payload = await getPayload({ config: configPromise });
+const getProducts = async (payload: BasePayload, categoryId: string) => {
   const products = await payload.find({
     collection: "products",
     where: { category: { equals: categoryId } },
@@ -29,7 +27,8 @@ export async function generateMetadata({
   params,
 }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const category = await getCategory(slug);
+  const payload = await getPayload({ config: configPromise });
+  const category = await getCategory(payload, slug);
 
   if (!category) {
     return {
@@ -55,8 +54,15 @@ export async function generateMetadata({
 
 const CategoryPage = async ({ params }: CategoryPageProps) => {
   const { slug } = await params;
-  const category = await getCategory(slug);
-  const products = await getProducts(category.id);
+  const payload = await getPayload({ config: configPromise });
+
+  const category = await getCategory(payload, slug);
+  if (!category) {
+    throw new Error("Category not found");
+  }
+
+  const products = await getProducts(payload, category.id);
+
   return <CategoryPageClient category={category} products={products} />;
 };
 

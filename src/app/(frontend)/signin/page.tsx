@@ -1,5 +1,6 @@
 import { SignIn } from "@/components/auth/signin";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Sign In",
@@ -18,5 +19,9 @@ export const metadata: Metadata = {
 };
 
 export default function SignInPage() {
-  return <SignIn />;
+  return (
+    <Suspense>
+      <SignIn />
+    </Suspense>
+  );
 }

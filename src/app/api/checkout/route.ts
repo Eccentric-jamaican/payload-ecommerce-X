@@ -4,6 +4,7 @@ import { getPayload } from "payload";
 import configPromise from "@/payload.config";
 import { CartItem } from "@/providers/CartProvider";
 import { Media } from "@/payload-types";
+import { getServerUrl } from "@/lib/utils";
 
 export async function POST(req: Request) {
   try {
@@ -133,8 +134,8 @@ export async function POST(req: Request) {
     const session = await stripe.checkout.sessions.create({
       line_items: lineItems,
       mode: "payment",
-      success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/cart`,
+      success_url: `${getServerUrl()}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${getServerUrl()}/cart`,
       metadata: {
         userId: user?.id || "guest",
         discountCode: discount?.code,

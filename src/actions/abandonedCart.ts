@@ -3,6 +3,7 @@
 import { getPayload } from "payload";
 import configPromise from "@/payload.config";
 import { Product } from "@/payload-types";
+import { getServerUrl } from "@/lib/utils";
 
 // const CART_ABANDONMENT_THRESHOLD = 24 * 60 * 60 * 1000;
 
@@ -117,7 +118,7 @@ export async function checkAbandonedCarts(authHeader: string) {
                   <p><strong>Total: £${total.toFixed(2)}</strong></p>
                 </div>
 
-                <a href="${process.env.NEXT_PUBLIC_SERVER_URL}/cart" class="cta-button">
+                <a href="${getServerUrl()}/cart" class="cta-button">
                   Complete Your Purchase
                 </a>
 

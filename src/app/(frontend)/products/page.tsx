@@ -19,27 +19,31 @@ export const metadata: Metadata = {
   },
 };
 
-const BrowsePage = async () => {
+const getBrowsePage = async () => {
   const payload = await getPayload({ config: configPromise });
 
-  const products = (
-    await payload.find({
-      collection: "products",
-    })
-  ).docs;
+  const [productsResponse, categoriesResponse, technologiesResponse] =
+    await Promise.all([
+      payload.find({
+        collection: "products",
+      }),
+      payload.find({
+        collection: "categories",
+      }),
+      payload.find({
+        collection: "technologies",
+      }),
+    ]);
 
-  const categories = (
-    await payload.find({
-      collection: "categories",
-    })
-  ).docs;
+  return {
+    products: productsResponse.docs,
+    categories: categoriesResponse.docs,
+    technologies: technologiesResponse.docs,
+  };
+};
 
-  const technologies = (
-    await payload.find({
-      collection: "technologies",
-    })
-  ).docs;
-
+const BrowsePage = async () => {
+  const { products, categories, technologies } = await getBrowsePage();
   return (
     <BrowsePageClient
       products={products}

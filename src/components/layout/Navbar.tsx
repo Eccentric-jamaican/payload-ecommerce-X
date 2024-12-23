@@ -26,7 +26,7 @@ import { CartSheet } from "@/components/cart/CartSheet";
 
 const Navbar: FC = () => {
   const { user, logout, isLoading } = useAuth();
-  const { itemCount } = useCart();
+  const { items } = useCart();
   // @ts-expect-error - Notifications are not implemented yet
   const notifications = []; // Replace with actual notifications
 
@@ -92,9 +92,9 @@ const Navbar: FC = () => {
             <CartSheet>
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />
-                {itemCount > 0 && (
+                {items.length > 0 && (
                   <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs text-white">
-                    {itemCount}
+                    {items.length}
                   </span>
                 )}
               </Button>
