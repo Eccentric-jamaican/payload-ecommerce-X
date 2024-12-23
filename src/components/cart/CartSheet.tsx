@@ -129,7 +129,6 @@ export const CartSheet: FC<CartSheetProps> = ({ children }) => {
       });
 
       const data = await response.json();
-      console.log("Checkout response:", { status: response.status, data });
 
       if (!response.ok) {
         throw new Error(data.error || "Failed to create checkout session");

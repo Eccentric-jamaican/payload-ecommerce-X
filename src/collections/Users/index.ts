@@ -281,19 +281,10 @@ export const Users: CollectionConfig = {
   ],
   timestamps: true,
   hooks: {
-    beforeChange: [
-      async ({ data, originalDoc }) => {
-        if (
-          ["seller"].includes(data.role) &&
-          !["seller"].includes(originalDoc?.role)
-        ) {
-          console.log(`New seller registered: ${data.email}`);
-        }
-      },
-    ],
     afterChange: [
       async ({ doc, operation }) => {
         if (operation === "create") {
+          // TODO: Send welcome email
           console.log(`Welcome email sent to ${doc.email}`);
         }
       },
