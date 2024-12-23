@@ -66,6 +66,36 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Animation Delay Utilities */
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+
+  /* Animation Fill Mode */
+  .animate-fade-in-up {
+    animation: fadeInUp 0.5s ease-out forwards;
+    animation-fill-mode: both;
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @layer base {

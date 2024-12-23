@@ -1,18 +1,25 @@
 import { isAdmin } from "@/access/admin";
 import { anyone } from "@/access/anyone";
-import { isBuyerOrAdmin } from "@/access/isBuyerOrAdmin";
+import { isUserOrAdmin } from "@/access/isUserOrAdmin";
 import { CollectionConfig } from "payload";
 
 export const Reviews: CollectionConfig = {
   slug: "reviews",
   admin: {
-    defaultColumns: ["template", "buyer", "rating", "comment", "status", "createdAt"], // Admin table view
+    defaultColumns: [
+      "template",
+      "user",
+      "rating",
+      "comment",
+      "status",
+      "createdAt",
+    ], // Admin table view
     useAsTitle: "template", // Use the template name as the title
     group: "Marketplace", // Grouping under "Marketplace" section
   },
   access: {
     read: anyone, // Reviews are public and can be read by anyone
-    create: isBuyerOrAdmin, // Only buyers can create reviews
+    create: isUserOrAdmin, // Only buyers can create reviews
     update: isAdmin, // Only admins can update reviews
     delete: isAdmin, // Only admins can delete reviews
   },
@@ -20,14 +27,14 @@ export const Reviews: CollectionConfig = {
     {
       name: "template",
       type: "relationship",
-      relationTo: "digital-products", // Reference to the Templates collection
+      relationTo: "products", // Reference to the Templates collection
       required: true,
       admin: {
         description: "The template being reviewed.",
       },
     },
     {
-      name: "buyer",
+      name: "user",
       type: "relationship",
       relationTo: "users", // Reference to the Users collection
       required: true,

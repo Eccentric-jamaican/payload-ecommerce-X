@@ -1,26 +1,14 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
-import { useEffect, useState } from "react";
-
-interface Category {
-  id: string;
-  name: string;
-}
-
-interface Technology {
-  id: string;
-  name: string;
-}
+import { Category, Technology } from "@/payload-types";
 
 interface FiltersProps {
   selectedCategories: string[];
   setSelectedCategories: (categories: string[]) => void;
   selectedTechnologies: string[];
   setSelectedTechnologies: (technologies: string[]) => void;
-  priceRange: number[];
-  setPriceRange: (range: number[]) => void;
+  categories: Category[];
+  technologies: Technology[];
 }
 
 export function Filters({
@@ -28,58 +16,9 @@ export function Filters({
   setSelectedCategories,
   selectedTechnologies,
   setSelectedTechnologies,
-  priceRange,
-  setPriceRange,
+  categories,
+  technologies,
 }: FiltersProps) {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [technologies, setTechnologies] = useState<Technology[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [categoriesRes, technologiesRes] = await Promise.all([
-          fetch("/api/categories"),
-          fetch("/api/technologies"),
-        ]);
-
-        if (!categoriesRes.ok || !technologiesRes.ok) {
-          throw new Error("Failed to fetch filters data");
-        }
-
-        const [categoriesData, technologiesData] = await Promise.all([
-          categoriesRes.json(),
-          technologiesRes.json(),
-        ]);
-
-        setCategories(categoriesData.docs || []);
-        setTechnologies(technologiesData.docs || []);
-      } catch (error) {
-        console.error("Failed to fetch filters data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="animate-pulse space-y-8">
-        <div>
-          <div className="mb-4 h-6 w-24 rounded bg-gray-200"></div>
-          <div className="space-y-2">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-4 w-full rounded bg-gray-200"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-8">
       <div>
@@ -141,34 +80,6 @@ export function Filters({
               <span className="text-sm">{tech.name}</span>
             </label>
           ))}
-        </div>
-      </div>
-
-      <div>
-        <h3 className="mb-4 text-lg font-semibold">Price Range</h3>
-        <div className="space-y-4">
-          <Slider
-            defaultValue={[0, 1000]}
-            max={1000}
-            step={1}
-            value={priceRange}
-            onValueChange={setPriceRange}
-          />
-          <div className="flex items-center justify-between gap-4">
-            <Input
-              type="number"
-              value={priceRange[0]}
-              onChange={(e) => setPriceRange([+e.target.value, priceRange[1]])}
-              className="h-9"
-            />
-            <span className="text-muted-foreground">to</span>
-            <Input
-              type="number"
-              value={priceRange[1]}
-              onChange={(e) => setPriceRange([priceRange[0], +e.target.value])}
-              className="h-9"
-            />
-          </div>
         </div>
       </div>
     </div>

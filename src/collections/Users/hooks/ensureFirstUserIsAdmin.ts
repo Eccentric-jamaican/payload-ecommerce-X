@@ -2,7 +2,11 @@ import type { FieldHook } from "payload";
 
 import type { User } from "@payload-types";
 
-export const ensureFirstUserIsAdmin: FieldHook<User> = async ({ req, operation, value }) => {
+export const ensureFirstUserIsAdmin: FieldHook<User> = async ({
+  req,
+  operation,
+  value,
+}) => {
   if (operation === "create") {
     const users = await req.payload.find({
       collection: "users",
@@ -11,8 +15,8 @@ export const ensureFirstUserIsAdmin: FieldHook<User> = async ({ req, operation, 
     });
     if (users.totalDocs === 0) {
       // if `admin` not in array of values, add it
-      if (!(value || []).includes("admin")) {
-        return [...(value || []), "admin"];
+      if (!(value || "")) {
+        return "admin";
       }
     }
   }

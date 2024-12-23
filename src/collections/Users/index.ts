@@ -17,7 +17,7 @@ export const Users: CollectionConfig = {
     delete: isAdminOrSelf,
     read: isAdminOrSelf,
     update: isAdminOrSelf,
-    admin: ({ req: { user } }) => Boolean(user?.roles?.includes("admin")),
+    admin: ({ req: { user } }) => user?.role === "admin",
   },
   fields: [
     {
@@ -56,9 +56,8 @@ export const Users: CollectionConfig = {
               type: "row",
               fields: [
                 {
-                  name: "roles",
+                  name: "role",
                   type: "select",
-                  hasMany: true,
                   saveToJWT: true,
                   hooks: {
                     beforeChange: [ensureFirstUserIsAdmin],
@@ -77,8 +76,8 @@ export const Users: CollectionConfig = {
                       value: "admin",
                     },
                     {
-                      label: "Buyer",
-                      value: "buyer",
+                      label: "User",
+                      value: "user",
                     },
                   ],
                   access: {
@@ -285,8 +284,8 @@ export const Users: CollectionConfig = {
     beforeChange: [
       async ({ data, originalDoc }) => {
         if (
-          ["seller"].includes(data.roles) &&
-          !["seller"].includes(originalDoc?.roles)
+          ["seller"].includes(data.role) &&
+          !["seller"].includes(originalDoc?.role)
         ) {
           console.log(`New seller registered: ${data.email}`);
         }

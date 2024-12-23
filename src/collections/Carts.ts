@@ -4,6 +4,7 @@ const Carts: CollectionConfig = {
   slug: "carts",
   admin: {
     useAsTitle: "id",
+    group: "Marketplace",
   },
   access: {
     create: () => true,
@@ -25,7 +26,7 @@ const Carts: CollectionConfig = {
         {
           name: "product",
           type: "relationship",
-          relationTo: "digital-products",
+          relationTo: "products",
           required: true,
         },
         {

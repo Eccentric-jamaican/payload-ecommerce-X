@@ -25,7 +25,7 @@ import { useCart } from "@/providers/CartProvider";
 import { CartSheet } from "@/components/cart/CartSheet";
 
 const Navbar: FC = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const { itemCount } = useCart();
   // @ts-expect-error - Notifications are not implemented yet
   const notifications = []; // Replace with actual notifications
@@ -46,7 +46,7 @@ const Navbar: FC = () => {
                 <SheetTitle>Menu</SheetTitle>
               </SheetHeader>
               <div className="mt-4 flex flex-col space-y-3">
-                <Link href="/browse" className="text-sm font-medium">
+                <Link href="/products" className="text-sm font-medium">
                   Browse
                 </Link>
                 <Link href="/categories" className="text-sm font-medium">
@@ -69,7 +69,7 @@ const Navbar: FC = () => {
 
           <div className="hidden md:flex md:items-center md:space-x-6">
             <Link
-              href="/browse"
+              href="/products"
               className="text-sm font-medium text-gray-700 transition-colors hover:text-primary"
             >
               Browse
@@ -129,7 +129,7 @@ const Navbar: FC = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {user ? (
+            {isLoading ? null : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button

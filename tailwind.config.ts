@@ -1,9 +1,9 @@
-/** @type {import('tailwindcss').Config} */
+import type { Config } from "tailwindcss";
 import typography from "@tailwindcss/typography";
 import forms from "@tailwindcss/forms";
 import animate from "tailwindcss-animate";
 
-const config = {
+const config: Config = {
   darkMode: ["class"],
   content: [
     "./src/app/(frontend)/**/*.{js,ts,jsx,tsx}",
@@ -12,7 +12,7 @@ const config = {
   theme: {
     extend: {
       container: {
-        center: "true",
+        center: true,
         padding: {
           "2xl": "1rem",
           DEFAULT: "1rem",
@@ -71,6 +71,26 @@ const config = {
           4: "hsl(var(--chart-4))",
           5: "hsl(var(--chart-5))",
         },
+      },
+      animation: {
+        "fade-in-up": "fadeInUp 0.5s ease-out forwards",
+      },
+      keyframes: {
+        fadeInUp: {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(20px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+      },
+      transitionDelay: {
+        "200": "200ms",
+        "400": "400ms",
+        "600": "600ms",
       },
     },
   },

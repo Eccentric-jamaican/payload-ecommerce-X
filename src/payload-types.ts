@@ -13,10 +13,9 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
-    'digital-products': DigitalProduct;
+    products: Product;
     categories: Category;
     technologies: Technology;
-    industries: Industry;
     transactions: Transaction;
     reviews: Review;
     notifications: Notification;
@@ -34,10 +33,9 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    'digital-products': DigitalProductsSelect<false> | DigitalProductsSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     technologies: TechnologiesSelect<false> | TechnologiesSelect<true>;
-    industries: IndustriesSelect<false> | IndustriesSelect<true>;
     transactions: TransactionsSelect<false> | TransactionsSelect<true>;
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     notifications: NotificationsSelect<false> | NotificationsSelect<true>;
@@ -92,8 +90,11 @@ export interface User {
   avatar?: (string | null) | Media;
   firstName: string;
   lastName: string;
-  roles?: ('admin' | 'buyer')[] | null;
+  role?: ('admin' | 'user') | null;
   dateOfBirth?: string | null;
+  /**
+   * Deactivate this user if needed.
+   */
   isActive?: boolean | null;
   lastActive?: string | null;
   phoneNumber?: string | null;
@@ -123,12 +124,6 @@ export interface User {
     docs?: (string | Transaction)[] | null;
     hasNextPage?: boolean | null;
   } | null;
-  sellerInfo?: {
-    companyName?: string | null;
-    website?: string | null;
-    bio?: string | null;
-    earnings?: number | null;
-  };
   paymentMethod?: ('creditCard' | 'paypal' | 'bankTransfer') | null;
   paymentDetails?: {
     cardNumber?: string | null;
@@ -175,68 +170,187 @@ export interface Media {
  */
 export interface Transaction {
   id: string;
+  /**
+   * Stripe session ID used as order ID
+   */
   orderId: string;
+  /**
+   * The buyer who made the purchase
+   */
   buyer: string | User;
-  'digital-products': string | DigitalProduct;
+  /**
+   * Total amount of the transaction
+   */
   amount: number;
+  /**
+   * Current status of the transaction
+   */
   status: 'pending' | 'completed' | 'failed' | 'refunded';
-  paymentMethod: string;
+  /**
+   * Payment method used for the transaction
+   */
+  paymentMethod: 'stripe';
+  /**
+   * Stripe session ID for reference
+   */
+  stripeSessionId?: string | null;
+  /**
+   * Digital product purchased in this transaction
+   */
+  products: (string | Product)[];
   createdAt: string;
   updatedAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "digital-products".
+ * via the `definition` "products".
  */
-export interface DigitalProduct {
+export interface Product {
   id: string;
+  /**
+   * Enter the name of your digital product
+   */
   name: string;
+  /**
+   * Provide a detailed description of the digital product
+   */
   description: string;
-  productType: 'website-template' | 'design-asset' | '3d-model' | 'font' | 'cad-file' | 'ui-kit' | 'other';
+  /**
+   * Select the type of digital product
+   */
+  productType:
+    | 'website-template'
+    | 'design-asset'
+    | '3d-model'
+    | 'font'
+    | 'cad-file'
+    | 'ui-kit'
+    | 'github-repo'
+    | 'other';
+  githubDetails?: {
+    /**
+     * GitHub username or organization that owns the repository
+     */
+    repositoryOwner: string;
+    /**
+     * Name of the private GitHub repository
+     */
+    repositoryName: string;
+    /**
+     * GitHub Personal Access Token with repo and admin:org scopes
+     */
+    githubAccessToken: string;
+  };
+  /**
+   * Select the most appropriate category for your product
+   */
   category: string | Category;
+  /**
+   * Select relevant technologies associated with this product
+   */
   technology: (string | Technology)[];
+  /**
+   * Select the creator/seller of this digital product
+   */
   seller: string | User;
+  /**
+   * Current status of the digital product
+   */
   status: 'draft' | 'active' | 'inactive' | 'rejected';
+  /**
+   * List software, platforms, or versions this product is compatible with
+   */
   compatibility?:
     | {
+        /**
+         * Specify compatible software versions (e.g., Figma 2023, Adobe CC 2024)
+         */
         softwareVersion?: string | null;
         id?: string | null;
       }[]
     | null;
+  /**
+   * List all file formats included in the product
+   */
   supportedFormats?:
     | {
+        /**
+         * Specify file formats included (e.g., .psd, .sketch, .figma)
+         */
         format?: string | null;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Add multiple preview images to showcase your product
+   */
   previewImages?:
     | {
+        /**
+         * Upload high-quality preview images showcasing the product
+         */
         image?: (string | null) | Media;
+        /**
+         * Provide a brief description of what this preview image shows
+         */
         imageDescription?: string | null;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Add tags to help users find your product more easily
+   */
   tags?:
     | {
+        /**
+         * Add relevant tags to improve searchability
+         */
         tag?: string | null;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Upload one or more files for your digital product
+   */
   productFiles?:
     | {
         file: string | Media;
+        /**
+         * Provide a brief description of this specific file
+         */
         fileDescription?: string | null;
+        /**
+         * Specify the type or purpose of this file
+         */
         fileType?: ('main' | 'documentation' | 'additional' | 'example') | null;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Set the price for your digital product (in pennies)
+   */
   price: number;
+  /**
+   * The type of product to create in Stripe
+   */
   stripeProductType?: ('product' | 'subscription') | null;
+  /**
+   * Select the licensing terms for this digital product
+   */
   licensingOptions?: ('single-use' | 'multiple-use' | 'commercial' | 'personal') | null;
+  /**
+   * Can this product be included in sales or promotional discounts?
+   */
   discountEligibility?: boolean | null;
   createdAt: string;
   lastUpdated?: string | null;
+  /**
+   * Number of times this product has been purchased
+   */
   salesCount?: number | null;
+  /**
+   * Average rating for this digital product
+   */
   averageRating?: number | null;
   stripeID?: string | null;
   skipSync?: boolean | null;
@@ -249,8 +363,17 @@ export interface DigitalProduct {
 export interface Category {
   id: string;
   name: string;
+  /**
+   * A URL-friendly identifier for the category (auto-generated if left blank).
+   */
   slug: string;
+  /**
+   * Optional description of the category.
+   */
   description?: string | null;
+  /**
+   * Optional icon for the category.
+   */
   icon?: (string | null) | Media;
   createdAt: string;
   updatedAt: string;
@@ -262,21 +385,17 @@ export interface Category {
 export interface Technology {
   id: string;
   name: string;
+  /**
+   * A URL-friendly identifier for the technology (auto-generated if left blank).
+   */
   slug: string;
+  /**
+   * Optional description of the technology.
+   */
   description?: string | null;
-  icon?: (string | null) | Media;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "industries".
- */
-export interface Industry {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string | null;
+  /**
+   * Optional icon for the technology.
+   */
   icon?: (string | null) | Media;
   createdAt: string;
   updatedAt: string;
@@ -287,10 +406,25 @@ export interface Industry {
  */
 export interface Review {
   id: string;
-  template: string | DigitalProduct;
-  buyer: string | User;
+  /**
+   * The template being reviewed.
+   */
+  template: string | Product;
+  /**
+   * The buyer who left the review.
+   */
+  user: string | User;
+  /**
+   * Rating from 1 (poor) to 5 (excellent).
+   */
   rating: number;
+  /**
+   * Optional review comment.
+   */
   comment?: string | null;
+  /**
+   * Approval status of the review.
+   */
   status: 'pending' | 'approved' | 'rejected';
   createdAt: string;
   updatedAt: string;
@@ -337,7 +471,7 @@ export interface Cart {
   user: string | User;
   items?:
     | {
-        product: string | DigitalProduct;
+        product: string | Product;
         quantity: number;
         id?: string | null;
       }[]
@@ -363,8 +497,8 @@ export interface PayloadLockedDocument {
         value: string | Media;
       } | null)
     | ({
-        relationTo: 'digital-products';
-        value: string | DigitalProduct;
+        relationTo: 'products';
+        value: string | Product;
       } | null)
     | ({
         relationTo: 'categories';
@@ -373,10 +507,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'technologies';
         value: string | Technology;
-      } | null)
-    | ({
-        relationTo: 'industries';
-        value: string | Industry;
       } | null)
     | ({
         relationTo: 'transactions';
@@ -448,7 +578,7 @@ export interface UsersSelect<T extends boolean = true> {
   avatar?: T;
   firstName?: T;
   lastName?: T;
-  roles?: T;
+  role?: T;
   dateOfBirth?: T;
   isActive?: T;
   lastActive?: T;
@@ -480,14 +610,6 @@ export interface UsersSelect<T extends boolean = true> {
         id?: T;
       };
   transactions?: T;
-  sellerInfo?:
-    | T
-    | {
-        companyName?: T;
-        website?: T;
-        bio?: T;
-        earnings?: T;
-      };
   paymentMethod?: T;
   paymentDetails?:
     | T
@@ -530,12 +652,19 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "digital-products_select".
+ * via the `definition` "products_select".
  */
-export interface DigitalProductsSelect<T extends boolean = true> {
+export interface ProductsSelect<T extends boolean = true> {
   name?: T;
   description?: T;
   productType?: T;
+  githubDetails?:
+    | T
+    | {
+        repositoryOwner?: T;
+        repositoryName?: T;
+        githubAccessToken?: T;
+      };
   category?: T;
   technology?: T;
   seller?: T;
@@ -611,27 +740,16 @@ export interface TechnologiesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "industries_select".
- */
-export interface IndustriesSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  description?: T;
-  icon?: T;
-  createdAt?: T;
-  updatedAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "transactions_select".
  */
 export interface TransactionsSelect<T extends boolean = true> {
   orderId?: T;
   buyer?: T;
-  'digital-products'?: T;
   amount?: T;
   status?: T;
   paymentMethod?: T;
+  stripeSessionId?: T;
+  products?: T;
   createdAt?: T;
   updatedAt?: T;
 }
@@ -641,7 +759,7 @@ export interface TransactionsSelect<T extends boolean = true> {
  */
 export interface ReviewsSelect<T extends boolean = true> {
   template?: T;
-  buyer?: T;
+  user?: T;
   rating?: T;
   comment?: T;
   status?: T;
@@ -735,8 +853,9 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface SiteSetting {
   id: string;
-  commissionRate: number;
-  defaultCurrency: 'USD' | 'EUR' | 'GBP';
+  /**
+   * Email address for customer queries
+   */
   supportEmail: string;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -746,8 +865,6 @@ export interface SiteSetting {
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
-  commissionRate?: T;
-  defaultCurrency?: T;
   supportEmail?: T;
   updatedAt?: T;
   createdAt?: T;

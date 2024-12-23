@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Category, DigitalProduct } from "@/payload-types";
+import { Category, Product } from "@/payload-types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, ChevronLeft, ShoppingBag } from "lucide-react";
@@ -10,62 +9,26 @@ import Link from "next/link";
 import { useCart } from "@/providers/CartProvider";
 import { formatPrice } from "@/lib/utils";
 
-const CategoryPageClient = ({ slug }: { slug: string }) => {
-  const [category, setCategory] = useState<Category | null>(null);
-  const [products, setProducts] = useState<DigitalProduct[]>([]);
-  const [loading, setLoading] = useState(true);
+const CategoryPageClient = ({
+  category,
+  products,
+}: {
+  category: Category;
+  products: Product[];
+}) => {
   const { addItem, items, removeItem } = useCart();
-
-  useEffect(() => {
-    const fetchCategoryAndProducts = async () => {
-      try {
-        setLoading(true);
-        // Fetch category
-        const categoryResponse = await fetch(
-          `/api/categories?where[slug][equals]=${slug}`,
-        );
-        if (!categoryResponse.ok) throw new Error("Failed to fetch category");
-        const categoryData = await categoryResponse.json();
-        const category = categoryData.docs[0];
-        if (!category) throw new Error("Category not found");
-        setCategory(category);
-
-        // Fetch products in this category
-        const productsResponse = await fetch(
-          `/api/products?where[category][equals]=${category.id}`,
-        );
-        if (!productsResponse.ok) throw new Error("Failed to fetch products");
-        const productsData = await productsResponse.json();
-        setProducts(productsData.docs || []);
-      } catch (error) {
-        console.error("Error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCategoryAndProducts();
-  }, [slug]);
 
   const isInCart = (productId: string) => {
     return items.some((item) => item.product.id === productId);
   };
 
-  const handleCartAction = (product: DigitalProduct) => {
+  const handleCartAction = (product: Product) => {
     if (isInCart(product.id)) {
       removeItem(product.id);
     } else {
       addItem(product, 1);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
 
   if (!category) {
     return (

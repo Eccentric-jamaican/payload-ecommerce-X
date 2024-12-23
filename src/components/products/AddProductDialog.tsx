@@ -139,7 +139,7 @@ export const AddProductDialog: FC<AddProductDialogProps> = ({ onSuccess }) => {
     fetchData();
   }, [toast]);
 
-  if (!user || !user.roles?.includes("admin")) {
+  if (!user) {
     return null;
   }
 

@@ -103,6 +103,7 @@ export async function loadCart() {
       const cart = existingCarts.docs[0];
       return {
         success: true,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data: cart.items?.map((item: any) => ({
           product: item.product,
           quantity: item.quantity,

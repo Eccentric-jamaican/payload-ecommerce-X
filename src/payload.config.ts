@@ -1,10 +1,9 @@
 import { Categories } from "@/collections/Categories";
-import { Industries } from "@/collections/Industries";
 import { Media } from "@/collections/Media";
 import { Notifications } from "@/collections/Notifications";
 import { Reviews } from "@/collections/Reviews";
 import { Technologies } from "@/collections/Technologies";
-import { DigitalProducts } from "@/collections/DigitalProducts";
+import { Products } from "@/collections/Products";
 import { Transactions } from "@/collections/Transactions";
 import { Users } from "@/collections/Users";
 import { SiteSettings } from "@/globals/SiteSettings";
@@ -36,10 +35,9 @@ export default buildConfig({
   collections: [
     Users,
     Media,
-    DigitalProducts,
+    Products,
     Categories,
     Technologies,
-    Industries,
     Transactions,
     Reviews,
     Notifications,
@@ -63,7 +61,7 @@ export default buildConfig({
         process.env.STRIPE_WEBHOOKS_ENDPOINT_SECRET || "",
       sync: [
         {
-          collection: "digital-products",
+          collection: "products",
           stripeResourceType: "products",
           stripeResourceTypeSingular: "product",
           fields: [
@@ -80,58 +78,58 @@ export default buildConfig({
       ],
     }),
   ],
-  endpoints: [
-    {
-      path: "/secure-download/:productId",
-      method: "get",
-      handler: async (req) => {
-        try {
-          const user = req.user;
-          if (!user) {
-            return Response.json({ message: "Unauthorized" }, { status: 401 });
-          }
+  // endpoints: [
+  //   {
+  //     path: "/secure-download/:productId",
+  //     method: "get",
+  //     handler: async (req) => {
+  //       try {
+  //         const user = req.user;
+  //         if (!user) {
+  //           return Response.json({ message: "Unauthorized" }, { status: 401 });
+  //         }
 
-          const productId = req.routeParams?.productId;
+  //         const productId = req.routeParams?.productId;
 
-          const transaction = await req.payload.find({
-            collection: "transactions",
-            where: {
-              "buyer.id": { equals: user.id },
-              "digital-products.id": { equals: productId },
-            },
-          });
+  //         const transaction = await req.payload.find({
+  //           collection: "transactions",
+  //           where: {
+  //             "buyer.id": { equals: user.id },
+  //             "products.id": { equals: productId },
+  //           },
+  //         });
 
-          if (transaction.docs.length === 0) {
-            return Response.json(
-              { message: "Forbidden: You have not purchased this product." },
-              { status: 403 },
-            );
-          }
+  //         if (transaction.docs.length === 0) {
+  //           return Response.json(
+  //             { message: "Forbidden: You have not purchased this product." },
+  //             { status: 403 },
+  //           );
+  //         }
 
-          // const product = await req.payload.findByID({
-          //   collection: "digital-products",
-          //   id: productId as string,
-          // });
+  //         // const product = await req.payload.findByID({
+  //         //   collection: "products",
+  //         //   id: productId as string,
+  //         // });
 
-          // if (!product || !product.productFiles?.url) {
-          //   return Response.json({ message: "Product file not found." }, { status: 404 });
-          // }
+  //         // if (!product || !product.productFiles?.url) {
+  //         //   return Response.json({ message: "Product file not found." }, { status: 404 });
+  //         // }
 
-          // return Response.redirect(product.productFiles.url);
-          return Response.json(
-            { message: "product and transaction found. well done." },
-            { status: 200 },
-          );
-        } catch (error) {
-          console.error(error);
-          return Response.json(
-            { message: "Internal Server Error" },
-            { status: 500 },
-          );
-        }
-      },
-    },
-  ],
+  //         // return Response.redirect(product.productFiles.url);
+  //         return Response.json(
+  //           { message: "product and transaction found. well done." },
+  //           { status: 200 },
+  //         );
+  //       } catch (error) {
+  //         console.error(error);
+  //         return Response.json(
+  //           { message: "Internal Server Error" },
+  //           { status: 500 },
+  //         );
+  //       }
+  //     },
+  //   },
+  // ],
   email: nodemailerAdapter({
     defaultFromAddress: "hello@kilinc.digital",
     defaultFromName: "Marketplace",

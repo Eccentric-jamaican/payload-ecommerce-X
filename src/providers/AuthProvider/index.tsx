@@ -37,7 +37,7 @@ async function loginToAuthServer(email: string, password: string) {
 
   const data = await response.json();
 
-  if (data.user.roles === "admin") {
+  if (data.user.role === "admin") {
     throw new Error("Login failed");
   }
 
@@ -100,10 +100,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(res.user);
 
       await setCookie(res.token, res.exp);
-
-      router.push("/");
     } catch (error) {
       console.error("Login error:", error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -152,7 +151,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             password,
             firstName,
             lastName,
-            roles: ["buyer"],
+            role: "user",
           }),
         },
       );
@@ -180,7 +179,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (loginRes.ok) {
         const loginData = await loginRes.json();
         await setCookie(loginData.token, loginData.exp);
-        router.push("/");
       } else {
         throw new Error("Login after signup failed");
       }

@@ -11,9 +11,13 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 import { useCart } from "@/providers/CartProvider";
 import type { CartItem } from "@/providers/CartProvider";
+import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/providers/AuthProvider";
+import { getAuthToken } from "@/actions/auth";
 
 interface CartItemProps {
   item: CartItem;
@@ -84,6 +88,65 @@ interface CartSheetProps {
 
 export const CartSheet: FC<CartSheetProps> = ({ children }) => {
   const { items, subtotal } = useCart();
+  const { toast } = useToast();
+  const { user } = useAuth();
+
+  const handleCheckout = async () => {
+    try {
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "Please log in to checkout",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const token = await getAuthToken();
+      if (!token) {
+        toast({
+          title: "Error",
+          description: "Authentication error. Please try logging in again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `JWT ${token}`,
+        },
+        body: JSON.stringify({
+          items: items.map((item) => ({
+            productId: item.product.id,
+            quantity: item.quantity,
+          })),
+        }),
+      });
+
+      const data = await response.json();
+      console.log("Checkout response:", { status: response.status, data });
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create checkout session");
+      }
+
+      if (!data.url) {
+        throw new Error("No checkout URL returned");
+      }
+
+      window.location.href = data.url;
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to initiate checkout. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <Sheet>
@@ -113,9 +176,11 @@ export const CartSheet: FC<CartSheetProps> = ({ children }) => {
                 <p className="text-lg font-medium text-muted-foreground">
                   Your cart is empty
                 </p>
-                <Button asChild variant="secondary">
-                  <Link href="/browse">Continue Shopping</Link>
-                </Button>
+                <SheetClose asChild>
+                  <Button asChild variant="secondary">
+                    <Link href="/products">Continue Shopping</Link>
+                  </Button>
+                </SheetClose>
               </div>
             )}
           </div>
@@ -131,16 +196,55 @@ export const CartSheet: FC<CartSheetProps> = ({ children }) => {
               Shipping and taxes will be calculated at checkout.
             </p>
             <div className="flex flex-col gap-2">
-              <Button asChild disabled={items.length === 0}>
-                <Link href="/checkout" className="w-full">
-                  Checkout
-                </Link>
-              </Button>
-              <Button asChild variant="secondary" disabled={items.length === 0}>
-                <Link href="/cart" className="w-full">
-                  View Cart
-                </Link>
-              </Button>
+              {user ? (
+                <SheetClose asChild>
+                  <Button
+                    className="w-full"
+                    onClick={handleCheckout}
+                    disabled={items.length === 0}
+                  >
+                    Checkout
+                  </Button>
+                </SheetClose>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <SheetClose asChild>
+                    <Button
+                      className="w-full"
+                      asChild
+                      disabled={items.length === 0}
+                    >
+                      <Link
+                        href={`/signin?redirect=${encodeURIComponent("/cart")}`}
+                      >
+                        Login to Checkout
+                      </Link>
+                    </Button>
+                  </SheetClose>
+                  <p className="text-center text-sm text-muted-foreground">
+                    or{" "}
+                    <SheetClose asChild>
+                      <Link
+                        href={`/signup?redirect=${encodeURIComponent("/cart")}`}
+                        className="text-primary hover:underline"
+                      >
+                        create an account
+                      </Link>
+                    </SheetClose>
+                  </p>
+                </div>
+              )}
+              <SheetClose asChild>
+                <Button
+                  asChild
+                  variant="secondary"
+                  disabled={items.length === 0}
+                >
+                  <Link href="/cart" className="w-full">
+                    View Cart
+                  </Link>
+                </Button>
+              </SheetClose>
             </div>
           </div>
         </div>

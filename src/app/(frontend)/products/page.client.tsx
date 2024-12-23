@@ -19,7 +19,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { formatPrice } from "@/lib/utils";
-import { DigitalProduct } from "@/payload-types";
+import { Category, Product, Technology } from "@/payload-types";
 import { useAuth } from "@/providers/AuthProvider";
 import { useCart } from "@/providers/CartProvider";
 import {
@@ -34,70 +34,58 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { FC, useEffect, useState } from "react";
+import { useState } from "react";
 import { Filters } from "@/components/products/Filters";
 
-const BrowsePage: FC = () => {
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+const BrowsePageClient = ({
+  products,
+  categories,
+  technologies,
+}: {
+  products: Product[];
+  categories: Category[];
+  technologies: Technology[];
+}) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedTechnologies, setSelectedTechnologies] = useState<string[]>(
     [],
   );
   const [sortOption, setSortOption] = useState<string>("featured");
-  const [products, setProducts] = useState<DigitalProduct[]>([]);
-  const [loading, setLoading] = useState(true);
   const { addItem, items, removeItem } = useCart();
   const { user } = useAuth();
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("/api/products");
-        if (!response.ok) {
-          throw new Error("Failed to fetch products");
-        }
-        const data = await response.json();
-        setProducts(data.docs || []);
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
 
   const isInCart = (productId: string) => {
     return items.some((item) => item.product.id === productId);
   };
 
+  if (!products) {
+    return <div>Loading...</div>;
+  }
+
   const filteredProducts = products.filter((product) => {
-    if (
-      selectedCategories.length > 0 &&
-      !selectedCategories.includes(
+    if (selectedCategories.length > 0) {
+      const categoryName =
         typeof product.category === "object" && product.category
           ? product.category.name
-          : (product.category as string) || "",
-      )
-    ) {
-      return false;
+          : "";
+      if (!selectedCategories.includes(categoryName)) {
+        return false;
+      }
     }
 
-    if (
-      selectedTechnologies.length > 0 &&
-      !product.technology?.some((tech: any) =>
-        selectedTechnologies.includes(
-          typeof tech === "object" && tech ? tech.name : (tech as string) || "",
-        ),
-      )
-    ) {
-      return false;
-    }
-
-    if (product.price < priceRange[0] || product.price > priceRange[1]) {
-      return false;
+    if (selectedTechnologies.length > 0) {
+      const productTechs = Array.isArray(product.technology)
+        ? product.technology.map((tech) =>
+            typeof tech === "object" && tech ? tech.name : "",
+          )
+        : [];
+      if (
+        !selectedTechnologies.some((selected) =>
+          productTechs.includes(selected),
+        )
+      ) {
+        return false;
+      }
     }
 
     return true;
@@ -106,19 +94,20 @@ const BrowsePage: FC = () => {
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortOption) {
       case "price-low":
-        return a.price - b.price;
+        return (a.price || 0) - (b.price || 0);
       case "price-high":
-        return b.price - a.price;
+        return (b.price || 0) - (a.price || 0);
       case "newest":
         return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.createdAt || 0).getTime() -
+          new Date(a.createdAt || 0).getTime()
         );
       default:
         return 0;
     }
   });
 
-  const handleCartAction = (product: DigitalProduct) => {
+  const handleCartAction = (product: Product) => {
     if (isInCart(product.id)) {
       removeItem(product.id);
     } else {
@@ -126,13 +115,8 @@ const BrowsePage: FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
+  console.log("sortedProducts", sortedProducts);
+  console.log("filteredProducts", filteredProducts);
 
   return (
     <main className="bg-gray-50/50">
@@ -157,12 +141,12 @@ const BrowsePage: FC = () => {
                     <SheetTitle>Filters</SheetTitle>
                   </SheetHeader>
                   <Filters
+                    categories={categories}
+                    technologies={technologies}
                     selectedCategories={selectedCategories}
                     setSelectedCategories={setSelectedCategories}
                     selectedTechnologies={selectedTechnologies}
                     setSelectedTechnologies={setSelectedTechnologies}
-                    priceRange={priceRange}
-                    setPriceRange={setPriceRange}
                   />
                 </SheetContent>
               </Sheet>
@@ -208,7 +192,7 @@ const BrowsePage: FC = () => {
               </div>
 
               <div className="ml-auto flex items-center gap-4">
-                {user?.roles?.includes("admin") && <AddProductDialog />}
+                {user?.role === "admin" && <AddProductDialog />}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="gap-2">
@@ -242,25 +226,25 @@ const BrowsePage: FC = () => {
         </div>
       </div>
 
-      <div className="mx-auto w-full p-4">
+      <div className="container p-4">
         <div className="flex gap-8">
           {/* Desktop Filters Sidebar */}
           <aside className="hidden lg:block lg:w-64">
             <div className="sticky top-[202px] rounded-lg border bg-white p-6">
               <Filters
+                categories={categories}
+                technologies={technologies}
                 selectedCategories={selectedCategories}
                 setSelectedCategories={setSelectedCategories}
                 selectedTechnologies={selectedTechnologies}
                 setSelectedTechnologies={setSelectedTechnologies}
-                priceRange={priceRange}
-                setPriceRange={setPriceRange}
               />
             </div>
           </aside>
 
           {/* Products Grid */}
           <div className="flex-1">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {sortedProducts.map((product) => (
                 <Card
                   key={product.id}
@@ -372,4 +356,4 @@ const BrowsePage: FC = () => {
   );
 };
 
-export default BrowsePage;
+export default BrowsePageClient;

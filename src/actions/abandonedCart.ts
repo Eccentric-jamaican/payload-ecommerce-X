@@ -2,7 +2,7 @@
 
 import { getPayload } from "payload";
 import configPromise from "@/payload.config";
-import { DigitalProduct } from "@/payload-types";
+import { Product } from "@/payload-types";
 
 // const CART_ABANDONMENT_THRESHOLD = 24 * 60 * 60 * 1000;
 
@@ -52,7 +52,7 @@ export async function checkAbandonedCarts(authHeader: string) {
         (
           sum: number,
           item: {
-            product: string | DigitalProduct;
+            product: string | Product;
             quantity: number;
             id?: string | null;
           },

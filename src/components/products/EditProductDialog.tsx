@@ -34,7 +34,7 @@ import * as z from "zod";
 import { Pencil } from "lucide-react";
 import { updateProduct } from "@/actions/products";
 import { useToast } from "@/components/ui/use-toast";
-import { DigitalProduct, Category, Technology } from "@/payload-types";
+import { Product, Category, Technology } from "@/payload-types";
 import { Spinner } from "@/components/ui/spinner";
 
 const productFormSchema = z.object({
@@ -49,6 +49,7 @@ const productFormSchema = z.object({
     "design-asset",
     "3d-model",
     "font",
+    "github-repo",
     "cad-file",
     "ui-kit",
     "other",
@@ -73,8 +74,8 @@ const productFormSchema = z.object({
 type ProductFormValues = z.infer<typeof productFormSchema>;
 
 interface EditProductDialogProps {
-  product: DigitalProduct;
-  onSuccess?: (updatedProduct: DigitalProduct) => void;
+  product: Product;
+  onSuccess?: (updatedProduct: Product) => void;
 }
 
 export const EditProductDialog: FC<EditProductDialogProps> = ({
@@ -147,7 +148,7 @@ export const EditProductDialog: FC<EditProductDialogProps> = ({
     },
   });
 
-  if (!user || !user.roles?.includes("admin")) {
+  if (!user) {
     return null;
   }
 

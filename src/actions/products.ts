@@ -5,7 +5,7 @@ import configPromise from "@/payload.config";
 import { headers } from "next/headers";
 import { getAuthToken } from "./auth";
 import { revalidatePath } from "next/cache";
-import { DigitalProduct } from "@/payload-types";
+import { Product } from "@/payload-types";
 
 export async function getUserProducts() {
   try {
@@ -27,7 +27,7 @@ export async function getUserProducts() {
 
     // Get user's products
     const products = await payload.find({
-      collection: "digital-products",
+      collection: "products",
       where: {
         "seller.id": {
           equals: user.id,
@@ -62,7 +62,7 @@ export async function deleteProduct(productId: string) {
 
     // Verify the product belongs to the user
     const product = await payload.findByID({
-      collection: "digital-products",
+      collection: "products",
       id: productId,
     });
 
@@ -73,7 +73,7 @@ export async function deleteProduct(productId: string) {
 
     // Delete the product
     await payload.delete({
-      collection: "digital-products",
+      collection: "products",
       id: productId,
     });
 
@@ -107,7 +107,7 @@ export async function updateProductStatus(
 
     // Verify the product belongs to the user
     const product = await payload.findByID({
-      collection: "digital-products",
+      collection: "products",
       id: productId,
     });
 
@@ -117,7 +117,7 @@ export async function updateProductStatus(
 
     // Update the product status
     const updatedProduct = await payload.update({
-      collection: "digital-products",
+      collection: "products",
       id: productId,
       data: {
         status,
@@ -174,7 +174,7 @@ export async function createProduct(data: {
     // Create the product
     // TODO: Fix later
     const product = await payload.create({
-      collection: "digital-products",
+      collection: "products",
       data: {
         name: data.name,
         description: data.description,
@@ -188,7 +188,7 @@ export async function createProduct(data: {
       },
     });
 
-    revalidatePath("/browse");
+    revalidatePath("/products");
     return { success: true, data: product };
   } catch (error) {
     console.error("Error creating product:", error);
@@ -203,12 +203,12 @@ export async function createProduct(data: {
 interface UpdateProductResult {
   success: boolean;
   error?: string;
-  data?: DigitalProduct;
+  data?: Product;
 }
 
 export async function updateProduct(
   id: string,
-  data: Partial<DigitalProduct>,
+  data: Partial<Product>,
 ): Promise<UpdateProductResult> {
   try {
     const token = await getAuthToken();
@@ -229,7 +229,7 @@ export async function updateProduct(
 
     // Verify the product belongs to the user
     const product = await payload.findByID({
-      collection: "digital-products",
+      collection: "products",
       id,
     });
 
@@ -239,7 +239,7 @@ export async function updateProduct(
 
     // Update the product
     const updatedProduct = await payload.update({
-      collection: "digital-products",
+      collection: "products",
       id,
       data,
     });

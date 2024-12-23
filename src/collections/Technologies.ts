@@ -28,7 +28,8 @@ export const Technologies: CollectionConfig = {
       required: true,
       unique: true,
       admin: {
-        description: "A URL-friendly identifier for the technology (auto-generated if left blank).",
+        description:
+          "A URL-friendly identifier for the technology (auto-generated if left blank).",
       },
       hooks: {
         beforeValidate: [
@@ -38,6 +39,10 @@ export const Technologies: CollectionConfig = {
                 .toLowerCase()
                 .replace(/[^a-z0-9]+/g, "-")
                 .replace(/^-|-$/g, ""); // Generate slug
+            }
+            // Remove forward slash from the beginning if it exists
+            if (data?.slug && data.slug.startsWith("/")) {
+              data.slug = data.slug.substring(1);
             }
           },
         ],

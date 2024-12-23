@@ -52,11 +52,6 @@ export async function updateProfile(data: UpdateProfileData) {
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
-        sellerInfo: {
-          companyName: data.companyName,
-          website: data.website,
-          bio: data.bio,
-        },
         address: {
           street: data.street,
           city: data.city,

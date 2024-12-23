@@ -1,12 +1,21 @@
 import { isAdmin } from "@/access/admin";
 import { CollectionConfig } from "payload";
 import { anyone } from "@/access/anyone";
+import Stripe from "stripe";
 
-export const DigitalProducts: CollectionConfig = {
-  slug: "digital-products",
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error("STRIPE_SECRET_KEY is not set");
+}
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2024-12-18.acacia",
+});
+
+export const Products: CollectionConfig = {
+  slug: "products",
   access: {
     read: anyone,
-    create: isAdmin,
+    create: anyone,
     update: isAdmin,
     delete: isAdmin,
   },
@@ -52,11 +61,51 @@ export const DigitalProducts: CollectionConfig = {
                 { label: "Font", value: "font" },
                 { label: "CAD File", value: "cad-file" },
                 { label: "UI Kit", value: "ui-kit" },
+                { label: "GitHub Repository", value: "github-repo" },
                 { label: "Other", value: "other" },
               ],
               admin: {
                 description: "Select the type of digital product",
               },
+            },
+            {
+              name: "githubDetails",
+              type: "group",
+              label: "GitHub Repository Details",
+              admin: {
+                condition: (data) => data.productType === "github-repo",
+              },
+              fields: [
+                {
+                  name: "repositoryOwner",
+                  type: "text",
+                  required: true,
+                  label: "Repository Owner",
+                  admin: {
+                    description:
+                      "GitHub username or organization that owns the repository",
+                  },
+                },
+                {
+                  name: "repositoryName",
+                  type: "text",
+                  required: true,
+                  label: "Repository Name",
+                  admin: {
+                    description: "Name of the private GitHub repository",
+                  },
+                },
+                {
+                  name: "githubAccessToken",
+                  type: "text",
+                  required: true,
+                  label: "GitHub Access Token",
+                  admin: {
+                    description:
+                      "GitHub Personal Access Token with repo and admin:org scopes",
+                  },
+                },
+              ],
             },
             {
               name: "category",
@@ -88,7 +137,7 @@ export const DigitalProducts: CollectionConfig = {
               required: true,
               label: "Product Creator",
               filterOptions: {
-                roles: { in: ["admin"] },
+                role: { in: ["admin"] },
               },
               admin: {
                 description:
@@ -369,28 +418,62 @@ export const DigitalProducts: CollectionConfig = {
     },
   ],
   hooks: {
-    // afterRead: [
-    //   async ({ doc, req }) => {
-    //     const reviews = await req.payload.find({
-    //       collection: "reviews",
-    //       where: {
-    //         product: { equals: doc.id },
-    //         status: { equals: "approved" },
-    //       },
-    //     });
-    //     const ratings = reviews.docs.map((review) => review.rating);
-    //     doc.averageRating = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
-    //     // Fetch total sales count (you'd need to implement a sales tracking mechanism)
-    //     // const salesCount = await req.payload.find({
-    //     //   collection: "orders",
-    //     //   where: {
-    //     //     product: { equals: doc.id },
-    //     //     status: { equals: "completed" },
-    //     //   },
-    //     // });
-    //     // doc.salesCount = salesCount.totalDocs || 0;
-    //     return doc;
-    //   },
-    // ],
+    beforeChange: [
+      async ({ data, operation }) => {
+        // Create Stripe product for new products
+        if (operation === "create") {
+          const product = await stripe.products.create({
+            name: data.name,
+            description: data.description,
+            default_price_data: {
+              currency: "gbp",
+              unit_amount: data.price * 100,
+            },
+          });
+          data.stripeID = product.id;
+        }
+        return data;
+      },
+    ],
+    afterChange: [
+      async ({ doc, operation }) => {
+        if (doc.stripeID && operation === "update") {
+          // Update Stripe product
+          await stripe.products.update(doc.stripeID, {
+            name: doc.name,
+            description: doc.description,
+            metadata: {
+              payloadId: doc.id,
+            },
+          });
+
+          // Update or create price
+          const prices = await stripe.prices.list({
+            product: doc.stripeID,
+            active: true,
+            limit: 1,
+          });
+
+          if (prices.data.length === 0) {
+            await stripe.prices.create({
+              product: doc.stripeID,
+              currency: "gbp",
+              unit_amount: doc.price * 100,
+            });
+          } else if (prices.data[0].unit_amount !== doc.price * 100) {
+            // If price has changed, create new price and make it default
+            const newPrice = await stripe.prices.create({
+              product: doc.stripeID,
+              currency: "gbp",
+              unit_amount: doc.price * 100,
+            });
+            await stripe.products.update(doc.stripeID, {
+              default_price: newPrice.id,
+            });
+          }
+        }
+        return doc;
+      },
+    ],
   },
 };

@@ -129,28 +129,28 @@ const Footer: FC = () => {
                 size="icon"
                 className="hover:text-primary"
               >
-                <Facebook className="h-5 w-5" />
+                <Facebook className="h-6 w-6" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 className="hover:text-primary"
               >
-                <Twitter className="h-5 w-5" />
+                <Twitter className="h-6 w-6" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 className="hover:text-primary"
               >
-                <Instagram className="h-5 w-5" />
+                <Instagram className="h-6 w-6" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 className="hover:text-primary"
               >
-                <Youtube className="h-5 w-5" />
+                <Youtube className="h-6 w-6" />
               </Button>
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
@@ -166,25 +166,31 @@ const Footer: FC = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-8 border-t pt-8">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Marketplace. All rights reserved.
-            </p>
-            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-              <Link href="/sitemap" className="hover:text-foreground">
-                Sitemap
-              </Link>
-              <span>•</span>
-              <Link href="/accessibility" className="hover:text-foreground">
-                Accessibility
-              </Link>
-            </div>
-          </div>
-        </div>
+        <BottomBar />
       </div>
     </footer>
   );
 };
 
 export default Footer;
+
+const BottomBar: FC = async () => {
+  return (
+    <div className="mt-8 border-t pt-8">
+      <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+        <p className="text-sm text-muted-foreground">
+          © {new Date().getFullYear()} Marketplace. All rights reserved.
+        </p>
+        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+          <Link href="/sitemap" className="hover:text-foreground">
+            Sitemap
+          </Link>
+          <span>•</span>
+          <Link href="/accessibility" className="hover:text-foreground">
+            Accessibility
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
