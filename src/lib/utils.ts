@@ -21,9 +21,9 @@ export function formatPrice(price: number) {
 }
 
 export function getServerUrl() {
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.VERCEL_ENV === "development") {
     return `http://${process.env.NEXT_PUBLIC_SERVER_URL}`;
-  } else if (process.env.NODE_ENV === "production") {
+  } else if (process.env.VERCEL_ENV === "production") {
     return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
   }
 }
