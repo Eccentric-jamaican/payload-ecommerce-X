@@ -9,9 +9,12 @@ import React, {
 } from "react";
 import { useRouter } from "next/navigation";
 import type { User } from "@/payload-types";
-import { fetchWithAuth } from "@/lib/api";
-import { deleteCookie, setCookie } from "@/actions/auth";
-import { getServerUrl } from "@/lib/utils";
+import {
+  login as loginAction,
+  logout as logoutAction,
+  signup as signupAction,
+  checkAuth as checkAuthAction,
+} from "@/actions/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -20,26 +23,6 @@ interface AuthContextType {
   logout: () => Promise<void>;
   signup: (formData: FormData) => Promise<void>;
   isLoading: boolean;
-}
-
-async function loginToAuthServer(email: string, password: string) {
-  const response = await fetch(`${getServerUrl()}/api/users/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-
-  if (!response.ok) {
-    throw new Error("Login failed");
-  }
-
-  const data = await response.json();
-
-  if (data.user.role === "admin") {
-    throw new Error("Login failed");
-  }
-
-  return data;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -60,22 +43,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuth = useCallback(async () => {
     try {
       if (user === null) {
-        let login;
-        const res = await fetchWithAuth(
-          `${getServerUrl()}/api/users/me?depth=10`,
-        );
-        if (res.ok) {
-          const user = await res.json();
-          setUser(user.user);
-        } else {
-          login = await fetchWithAuth(
-            `${getServerUrl()}/api/users/refresh-token`,
-          );
-          if (login.ok) {
-            const user = await login.json();
-            setUser(user.user);
-          }
-        }
+        const { user: authUser } = await checkAuthAction();
+        setUser(authUser);
       }
     } catch (error) {
       console.error("Error checking authentication:", error);
@@ -90,14 +59,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (formData: FormData) => {
     setIsLoading(true);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
     try {
-      const res = await loginToAuthServer(email, password);
+      const email = formData.get("email") as string;
+      const password = formData.get("password") as string;
 
-      setUser(res.user);
-
-      await setCookie(res.token, res.exp);
+      const { user: loggedInUser } = await loginAction(email, password);
+      setUser(loggedInUser);
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -109,19 +76,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${getServerUrl()}/api/users/logout`, {
-        method: "POST",
-      });
-
-      if (res.ok) {
-        setUser(null);
-        await deleteCookie();
-        router.push("/");
-      } else {
-        throw new Error("Logout failed");
-      }
+      await logoutAction();
+      setUser(null);
+      router.push("/");
     } catch (error) {
       console.error("Logout error:", error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -129,48 +89,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signup = async (formData: FormData) => {
     setIsLoading(true);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const firstName = formData.get("firstName") as string;
-    const lastName = formData.get("lastName") as string;
     try {
-      const res = await fetch(`${getServerUrl()}/api/users`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          firstName,
-          lastName,
-          role: "user",
-        }),
+      const email = formData.get("email") as string;
+      const password = formData.get("password") as string;
+      const firstName = formData.get("firstName") as string;
+      const lastName = formData.get("lastName") as string;
+
+      const { user: newUser } = await signupAction({
+        email,
+        password,
+        firstName,
+        lastName,
       });
 
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Signup failed");
-      }
-
-      const data = await res.json();
-      setUser(data.user);
-
-      // After successful signup, log the user in
-      const loginRes = await fetch(`${getServerUrl()}/api/users/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (loginRes.ok) {
-        const loginData = await loginRes.json();
-        await setCookie(loginData.token, loginData.exp);
-      } else {
-        throw new Error("Login after signup failed");
-      }
+      setUser(newUser);
     } catch (error) {
       console.error("Signup error:", error);
       throw error;
