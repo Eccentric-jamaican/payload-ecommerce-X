@@ -1,4 +1,5 @@
-import { CollectionConfig } from "payload/types";
+import { isAdmin } from "@/access/admin";
+import { CollectionConfig } from "payload";
 
 export const DiscountCodes: CollectionConfig = {
   slug: "discount-codes",
@@ -7,9 +8,9 @@ export const DiscountCodes: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: ({ req: { user } }) => Boolean(user?.role === "admin"),
-    update: ({ req: { user } }) => Boolean(user?.role === "admin"),
-    delete: ({ req: { user } }) => Boolean(user?.role === "admin"),
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
   },
   fields: [
     {
@@ -39,7 +40,6 @@ export const DiscountCodes: CollectionConfig = {
       type: "number",
       required: true,
       min: 0,
-      max: 100,
       admin: {
         description:
           "For percentage discounts, enter a number between 0-100. For fixed amounts, enter the discount value.",

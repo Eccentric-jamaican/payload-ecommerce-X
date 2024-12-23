@@ -17,9 +17,12 @@ import Link from "next/link";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/providers/AuthProvider";
 import { getAuthToken } from "@/actions/auth";
+import { Media } from "@/payload-types";
+import { DiscountCode } from "@/components/cart/DiscountCode";
 
 const CartPageClient = () => {
-  const { items, removeItem, updateQuantity, total, itemCount } = useCart();
+  const { items, removeItem, updateQuantity, subtotal, total, discount } =
+    useCart();
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -51,10 +54,8 @@ const CartPageClient = () => {
           Authorization: `JWT ${token}`,
         },
         body: JSON.stringify({
-          items: items.map((item) => ({
-            productId: item.product.id,
-            quantity: item.quantity,
-          })),
+          cartItems: items,
+          discount: discount,
         }),
       });
 
@@ -79,7 +80,7 @@ const CartPageClient = () => {
     }
   };
 
-  if (itemCount === 0) {
+  if (items.length === 0) {
     return (
       <div className="container mx-auto py-4">
         <div className="text-center">
@@ -116,16 +117,26 @@ const CartPageClient = () => {
                 <TableRow key={item.product.id}>
                   <TableCell>
                     <div className="flex items-center gap-4">
-                      {item.product.images?.[0]?.url && (
-                        <div className="relative h-16 w-16">
+                      <div className="relative h-24 w-24 overflow-hidden rounded-md border">
+                        {item.product.previewImages?.[0]?.image &&
+                        typeof item.product.previewImages[0].image !==
+                          "string" &&
+                        item.product.previewImages[0].image.url ? (
                           <Image
-                            src={item.product.images[0].url}
+                            src={item.product.previewImages[0].image.url}
                             alt={item.product.name}
                             fill
-                            className="rounded object-cover"
+                            className="object-cover"
+                            sizes="64px"
                           />
-                        </div>
-                      )}
+                        ) : (
+                          <div className="flex h-full items-center justify-center bg-gray-100">
+                            <span className="text-xs text-muted-foreground">
+                              No image
+                            </span>
+                          </div>
+                        )}
+                      </div>
                       <div>
                         <h3 className="font-medium">{item.product.name}</h3>
                       </div>
@@ -174,47 +185,58 @@ const CartPageClient = () => {
         </div>
 
         <div className="lg:col-span-4">
-          <div className="space-y-4 rounded-lg border p-6">
-            <h2 className="text-xl font-semibold">Order Summary</h2>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span>Items ({itemCount})</span>
-                <span>{formatPrice(total)}</span>
-              </div>
-              <div className="border-t pt-2">
-                <div className="flex justify-between font-semibold">
+          <div className="rounded-lg border bg-card p-6">
+            <h2 className="mb-4 text-lg font-semibold">Order Summary</h2>
+            <div className="space-y-4">
+              <DiscountCode />
+
+              <div className="border-t pt-4">
+                <div className="flex justify-between py-1">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span>{formatPrice(subtotal)}</span>
+                </div>
+
+                {discount && (
+                  <div className="flex justify-between py-1 text-primary">
+                    <span>Discount</span>
+                    <span>-{formatPrice(discount.discountAmount)}</span>
+                  </div>
+                )}
+
+                <div className="flex justify-between border-t py-2 text-lg font-semibold">
                   <span>Total</span>
                   <span>{formatPrice(total)}</span>
                 </div>
               </div>
-            </div>
-            <Button
-              className="w-full"
-              onClick={user ? handleCheckout : undefined}
-              asChild={!user}
-              disabled={items.length === 0}
-            >
-              {user ? (
-                "Proceed to Checkout"
-              ) : (
-                <div className="flex flex-col gap-2">
-                  <Link
-                    href={`/signin?redirect=${encodeURIComponent("/cart")}`}
-                  >
-                    Login to Checkout
-                  </Link>
-                  <p className="text-center text-sm text-muted-foreground">
-                    or{" "}
+
+              <Button
+                className="w-full"
+                onClick={user ? handleCheckout : undefined}
+                asChild={!user}
+                disabled={items.length === 0}
+              >
+                {user ? (
+                  "Proceed to Checkout"
+                ) : (
+                  <div className="flex flex-col gap-2">
                     <Link
-                      href={`/signup?redirect=${encodeURIComponent("/cart")}`}
-                      className="text-primary hover:underline"
+                      href={`/signin?redirect=${encodeURIComponent("/cart")}`}
                     >
-                      create an account
+                      Login to Checkout
                     </Link>
-                  </p>
-                </div>
-              )}
-            </Button>
+                    <p className="text-center text-sm text-muted-foreground">
+                      or{" "}
+                      <Link
+                        href={`/signup?redirect=${encodeURIComponent("/cart")}`}
+                        className="text-primary hover:underline"
+                      >
+                        create an account
+                      </Link>
+                    </p>
+                  </div>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </div>

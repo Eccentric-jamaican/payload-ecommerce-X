@@ -115,9 +115,6 @@ const BrowsePageClient = ({
     }
   };
 
-  console.log("sortedProducts", sortedProducts);
-  console.log("filteredProducts", filteredProducts);
-
   return (
     <main className="bg-gray-50/50">
       {/* Header */}

@@ -18,6 +18,7 @@ import { ProductFiles } from "./collections/ProductFiles";
 import Carts from "./collections/Carts";
 import nodemailer from "nodemailer";
 import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
+import { DiscountCodes } from "./collections/DiscountCodes";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -43,6 +44,7 @@ export default buildConfig({
     Notifications,
     ProductFiles,
     Carts,
+    DiscountCodes,
   ],
   globals: [SiteSettings],
   editor: lexicalEditor(),

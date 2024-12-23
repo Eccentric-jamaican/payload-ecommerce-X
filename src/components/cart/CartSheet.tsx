@@ -29,9 +29,11 @@ const CartItemComponent: FC<CartItemProps> = ({ item }) => {
   return (
     <div className="flex items-center gap-4 py-4">
       <div className="relative h-16 w-16 overflow-hidden rounded-md border">
-        {item.product.images?.[0]?.url ? (
+        {item.product.previewImages?.[0]?.image &&
+        typeof item.product.previewImages[0].image !== "string" &&
+        item.product.previewImages[0].image.url ? (
           <Image
-            src={item.product.images[0].url}
+            src={item.product.previewImages[0].image.url}
             alt={item.product.name}
             fill
             className="object-cover"

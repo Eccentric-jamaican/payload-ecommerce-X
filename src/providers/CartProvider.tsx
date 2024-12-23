@@ -1,18 +1,15 @@
 "use client";
 
+import { Product } from "@/payload-types";
 import {
   createContext,
+  FC,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type ReactNode,
-  useMemo,
-  FC,
 } from "react";
-import { Product } from "@/payload-types";
-import { useAuth } from "./AuthProvider";
-import { loadCart, saveCart } from "@/actions/cart";
-import { useToast } from "@/components/ui/use-toast";
 
 export interface CartItem {
   product: Product;

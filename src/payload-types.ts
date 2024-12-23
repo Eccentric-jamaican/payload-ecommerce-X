@@ -21,6 +21,7 @@ export interface Config {
     notifications: Notification;
     'product-files': ProductFile;
     carts: Cart;
+    'discount-codes': DiscountCode;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -41,6 +42,7 @@ export interface Config {
     notifications: NotificationsSelect<false> | NotificationsSelect<true>;
     'product-files': ProductFilesSelect<false> | ProductFilesSelect<true>;
     carts: CartsSelect<false> | CartsSelect<true>;
+    'discount-codes': DiscountCodesSelect<false> | DiscountCodesSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -483,6 +485,57 @@ export interface Cart {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "discount-codes".
+ */
+export interface DiscountCode {
+  id: string;
+  code: string;
+  type: 'percentage' | 'fixed';
+  /**
+   * For percentage discounts, enter a number between 0-100. For fixed amounts, enter the discount value.
+   */
+  value: number;
+  /**
+   * Minimum purchase amount required to use this discount code (optional)
+   */
+  minPurchaseAmount?: number | null;
+  /**
+   * Maximum number of times this code can be used (optional)
+   */
+  maxUses?: number | null;
+  usedCount: number;
+  /**
+   * When this discount code becomes valid (optional)
+   */
+  startDate?: string | null;
+  /**
+   * When this discount code expires (optional)
+   */
+  endDate?: string | null;
+  /**
+   * Whether this discount code is currently active
+   */
+  isActive: boolean;
+  /**
+   * Specific categories or products this discount applies to (optional, leave empty for all products)
+   */
+  appliesTo?:
+    | (
+        | {
+            relationTo: 'categories';
+            value: string | Category;
+          }
+        | {
+            relationTo: 'products';
+            value: string | Product;
+          }
+      )[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -527,6 +580,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'carts';
         value: string | Cart;
+      } | null)
+    | ({
+        relationTo: 'discount-codes';
+        value: string | DiscountCode;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -812,6 +869,24 @@ export interface CartsSelect<T extends boolean = true> {
       };
   lastUpdated?: T;
   abandonedEmailSent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "discount-codes_select".
+ */
+export interface DiscountCodesSelect<T extends boolean = true> {
+  code?: T;
+  type?: T;
+  value?: T;
+  minPurchaseAmount?: T;
+  maxUses?: T;
+  usedCount?: T;
+  startDate?: T;
+  endDate?: T;
+  isActive?: T;
+  appliesTo?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -1,96 +1,137 @@
 import { NextResponse } from "next/server";
+import { stripe } from "@/lib/stripe";
 import { getPayload } from "payload";
 import configPromise from "@/payload.config";
-import Stripe from "stripe";
+import { CartItem } from "@/providers/CartProvider";
+import { Media } from "@/payload-types";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is not set");
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-12-18.acacia",
-});
-
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const { items } = await request.json();
-    const authHeader = request.headers.get("authorization");
+    const { cartItems, discount } = await req.json();
+    const authHeader = req.headers.get("authorization");
 
-    if (!authHeader) {
-      return NextResponse.json(
-        { error: "Unauthorized - No auth header" },
-        { status: 401 },
-      );
+    if (!cartItems?.length) {
+      return NextResponse.json({ error: "No items provided" }, { status: 400 });
     }
 
     const payload = await getPayload({ config: configPromise });
-    const { user } = await payload.auth({
-      headers: new Headers({
-        authorization: authHeader,
-      }),
+
+    // Get user if authenticated
+    let user = null;
+    if (authHeader) {
+      try {
+        const { user: authUser } = await payload.auth({
+          headers: new Headers({
+            authorization: authHeader,
+          }),
+        });
+        user = authUser;
+      } catch (error) {
+        console.error("Auth error:", error);
+      }
+    }
+
+    // Verify all products exist and are active
+    const productIds = cartItems.map((item: CartItem) => item.product.id);
+    const products = await payload.find({
+      collection: "products",
+      where: {
+        id: { in: productIds },
+        status: { equals: "published" },
+      },
     });
 
-    if (!user) {
+    if (products.docs.length !== productIds.length) {
       return NextResponse.json(
-        { error: "Unauthorized - Invalid token" },
-        { status: 401 },
+        { error: "Some products are no longer available" },
+        { status: 400 },
       );
     }
 
-    // Fetch all products and their prices
-    const lineItems = await Promise.all(
-      items.map(async (item: { productId: string; quantity: number }) => {
-        const product = await payload.findByID({
-          collection: "products",
-          id: item.productId,
-        });
+    // Create line items for Stripe
+    const lineItems = cartItems.map((item: CartItem) => {
+      const image = item.product.previewImages?.[0]?.image;
+      const imageUrl = typeof image !== "string" && (image as Media)?.url;
 
-        if (!product) {
-          throw new Error(`Product not found: ${item.productId}`);
-        }
+      return {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: item.product.name,
+            description: item.product.description,
+            images: imageUrl ? [imageUrl] : undefined,
+          },
+          unit_amount: item.product.price * 100, // Convert to cents
+        },
+        quantity: item.quantity,
+      };
+    });
 
-        if (!product.stripeID) {
-          throw new Error(`Product ${product.name} is not synced with Stripe`);
-        }
-
-        // Get the default price for the product
-        const prices = await stripe.prices.list({
-          product: product.stripeID as string,
-          active: true,
-          limit: 1,
-        });
-
-        if (prices.data.length === 0) {
-          throw new Error(`No active price found for product: ${product.name}`);
-        }
-
-        return {
-          price: prices.data[0].id,
-          quantity: item.quantity,
-          productId: item.productId,
+    // Handle discount
+    let discountOptions = {};
+    if (discount) {
+      if (discount.type === "percentage") {
+        discountOptions = {
+          discounts: [
+            {
+              coupon: await getOrCreatePercentageCoupon(discount.value),
+            },
+          ],
         };
-      }),
-    );
+      } else {
+        // For fixed amount discounts, we'll apply it as a negative line item
+        lineItems.push({
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: "Discount",
+              description: `Discount code: ${discount.code}`,
+            },
+            unit_amount: -discount.discountAmount * 100, // Negative amount
+          },
+          quantity: 1,
+        });
+      }
+    }
 
+    // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
-      customer_email: user.email,
-      payment_method_types: ["card"],
-      line_items: lineItems.map(({ price, quantity }) => ({ price, quantity })),
+      line_items: lineItems,
       mode: "payment",
       success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/cart`,
       metadata: {
-        userId: user.id,
-        productIds: JSON.stringify(lineItems.map((item) => item.productId)),
+        userId: user?.id || "guest",
+        discountCode: discount?.code,
       },
+      customer_email: user?.email,
+      ...discountOptions,
     });
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error("Checkout error:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Checkout failed" },
+      { error: "Failed to create checkout session" },
       { status: 500 },
     );
+  }
+}
+
+async function getOrCreatePercentageCoupon(percentage: number) {
+  const couponId = `PERCENT_${percentage}`;
+
+  try {
+    // Try to retrieve existing coupon
+    const existingCoupon = await stripe.coupons.retrieve(couponId);
+    return existingCoupon.id;
+  } catch (error) {
+    // Create new coupon if it doesn't exist
+    const coupon = await stripe.coupons.create({
+      id: couponId,
+      percent_off: percentage,
+      duration: "once",
+    });
+    return coupon.id;
   }
 }
