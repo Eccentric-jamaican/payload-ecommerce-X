@@ -121,10 +121,7 @@ export const CartSheet: FC<CartSheetProps> = ({ children }) => {
           Authorization: `JWT ${token}`,
         },
         body: JSON.stringify({
-          items: items.map((item) => ({
-            productId: item.product.id,
-            quantity: item.quantity,
-          })),
+          cartItems: items,
         }),
       });
 
