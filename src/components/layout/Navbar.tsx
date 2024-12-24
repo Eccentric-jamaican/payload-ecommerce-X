@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetHeader,
   SheetTitle,
@@ -40,12 +41,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { FC } from "react";
+import { NotificationsSheet } from "../notifications/NotificationsSheet";
+import { useNotifications } from "@/providers/NotificationsProvider";
 
 const Navbar: FC = () => {
   const { user, logout, isLoading } = useAuth();
   const { items } = useCart();
-  // @ts-expect-error - Notifications are not implemented yet
-  const notifications = []; // Replace with actual notifications
+  const { notifications } = useNotifications();
 
   const mainNavItems = [
     {
@@ -100,30 +102,43 @@ const Navbar: FC = () => {
               <SheetHeader>
                 <SheetTitle>Menu</SheetTitle>
               </SheetHeader>
-              <div className="mt-6 space-y-6">
-                {mainNavItems.map((category) => (
-                  <div key={category.title} className="space-y-3">
-                    <h3 className="text-sm font-medium text-muted-foreground">
-                      {category.title}
-                    </h3>
-                    <div className="flex flex-col space-y-2">
-                      {category.items.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          className="flex items-center text-sm font-medium"
-                        >
-                          {"icon" in item
-                            ? item.icon && (
-                                <span className="mr-2">{item.icon}</span>
-                              )
-                            : null}
-                          {item.label}
-                        </Link>
-                      ))}
+              <div className="flex flex-grow flex-col">
+                <div className="mt-6 space-y-6">
+                  {mainNavItems.map((category) => (
+                    <div key={category.title} className="space-y-3">
+                      <h3 className="text-sm font-medium text-muted-foreground">
+                        {category.title}
+                      </h3>
+                      <div className="flex flex-col space-y-2">
+                        {category.items.map((item) => (
+                          <SheetClose key={item.href} asChild>
+                            <Link
+                              href={item.href}
+                              className="flex items-center text-sm font-medium"
+                            >
+                              {"icon" in item
+                                ? item.icon && (
+                                    <span className="mr-2">{item.icon}</span>
+                                  )
+                                : null}
+                              {item.label}
+                            </Link>
+                          </SheetClose>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </div>
+              <div className="mt-10 flex flex-col">
+                {user ? null : (
+                  <SheetClose asChild>
+                    <Button asChild variant="default">
+                      <Link href="/signin">Sign in</Link>
+                    </Button>
+                  </SheetClose>
+                )}
+                <ThemeToggle />
               </div>
             </SheetContent>
           </Sheet>
@@ -166,7 +181,9 @@ const Navbar: FC = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <ThemeToggle />
+            <div className="hidden md:flex">
+              <ThemeToggle />
+            </div>
             <CartSheet>
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />
@@ -178,34 +195,16 @@ const Navbar: FC = () => {
               </Button>
             </CartSheet>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
-                  <Bell className="h-5 w-5" />
-                  {notifications.length > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs text-white">
-                      {notifications.length}
-                    </span>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  Notifications
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {notifications.length > 0 ? (
-                  // @ts-expect-error - Notifications are not implemented yet
-                  notifications?.map((notification, index) => (
-                    <DropdownMenuItem key={index}>
-                      {notification.message}
-                    </DropdownMenuItem>
-                  ))
-                ) : (
-                  <DropdownMenuItem>No new notifications</DropdownMenuItem>
+            <NotificationsSheet>
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="h-5 w-5" />
+                {notifications.length > 0 && (
+                  <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-medium text-primary-foreground ring-2 ring-background">
+                    {notifications.length}
+                  </span>
                 )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </Button>
+            </NotificationsSheet>
 
             {isLoading ? null : user ? (
               <DropdownMenu>
@@ -295,7 +294,7 @@ const Navbar: FC = () => {
                     </>
                   )}
                   <DropdownMenuItem
-                    className="text-red-500 dark:text-red-400 focus:bg-red-50 dark:focus:bg-red-950 focus:text-red-600 dark:focus:text-red-300"
+                    className="text-red-500 focus:bg-red-50 focus:text-red-600 dark:text-red-400 dark:focus:bg-red-950 dark:focus:text-red-300"
                     onClick={() => logout()}
                   >
                     <LogOut className="mr-2 h-4 w-4" />
@@ -304,7 +303,7 @@ const Navbar: FC = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button asChild variant="default">
+              <Button asChild className="hidden md:block" variant="default">
                 <Link href="/signin">Sign in</Link>
               </Button>
             )}

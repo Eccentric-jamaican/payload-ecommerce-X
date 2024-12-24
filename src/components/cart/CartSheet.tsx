@@ -164,7 +164,7 @@ export const CartSheet: FC<CartSheetProps> = ({ children }) => {
         </SheetHeader>
 
         <div className="flex h-full flex-1 flex-col">
-          <div className="flex-1 overflow-y-auto px-6">
+          <div className="flex-1 overflow-y-auto px-4">
             {items.length > 0 ? (
               <div className="divide-y">
                 {items.map((item) => (

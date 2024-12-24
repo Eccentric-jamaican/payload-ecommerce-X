@@ -1,70 +1,152 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback } from "react";
+import { Product } from "@/payload-types";
+import {
+  createContext,
+  FC,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 
 export interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
+  product: Product;
   quantity: number;
+}
+
+interface Discount {
+  code: string;
+  type: "percentage" | "fixed";
+  value: number;
+  discountAmount: number;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (item: Omit<CartItem, "quantity">) => void;
-  removeItem: (itemId: string) => void;
-  updateQuantity: (itemId: string, quantity: number) => void;
+  addItem: (product: Product, quantity: number) => void;
+  removeItem: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
-  itemCount: number;
+  discount: Discount | null;
+  applyDiscount: (code: string) => Promise<void>;
+  removeDiscount: () => void;
   subtotal: number;
+  total: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
+export const CartProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [discount, setDiscount] = useState<Discount | null>(null);
 
-  const addItem = useCallback((newItem: Omit<CartItem, "quantity">) => {
+  const subtotal = useMemo(() => {
+    return items.reduce((total, item) => {
+      return total + item.product.price * item.quantity;
+    }, 0);
+  }, [items]);
+
+  const total = useMemo(() => {
+    if (!discount) return subtotal;
+    return Math.max(0, subtotal - discount.discountAmount);
+  }, [subtotal, discount]);
+
+  const addItem = (product: Product, quantity: number) => {
     setItems((currentItems) => {
-      const existingItem = currentItems.find((item) => item.id === newItem.id);
+      const existingItem = currentItems.find(
+        (item) => item.product.id === product.id,
+      );
 
       if (existingItem) {
         return currentItems.map((item) =>
-          item.id === newItem.id
-            ? { ...item, quantity: item.quantity + 1 }
+          item.product.id === product.id
+            ? { ...item, quantity: item.quantity + quantity }
             : item,
         );
       }
 
-      return [...currentItems, { ...newItem, quantity: 1 }];
+      return [...currentItems, { product, quantity }];
     });
-  }, []);
+  };
 
-  const removeItem = useCallback((itemId: string) => {
+  const removeItem = (productId: string) => {
     setItems((currentItems) =>
-      currentItems.filter((item) => item.id !== itemId),
+      currentItems.filter((item) => item.product.id !== productId),
     );
-  }, []);
+  };
 
-  const updateQuantity = useCallback((itemId: string, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number) => {
+    if (quantity < 1) {
+      removeItem(productId);
+      return;
+    }
+
     setItems((currentItems) =>
       currentItems.map((item) =>
-        item.id === itemId ? { ...item, quantity } : item,
+        item.product.id === productId ? { ...item, quantity } : item,
       ),
     );
-  }, []);
+  };
 
-  const clearCart = useCallback(() => {
+  const clearCart = () => {
     setItems([]);
+    setDiscount(null);
+  };
+
+  const applyDiscount = async (code: string) => {
+    try {
+      const response = await fetch("/api/discount-codes/validate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          code,
+          cartTotal: subtotal,
+          items,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to apply discount code");
+      }
+
+      setDiscount(data.discount);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+      throw new Error("Failed to apply discount code");
+    }
+  };
+
+  const removeDiscount = () => {
+    setDiscount(null);
+  };
+
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    const savedCart = localStorage.getItem("cart");
+    if (savedCart) {
+      try {
+        const { items: savedItems, discount: savedDiscount } =
+          JSON.parse(savedCart);
+        setItems(savedItems);
+        setDiscount(savedDiscount);
+      } catch (error) {
+        console.error("Failed to load cart from localStorage:", error);
+      }
+    }
   }, []);
 
-  const itemCount = items.reduce((total, item) => total + item.quantity, 0);
-
-  const subtotal = items.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0,
-  );
+  // Save cart to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify({ items, discount }));
+  }, [items, discount]);
 
   return (
     <CartContext.Provider
@@ -74,19 +156,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         removeItem,
         updateQuantity,
         clearCart,
-        itemCount,
+        discount,
+        applyDiscount,
+        removeDiscount,
         subtotal,
+        total,
       }}
     >
       {children}
     </CartContext.Provider>
   );
-}
+};
 
-export function useCart() {
+export const useCart = () => {
   const context = useContext(CartContext);
   if (context === undefined) {
     throw new Error("useCart must be used within a CartProvider");
   }
   return context;
-}
+};

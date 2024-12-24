@@ -10,7 +10,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://payload-templates.com"),
+  metadataBase: new URL("https://payload-templates.vercel.app"),
   title: {
     default: "Payload Templates - Digital Assets Marketplace",
     template: "%s | Payload Templates",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://payload-templates.com",
+    url: "https://payload-templates.vercel.app",
     siteName: "Payload Templates",
     title: "Payload Templates - Digital Assets Marketplace",
     description:
@@ -49,7 +49,7 @@ interface LayoutProps {
 export default function RootLayout({ children, modal }: LayoutProps) {
   return (
     <html lang="en" className={inter.className} suppressHydrationWarning>
-      <body suppressHydrationWarning>
+      <body>
         <Providers>
           <div className="min-h-screen bg-background antialiased">
             <Navbar />
