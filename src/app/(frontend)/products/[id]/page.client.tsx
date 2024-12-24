@@ -264,11 +264,9 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
   const { toast } = useToast();
   const { addItem } = useCart();
   const { user } = useAuth();
-  const [currentProduct, setCurrentProduct] =
-    useState<ExtendedProduct>(product);
   const [isWishListed, setIsWishListed] = useState(false);
 
-  const isOwner = user?.id === currentProduct.user?.id;
+  const isOwner = user?.id === product.user?.id;
 
   const handleQuantityChange = (value: number) => {
     const newQuantity = Math.max(1, value);
@@ -276,10 +274,10 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
   };
 
   const handleAddToCart = () => {
-    addItem(currentProduct, quantity);
+    addItem(product, quantity);
     toast({
       title: "Added to Cart",
-      description: `${quantity} × ${currentProduct.name} added to your cart`,
+      description: `${quantity} × ${product.name} added to your cart`,
     });
   };
 
@@ -304,7 +302,7 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
         body: JSON.stringify({
           items: [
             {
-              productId: currentProduct.id,
+              productId: product.id,
               quantity: quantity,
             },
           ],
@@ -319,6 +317,7 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
 
       // Redirect to Stripe Checkout
       window.location.href = url;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({
         title: "Checkout Error",
@@ -332,8 +331,8 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
   const handleShare = async () => {
     try {
       await navigator.share({
-        title: currentProduct.name,
-        text: currentProduct.description,
+        title: product.name,
+        text: product.description,
         url: window.location.href,
       });
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -351,8 +350,8 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
     toast({
       title: isWishListed ? "Removed from Wishlist" : "Added to Wishlist",
       description: isWishListed
-        ? `${currentProduct.name} removed from your wishlist`
-        : `${currentProduct.name} added to your wishlist`,
+        ? `${product.name} removed from your wishlist`
+        : `${product.name} added to your wishlist`,
     });
   };
 
@@ -361,16 +360,14 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
       {/* Breadcrumb - can be implemented later */}
       <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2">
         {/* Product Images */}
-        <ProductImageCarousel product={currentProduct} />
+        <ProductImageCarousel product={product} />
 
         {/* Product Info */}
         <div className="space-y-6">
           <div>
             <div className="mb-4 flex items-start justify-between">
               <div className="flex-1">
-                <h1 className="mb-2 text-3xl font-bold">
-                  {currentProduct.name}
-                </h1>
+                <h1 className="mb-2 text-3xl font-bold">{product.name}</h1>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center">
                     <div className="flex">
@@ -379,7 +376,7 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
                           key={star}
                           className={cn(
                             "h-4 w-4",
-                            star <= (currentProduct.rating || 0)
+                            star <= (product.rating || 0)
                               ? "fill-yellow-400 text-yellow-400"
                               : "text-muted-foreground/25",
                           )}
@@ -387,17 +384,16 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
                       ))}
                     </div>
                     <span className="ml-2 text-sm text-muted-foreground">
-                      {currentProduct.rating || 0} (
-                      {currentProduct.reviewCount || 0} reviews)
+                      {product.rating || 0} ({product.reviewCount || 0} reviews)
                     </span>
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    {currentProduct.salesCount || 0} sales
+                    {product.salesCount || 0} sales
                   </span>
                 </div>
               </div>
               <div className="flex gap-2">
-                {isOwner && <EditProductDialog product={currentProduct} />}
+                {isOwner && <EditProductDialog product={product} />}
                 <Button
                   variant="ghost"
                   size="icon"
@@ -422,17 +418,15 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
             <div className="mb-6">
               <div className="mb-4 flex items-baseline gap-4">
                 <span className="text-3xl font-bold">
-                  £{currentProduct.price.toFixed(2)}
+                  £{product.price.toFixed(2)}
                 </span>
-                {currentProduct.compareAtPrice && (
+                {product.compareAtPrice && (
                   <span className="text-lg text-muted-foreground line-through">
-                    £{currentProduct.compareAtPrice.toFixed(2)}
+                    £{product.compareAtPrice.toFixed(2)}
                   </span>
                 )}
               </div>
-              <p className="text-muted-foreground">
-                {currentProduct.description}
-              </p>
+              <p className="text-muted-foreground">{product.description}</p>
             </div>
 
             <div className="space-y-4">
@@ -476,13 +470,10 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
 
           <div className="space-y-4">
             <div className="flex flex-wrap gap-2">
-              {currentProduct.category &&
-                typeof currentProduct.category === "object" && (
-                  <Badge variant="secondary">
-                    {currentProduct.category.name}
-                  </Badge>
-                )}
-              {currentProduct.technology?.map(
+              {product.category && typeof product.category === "object" && (
+                <Badge variant="secondary">{product.category.name}</Badge>
+              )}
+              {product.technology?.map(
                 (tech) =>
                   typeof tech !== "string" && (
                     <Badge key={tech.id} variant="outline">
@@ -510,15 +501,15 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
               <div>
                 <span className="text-muted-foreground">Category:</span>
                 <span className="ml-2">
-                  {typeof currentProduct.category === "string"
-                    ? currentProduct.category
-                    : currentProduct.category?.name}
+                  {typeof product.category === "string"
+                    ? product.category
+                    : product.category?.name}
                 </span>
               </div>
               <div>
                 <span className="text-muted-foreground">License:</span>
                 <span className="ml-2">
-                  {currentProduct.licensingOptions
+                  {product.licensingOptions
                     ?.split("-")
                     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                     .join(" ")}
@@ -526,15 +517,11 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
               </div>
               <div>
                 <span className="text-muted-foreground">Created:</span>
-                <span className="ml-2">
-                  {formatDate(currentProduct.createdAt)}
-                </span>
+                <span className="ml-2">{formatDate(product.createdAt)}</span>
               </div>
               <div>
                 <span className="text-muted-foreground">Last Updated:</span>
-                <span className="ml-2">
-                  {formatDate(currentProduct.updatedAt)}
-                </span>
+                <span className="ml-2">{formatDate(product.updatedAt)}</span>
               </div>
             </div>
           </div>
@@ -551,9 +538,9 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
                 <Button variant="outline">Write a Review</Button>
               )}
             </div>
-            {currentProduct.reviews && currentProduct.reviews.length > 0 ? (
+            {product.reviews && product.reviews.length > 0 ? (
               <div className="space-y-6">
-                {currentProduct.reviews.map((review, index) => (
+                {product.reviews.map((review, index) => (
                   <div key={index} className="space-y-2">
                     <div className="flex items-center gap-2">
                       <div className="flex">

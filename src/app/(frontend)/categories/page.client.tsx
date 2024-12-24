@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Category } from "@/payload-types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Category } from "@/payload-types";
 import { Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 const CategoriesPageClient = ({ categories }: { categories: Category[] }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,9 +20,7 @@ const CategoriesPageClient = ({ categories }: { categories: Category[] }) => {
       {/* Header */}
       <div className="container relative">
         <div className="pt-12">
-          <h1 className="text-4xl font-bold md:text-5xl">
-            Browse Categories
-          </h1>
+          <h1 className="text-4xl font-bold md:text-5xl">Browse Categories</h1>
           <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
             Explore our curated collection of digital assets across various
             categories

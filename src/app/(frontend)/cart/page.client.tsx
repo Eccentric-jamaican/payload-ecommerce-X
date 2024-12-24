@@ -1,6 +1,8 @@
 "use client";
 
-import { useCart } from "@/providers/CartProvider";
+import { getAuthToken } from "@/actions/auth";
+import { DiscountCode } from "@/components/cart/DiscountCode";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -10,25 +12,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useToast } from "@/components/ui/use-toast";
+import { formatPrice } from "@/lib/utils";
+import { useAuth } from "@/providers/AuthProvider";
+import { useCart } from "@/providers/CartProvider";
 import {
-  Trash2,
-  MinusCircle,
-  PlusCircle,
-  ShieldIcon,
   ArrowRight,
   Clock,
   CreditCard,
+  MinusCircle,
+  PlusCircle,
   Shield,
+  Trash2,
   X,
 } from "lucide-react";
 import Image from "next/image";
-import { formatPrice } from "@/lib/utils";
 import Link from "next/link";
-import { useToast } from "@/components/ui/use-toast";
-import { useAuth } from "@/providers/AuthProvider";
-import { getAuthToken } from "@/actions/auth";
-import { DiscountCode } from "@/components/cart/DiscountCode";
-import { Badge } from "@/components/ui/badge";
 
 const CartPageClient = () => {
   const { items, removeItem, updateQuantity, subtotal, total, discount } =
@@ -355,7 +354,7 @@ const CartPageClient = () => {
                         </Link>
                       </Button>
                       <p className="text-center text-sm text-muted-foreground">
-                        Don't have an account?{" "}
+                        Don&apos;t have an account?{" "}
                         <Link
                           href={`/signup?redirect=${encodeURIComponent("/cart")}`}
                           className="font-medium text-primary hover:underline"

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPayload } from "payload";
 import configPromise from "@/payload.config";
+import { CartItem } from "@/providers/CartProvider";
 
 export async function POST(req: Request) {
   try {
@@ -89,7 +90,7 @@ export async function POST(req: Request) {
       const applicableProducts = new Set();
       const applicableCategories = new Set();
 
-      discountCode.appliesTo.forEach((item: any) => {
+      discountCode.appliesTo.forEach((item) => {
         if (item.relationTo === "products") {
           applicableProducts.add(item.value);
         } else if (item.relationTo === "categories") {
@@ -98,7 +99,7 @@ export async function POST(req: Request) {
       });
 
       // Filter cart items and recalculate discount
-      const applicableTotal = items.reduce((total: number, item: any) => {
+      const applicableTotal = items.reduce((total: number, item: CartItem) => {
         if (
           applicableProducts.has(item.product.id) ||
           (item.product.category &&

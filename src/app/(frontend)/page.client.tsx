@@ -38,7 +38,7 @@ const HomePageClient: FC<HomePageClientProps> = ({
       rootMargin: "-100px 0px",
     };
 
-    const createObserver = (selector: string) => {
+    const createObserver = () => {
       return new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -49,7 +49,7 @@ const HomePageClient: FC<HomePageClientProps> = ({
     };
 
     // Products observer
-    const productsObserver = createObserver(".product-card");
+    const productsObserver = createObserver();
     const productCards = productsRef.current?.querySelectorAll(".product-card");
     productCards?.forEach((card, index) => {
       (card as HTMLElement).style.opacity = "0";
@@ -58,7 +58,7 @@ const HomePageClient: FC<HomePageClientProps> = ({
     });
 
     // Categories observer
-    const categoriesObserver = createObserver(".category-card");
+    const categoriesObserver = createObserver();
     const categoryCards =
       categoriesRef.current?.querySelectorAll(".category-card");
     categoryCards?.forEach((card, index) => {

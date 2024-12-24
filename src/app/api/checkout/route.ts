@@ -174,6 +174,7 @@ async function getOrCreatePercentageCoupon(
     // Try to retrieve existing coupon
     const existingCoupon = await stripe.coupons.retrieve(couponId);
     return existingCoupon.id;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     // Create new coupon if it doesn't exist
     const coupon = await stripe.coupons.create({
