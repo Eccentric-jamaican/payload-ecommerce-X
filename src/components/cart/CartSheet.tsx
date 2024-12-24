@@ -3,7 +3,7 @@
 import { FC } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingBag, X } from "lucide-react";
+import { ArrowRight, ShoppingBag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -198,13 +198,33 @@ export const CartSheet: FC<CartSheetProps> = ({ children }) => {
             </p>
             <div className="flex flex-col gap-2">
               {user ? (
-                <Button className="w-full" onClick={handleCheckout}>
-                  Checkout
+                <Button
+                  className="group w-full"
+                  size="lg"
+                  onClick={handleCheckout}
+                >
+                  Proceed to Checkout
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
               ) : (
-                <Button className="w-full" asChild>
-                  <Link href="/sign-in">Sign in to Checkout</Link>
-                </Button>
+                <div className="space-y-3">
+                  <Button className="w-full" asChild size="lg">
+                    <Link
+                      href={`/signin?redirect=${encodeURIComponent("/cart")}`}
+                    >
+                      Login to Checkout
+                    </Link>
+                  </Button>
+                  <p className="text-center text-sm text-muted-foreground">
+                    Don&apos;t have an account?{" "}
+                    <Link
+                      href={`/signup?redirect=${encodeURIComponent("/cart")}`}
+                      className="font-medium text-primary hover:underline"
+                    >
+                      Sign up
+                    </Link>
+                  </p>
+                </div>
               )}
               <SheetClose asChild>
                 <Button variant="outline" className="w-full">
