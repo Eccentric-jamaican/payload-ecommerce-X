@@ -215,8 +215,8 @@ const HomePageClient: FC<HomePageClientProps> = ({
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center">
-                          <span className="text-5xl font-bold text-muted-foreground/30">
-                            {category.name[0].toUpperCase()}
+                          <span className="text-4xl text-muted-foreground/30">
+                            {category.name[0]}
                           </span>
                         </div>
                       )}

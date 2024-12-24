@@ -22,7 +22,8 @@ const config: Config = {
           xl: "1rem",
         },
         screens: {
-          xl: "84rem",
+          xl: "100rem",
+          sm: "100rem",
         },
       },
       borderRadius: {
