@@ -90,7 +90,7 @@ const HomePageClient: FC<HomePageClientProps> = ({
       <section className="relative overflow-hidden bg-black">
         <div className="absolute inset-0 bg-[url('/images/hero-pattern.jpg')] bg-cover bg-fixed bg-center opacity-50 transition-opacity duration-700 hover:opacity-40" />
         <div className="absolute inset-0 bg-gradient-to-br from-black via-black/80 to-purple-900/30" />
-        <div className="container relative mx-auto py-32 lg:py-48">
+        <div className="container relative mx-auto pb-32 pt-16 lg:py-48">
           <div className="max-w-4xl space-y-8">
             <div className="animate-fade-in-up">
               <Badge
@@ -100,26 +100,26 @@ const HomePageClient: FC<HomePageClientProps> = ({
                 🔥 New Collection Available
               </Badge>
             </div>
-            <div className="animate-fade-in-up animation-delay-200">
-              <h1 className="text-5xl font-bold tracking-tight text-white lg:text-7xl xl:text-8xl">
+            <div className="animation-delay-200 animate-fade-in-up">
+              <h1 className="text-3xl font-bold tracking-tight text-white md:text-5xl lg:text-7xl xl:text-8xl">
                 Thousands Of Design Assets Ready To{" "}
-                <span className="relative">
+                <span className="relative inline-block">
+                  <span className="relative z-10">Download</span>
                   <span
-                    className="absolute -inset-1 block -skew-y-3 bg-gradient-to-r from-purple-600 to-pink-600"
+                    className="absolute inset-0 z-0 -skew-y-2 bg-gradient-to-r from-purple-500 to-pink-500"
                     aria-hidden="true"
                   />
-                  <span className="relative text-white">Download</span>
                 </span>
               </h1>
             </div>
-            <div className="animate-fade-in-up animation-delay-400">
+            <div className="animation-delay-400 animate-fade-in-up">
               <p className="max-w-2xl text-xl leading-relaxed text-gray-300">
                 Discover curated products that blend style with innovation. Join
                 thousands of satisfied customers worldwide and transform your
                 projects.
               </p>
             </div>
-            <div className="animate-fade-in-up animation-delay-600 flex flex-wrap gap-4 pt-6">
+            <div className="animation-delay-600 flex animate-fade-in-up flex-wrap gap-4 pt-6">
               <Button
                 size="lg"
                 className="transform bg-white text-black transition-all duration-300 hover:scale-105 hover:bg-gray-100"
@@ -139,9 +139,9 @@ const HomePageClient: FC<HomePageClientProps> = ({
         </div>
       </section>
 
-      <section className="relative -mt-8">
-        <div className="container mx-auto">
-          <Card className="transform shadow-2xl transition-all duration-300 hover:scale-[1.01]">
+      <section className="relative -mt-16">
+        <div className="container mx-auto overflow-visible pb-24">
+          <Card className="shadow-2xl">
             <CardContent className="p-8">
               <div className="grid gap-8 md:grid-cols-[2fr,1fr,1fr,1fr]">
                 <div className="flex items-center gap-4">
@@ -150,7 +150,7 @@ const HomePageClient: FC<HomePageClientProps> = ({
                     <Input
                       type="search"
                       placeholder="Search for products..."
-                      className="border-gray-200 pl-10 pr-4 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
+                      className="h-12 w-full pl-10 pr-4 text-base placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-primary"
                     />
                   </div>
                   <Button className="shrink-0 transform transition-all duration-300 hover:scale-105">
@@ -160,7 +160,7 @@ const HomePageClient: FC<HomePageClientProps> = ({
                 {stats.map((stat, index) => (
                   <div
                     key={stat.label}
-                    className="animate-fade-in-up flex items-center gap-4"
+                    className="flex animate-fade-in-up items-center gap-4"
                     style={{ animationDelay: `${(index + 1) * 100}ms` }}
                   >
                     <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 transition-transform duration-300 hover:scale-110">
@@ -182,58 +182,51 @@ const HomePageClient: FC<HomePageClientProps> = ({
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="container mx-auto">
-          <div className="mb-12 flex items-center justify-between">
-            <div>
-              <h2 className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-3xl font-bold text-transparent">
-                Trending Categories
-              </h2>
-              <p className="mt-2 text-muted-foreground">
-                Explore our most popular categories
-              </p>
-            </div>
-            <Link href="/categories">
-              <Button variant="ghost" className="group">
-                View All Categories{" "}
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-              </Button>
-            </Link>
+      <section className="relative bg-dot-pattern py-24">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/30 to-background" />
+        <div className="container relative mx-auto">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-4xl font-bold md:text-5xl">
+              Trending Categories
+            </h2>
+            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+              Explore our most popular categories and discover high-quality
+              digital assets
+            </p>
           </div>
           <div
             ref={categoriesRef}
-            className="grid grid-cols-2 gap-6 md:grid-cols-4"
+            className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4"
           >
             {initialCategories.map((category) => (
               <Link href={`/categories/${category.slug}`} key={category.id}>
-                <Card className="category-card group cursor-pointer overflow-hidden opacity-0 transition-all duration-300 hover:shadow-xl">
-                  <CardContent className="p-4 md:p-6">
-                    <div className="relative mb-4">
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/5 via-primary/10 to-primary/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                      <div className="flex aspect-square items-center justify-center rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 transition-transform duration-300 group-hover:scale-[1.02]">
-                        {category.icon &&
-                        typeof category.icon !== "string" &&
-                        category.icon.url ? (
-                          <div className="relative h-16 w-16 transform transition-transform duration-300 group-hover:scale-110">
-                            <Image
-                              src={category.icon.url}
-                              alt={category.name}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                        ) : (
-                          <div className="text-4xl text-primary/80 transition-transform duration-300 group-hover:scale-110">
-                            {category.name[0]}
-                          </div>
-                        )}
-                      </div>
+                <Card className="category-card group overflow-hidden border-0 bg-card opacity-0 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10">
+                  <CardContent className="p-0">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                      {category.icon &&
+                      typeof category.icon !== "string" &&
+                      category.icon.url ? (
+                        <Image
+                          src={category.icon.url}
+                          alt={category.name}
+                          fill
+                          className="object-cover transition-all duration-700 group-hover:scale-110"
+                          sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center">
+                          <span className="text-5xl font-bold text-muted-foreground/30">
+                            {category.name[0].toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     </div>
-                    <div className="space-y-2">
-                      <h3 className="font-semibold text-gray-900 transition-colors duration-300 group-hover:text-primary">
+                    <div className="p-6">
+                      <h3 className="text-lg font-semibold transition-colors duration-300 group-hover:text-primary">
                         {category.name}
                       </h3>
-                      <p className="line-clamp-2 text-sm text-muted-foreground">
+                      <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
                         {category.description ||
                           `Explore ${category.name} products`}
                       </p>
@@ -246,39 +239,29 @@ const HomePageClient: FC<HomePageClientProps> = ({
         </div>
       </section>
 
-      <section className="bg-gray-50 py-20">
-        <div className="container mx-auto">
-          <div className="animate-fade-in-up mb-12 flex items-center justify-between">
-            <div>
-              <h2 className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-3xl font-bold text-transparent">
-                Featured Products
-              </h2>
-              <p className="mt-2 text-muted-foreground">
-                Handpicked by our curators
-              </p>
-            </div>
-            <Link href="/products">
-              <Button variant="ghost" className="group">
-                View All Products{" "}
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-              </Button>
-            </Link>
+      <section className="relative bg-dot-pattern py-24">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/30 to-background" />
+        <div className="container relative mx-auto">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-4xl font-bold md:text-5xl">
+              Featured Products
+            </h2>
+            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+              Discover our handpicked selection of premium digital assets
+            </p>
           </div>
           <div
             ref={productsRef}
-            className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-4"
+            className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4"
           >
-            {initialProducts.map((product, index) => (
+            {initialProducts.map((product) => (
               <Card
                 key={product.id}
-                className="product-card group overflow-hidden opacity-0 transition-all duration-500 hover:shadow-xl"
-                style={{
-                  transform: "perspective(1000px)",
-                }}
+                className="product-card group overflow-hidden border-0 bg-card opacity-0 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10"
               >
                 <CardContent className="p-0">
                   <Link href={`/products/${product.id}`}>
-                    <div className="relative aspect-square overflow-hidden bg-gray-100">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                       {product.previewImages?.[0]?.image &&
                       typeof product.previewImages[0].image !== "string" &&
                       product.previewImages[0].image.url ? (
@@ -286,51 +269,53 @@ const HomePageClient: FC<HomePageClientProps> = ({
                           src={product.previewImages[0].image.url}
                           alt={product.name}
                           fill
-                          className="object-cover transition-transform duration-700 group-hover:scale-110"
+                          className="object-cover transition-all duration-700 group-hover:scale-110"
                           sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center">
-                          <p className="text-muted-foreground">
-                            No image available
-                          </p>
+                          <span className="text-4xl text-muted-foreground/30">
+                            {product.name[0]}
+                          </span>
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                      <div className="absolute right-3 top-3 flex gap-2 transition-transform duration-300 group-hover:-translate-y-1">
-                        <Button
-                          size="icon"
-                          className="h-8 w-8 rounded-full shadow-lg backdrop-blur-md"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleCartAction(product);
-                          }}
-                          variant={
-                            isInCart(product.id) ? "default" : "secondary"
-                          }
-                        >
-                          {isInCart(product.id) ? (
-                            <Check className="h-4 w-4" />
-                          ) : (
-                            <ShoppingBag className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                      <Button
+                        size="icon"
+                        className="absolute right-4 top-4 h-8 w-8 translate-y-2 rounded-full opacity-0 shadow-lg backdrop-blur-md transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleCartAction(product);
+                        }}
+                        variant={isInCart(product.id) ? "default" : "secondary"}
+                      >
+                        {isInCart(product.id) ? (
+                          <Check className="h-4 w-4" />
+                        ) : (
+                          <ShoppingBag className="h-4 w-4" />
+                        )}
+                      </Button>
                     </div>
                   </Link>
-                  <div className="p-4">
-                    <Link href={`/products/${product.id}`}>
-                      <h3 className="font-semibold transition-colors duration-300 hover:underline group-hover:text-primary">
+                  <div className="p-6">
+                    <Link
+                      href={`/products/${product.id}`}
+                      className="group/title"
+                    >
+                      <h3 className="text-lg font-semibold transition-colors duration-300 group-hover/title:text-primary">
                         {product.name}
                       </h3>
                     </Link>
-                    <p className="mb-2 line-clamp-2 text-sm text-muted-foreground">
+                    <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
                       {product.description}
                     </p>
-                    <div className="flex items-center justify-between">
-                      <p className="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-lg font-semibold text-transparent">
+                    <div className="mt-4 flex items-center justify-between">
+                      <span className="text-lg font-semibold text-foreground">
                         {formatPrice(product.price)}
-                      </p>
+                      </span>
+                      <Badge variant="secondary" className="font-medium">
+                        {product.productType.split("-").join(" ")}
+                      </Badge>
                     </div>
                   </div>
                 </CardContent>

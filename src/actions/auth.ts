@@ -4,6 +4,7 @@ import configPromise from "@/payload.config";
 import { cookies, headers } from "next/headers";
 import { getPayload } from "payload";
 import { User } from "@/payload-types";
+import { getServerUrl } from "@/lib/utils";
 
 export async function setCookie(token: string, exp: number) {
   (await cookies()).set("payload-token", token, {
@@ -37,9 +38,9 @@ export async function login(
       },
     });
 
-    if (result.user.role === "admin") {
-      throw new Error("Login failed");
-    }
+    // if (result.user.role === "admin") {
+    //   throw new Error("Login failed");
+    // }
 
     if (!result.token || !result.exp) {
       throw new Error("Invalid login response");
@@ -110,16 +111,13 @@ export async function logout(): Promise<{ success: boolean }> {
 
     if (token) {
       // Use the REST API endpoint for logout
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/logout`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `JWT ${token}`,
-          },
+      const res = await fetch(`${getServerUrl()}/api/users/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `JWT ${token}`,
         },
-      );
+      });
 
       if (!res.ok) {
         throw new Error("Failed to logout");

@@ -46,20 +46,20 @@ interface LayoutProps {
   modal: ReactNode;
 }
 
-const Layout: FC<LayoutProps> = ({ children, modal }) => {
+export default function RootLayout({ children, modal }: LayoutProps) {
   return (
-    <Providers>
-      <html lang="en" className={inter.className}>
-        <body className="min-h-screen bg-background">
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-          <Toaster />
-          {modal}
-        </body>
-      </html>
-    </Providers>
+    <html lang="en" className={inter.className} suppressHydrationWarning>
+      <body suppressHydrationWarning>
+        <Providers>
+          <div className="min-h-screen bg-background antialiased">
+            <Navbar />
+            <main>{children}</main>
+            <Footer />
+            <Toaster />
+            {modal}
+          </div>
+        </Providers>
+      </body>
+    </html>
   );
-};
-
-export default Layout;
+}

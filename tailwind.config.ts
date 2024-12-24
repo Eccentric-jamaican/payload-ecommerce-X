@@ -92,6 +92,13 @@ const config: Config = {
         "400": "400ms",
         "600": "600ms",
       },
+      backgroundImage: {
+        "dot-pattern":
+          "radial-gradient(circle, hsl(var(--muted-foreground) / 0.2) 1px, transparent 1px)",
+      },
+      backgroundSize: {
+        "dot-pattern": "24px 24px",
+      },
     },
   },
   plugins: [typography, forms, animate],

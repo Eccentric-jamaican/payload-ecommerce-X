@@ -6,38 +6,43 @@ import { FC } from "react";
 
 const Footer: FC = () => {
   return (
-    <footer className="border-t bg-white">
-      <div className="container mx-auto py-12">
+    <footer className="relative border-t bg-dot-pattern">
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/30 to-background" />
+      <div className="container relative py-12 md:py-16">
         {/* Newsletter Section */}
-        <div className="mb-12 grid gap-8 lg:grid-cols-2 lg:gap-16">
+        <div className="mb-16 grid gap-8 rounded-2xl border bg-card/50 p-8 backdrop-blur-sm lg:grid-cols-2 lg:gap-12">
           <div>
-            <h3 className="text-2xl font-bold">Stay in the loop</h3>
-            <p className="mt-2 text-muted-foreground">
+            <h3 className="text-2xl font-semibold sm:text-3xl">
+              Stay in the loop
+            </h3>
+            <p className="mt-3 text-muted-foreground">
               Subscribe to our newsletter for updates, exclusive offers, and
               early access to new products.
             </p>
           </div>
           <div className="flex items-center">
-            <div className="flex w-full max-w-md gap-2">
+            <div className="flex w-full max-w-md gap-3">
               <Input
                 type="email"
                 placeholder="Enter your email"
-                className="flex-1"
+                className="flex-1 bg-background/50 h-11"
               />
-              <Button>Subscribe</Button>
+              <Button className="h-11 px-6">Subscribe</Button>
             </div>
           </div>
         </div>
 
         {/* Main Footer Content */}
-        <div className="grid gap-8 border-t pt-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-16 grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <h4 className="mb-4 text-lg font-semibold">About</h4>
-            <ul className="space-y-3 text-sm">
+            <h4 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+              About
+            </h4>
+            <ul className="space-y-2.5">
               <li>
                 <Link
                   href="/about"
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
                 >
                   About Us
                 </Link>
@@ -45,7 +50,7 @@ const Footer: FC = () => {
               <li>
                 <Link
                   href="/careers"
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
                 >
                   Careers
                 </Link>
@@ -53,7 +58,7 @@ const Footer: FC = () => {
               <li>
                 <Link
                   href="/press"
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
                 >
                   Press
                 </Link>
@@ -62,12 +67,14 @@ const Footer: FC = () => {
           </div>
 
           <div>
-            <h4 className="mb-4 text-lg font-semibold">Support</h4>
-            <ul className="space-y-3 text-sm">
+            <h4 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+              Support
+            </h4>
+            <ul className="space-y-2.5">
               <li>
                 <Link
                   href="/help"
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
                 >
                   Help Center
                 </Link>
@@ -75,7 +82,7 @@ const Footer: FC = () => {
               <li>
                 <Link
                   href="/contact"
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
                 >
                   Contact Us
                 </Link>
@@ -83,7 +90,7 @@ const Footer: FC = () => {
               <li>
                 <Link
                   href="/faq"
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
                 >
                   FAQ
                 </Link>
@@ -92,12 +99,14 @@ const Footer: FC = () => {
           </div>
 
           <div>
-            <h4 className="mb-4 text-lg font-semibold">Legal</h4>
-            <ul className="space-y-3 text-sm">
+            <h4 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+              Legal
+            </h4>
+            <ul className="space-y-2.5">
               <li>
                 <Link
                   href="/privacy"
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
                 >
                   Privacy Policy
                 </Link>
@@ -105,7 +114,7 @@ const Footer: FC = () => {
               <li>
                 <Link
                   href="/terms"
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
                 >
                   Terms of Service
                 </Link>
@@ -113,7 +122,7 @@ const Footer: FC = () => {
               <li>
                 <Link
                   href="/cookies"
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
                 >
                   Cookie Policy
                 </Link>
@@ -122,42 +131,44 @@ const Footer: FC = () => {
           </div>
 
           <div>
-            <h4 className="mb-4 text-lg font-semibold">Connect</h4>
-            <div className="flex space-x-4">
+            <h4 className="mb-4 text-sm font-medium uppercase tracking-wider">
+              Connect
+            </h4>
+            <div className="mb-6 flex space-x-3">
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
-                className="hover:text-primary"
+                className="h-9 w-9 rounded-full hover:bg-primary hover:text-primary-foreground"
               >
-                <Facebook className="h-6 w-6" />
+                <Facebook className="h-4 w-4" />
               </Button>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
-                className="hover:text-primary"
+                className="h-9 w-9 rounded-full hover:bg-primary hover:text-primary-foreground"
               >
-                <Twitter className="h-6 w-6" />
+                <Twitter className="h-4 w-4" />
               </Button>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
-                className="hover:text-primary"
+                className="h-9 w-9 rounded-full hover:bg-primary hover:text-primary-foreground"
               >
-                <Instagram className="h-6 w-6" />
+                <Instagram className="h-4 w-4" />
               </Button>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
-                className="hover:text-primary"
+                className="h-9 w-9 rounded-full hover:bg-primary hover:text-primary-foreground"
               >
-                <Youtube className="h-6 w-6" />
+                <Youtube className="h-4 w-4" />
               </Button>
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Contact us at:{" "}
               <a
                 href="mailto:support@marketplace.com"
-                className="text-primary hover:underline"
+                className="text-primary transition-colors hover:text-primary/90 hover:underline"
               >
                 support@marketplace.com
               </a>
@@ -166,31 +177,29 @@ const Footer: FC = () => {
         </div>
 
         {/* Bottom Bar */}
-        <BottomBar />
+        <div className="flex flex-col items-center justify-between gap-6 border-t py-8 text-center sm:flex-row sm:gap-4 sm:text-left">
+          <p className="text-sm text-muted-foreground">
+            &copy; 2024 Marketplace. All rights reserved.
+          </p>
+          <div className="flex items-center space-x-6 text-sm">
+            <Link
+              href="/sitemap"
+              className="text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Sitemap
+            </Link>
+            <span className="text-muted-foreground/40">•</span>
+            <Link
+              href="/accessibility"
+              className="text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Accessibility
+            </Link>
+          </div>
+        </div>
       </div>
     </footer>
   );
 };
 
 export default Footer;
-
-const BottomBar: FC = async () => {
-  return (
-    <div className="mt-8 border-t pt-8">
-      <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-        <p className="text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Marketplace. All rights reserved.
-        </p>
-        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-          <Link href="/sitemap" className="hover:text-foreground">
-            Sitemap
-          </Link>
-          <span>•</span>
-          <Link href="/accessibility" className="hover:text-foreground">
-            Accessibility
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-};

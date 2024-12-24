@@ -186,7 +186,7 @@ export const CartSheet: FC<CartSheetProps> = ({ children }) => {
             )}
           </div>
 
-          <div className="border-t bg-white px-6 py-4">
+          <div className="border-t bg-card px-6 py-4">
             <div className="mb-4 flex items-center justify-between">
               <span className="text-sm font-medium">Subtotal</span>
               <span className="text-sm font-medium">
@@ -198,52 +198,17 @@ export const CartSheet: FC<CartSheetProps> = ({ children }) => {
             </p>
             <div className="flex flex-col gap-2">
               {user ? (
-                <SheetClose asChild>
-                  <Button
-                    className="w-full"
-                    onClick={handleCheckout}
-                    disabled={items.length === 0}
-                  >
-                    Checkout
-                  </Button>
-                </SheetClose>
+                <Button className="w-full" onClick={handleCheckout}>
+                  Checkout
+                </Button>
               ) : (
-                <div className="flex flex-col gap-2">
-                  <SheetClose asChild>
-                    <Button
-                      className="w-full"
-                      asChild
-                      disabled={items.length === 0}
-                    >
-                      <Link
-                        href={`/signin?redirect=${encodeURIComponent("/cart")}`}
-                      >
-                        Login to Checkout
-                      </Link>
-                    </Button>
-                  </SheetClose>
-                  <p className="text-center text-sm text-muted-foreground">
-                    or{" "}
-                    <SheetClose asChild>
-                      <Link
-                        href={`/signup?redirect=${encodeURIComponent("/cart")}`}
-                        className="text-primary hover:underline"
-                      >
-                        create an account
-                      </Link>
-                    </SheetClose>
-                  </p>
-                </div>
+                <Button className="w-full" asChild>
+                  <Link href="/sign-in">Sign in to Checkout</Link>
+                </Button>
               )}
               <SheetClose asChild>
-                <Button
-                  asChild
-                  variant="secondary"
-                  disabled={items.length === 0}
-                >
-                  <Link href="/cart" className="w-full">
-                    View Cart
-                  </Link>
+                <Button variant="outline" className="w-full">
+                  Continue Shopping
                 </Button>
               </SheetClose>
             </div>

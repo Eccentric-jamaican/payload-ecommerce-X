@@ -357,7 +357,7 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
   };
 
   return (
-    <main className="container mx-auto py-8">
+    <main className="container py-8">
       {/* Breadcrumb - can be implemented later */}
       <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2">
         {/* Product Images */}
@@ -381,7 +381,7 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
                             "h-4 w-4",
                             star <= (currentProduct.rating || 0)
                               ? "fill-yellow-400 text-yellow-400"
-                              : "text-gray-300",
+                              : "text-muted-foreground/25",
                           )}
                         />
                       ))}
@@ -397,30 +397,20 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
                 </div>
               </div>
               <div className="flex gap-2">
-                {isOwner && (
-                  <EditProductDialog
-                    product={currentProduct}
-                    onSuccess={(updatedProduct) =>
-                      setCurrentProduct(updatedProduct as ExtendedProduct)
-                    }
-                  />
-                )}
+                {isOwner && <EditProductDialog product={currentProduct} />}
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="icon"
-                  onClick={handleShare}
                   className="h-10 w-10"
+                  onClick={handleShare}
                 >
                   <Share2 className="h-5 w-5" />
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="icon"
+                  className={cn("h-10 w-10", isWishListed && "text-red-500")}
                   onClick={toggleWishlist}
-                  className={cn(
-                    "h-10 w-10",
-                    isWishListed && "bg-primary/10 text-primary",
-                  )}
                 >
                   <Heart
                     className={cn("h-5 w-5", isWishListed && "fill-current")}
@@ -429,49 +419,38 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
               </div>
             </div>
 
-            <div className="space-y-4 rounded-lg border bg-card p-6">
-              <div className="flex items-baseline justify-between">
-                <div>
-                  <div className="text-3xl font-bold text-primary">
-                    £{currentProduct.price.toFixed(2)}
-                  </div>
-                  {currentProduct.compareAtPrice && (
-                    <div className="text-sm text-muted-foreground line-through">
-                      ${currentProduct.compareAtPrice.toFixed(2)}
-                    </div>
-                  )}
-                </div>
-                <Badge variant="secondary" className="text-sm">
-                  {currentProduct.productType
-                    .split("-")
-                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(" ")}
-                </Badge>
+            <div className="mb-6">
+              <div className="mb-4 flex items-baseline gap-4">
+                <span className="text-3xl font-bold">
+                  £{currentProduct.price.toFixed(2)}
+                </span>
+                {currentProduct.compareAtPrice && (
+                  <span className="text-lg text-muted-foreground line-through">
+                    £{currentProduct.compareAtPrice.toFixed(2)}
+                  </span>
+                )}
               </div>
+              <p className="text-muted-foreground">
+                {currentProduct.description}
+              </p>
+            </div>
 
-              <div>
-                <div className="mb-2 font-semibold">Quantity</div>
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
                     size="icon"
+                    className="h-8 w-8"
                     onClick={() => handleQuantityChange(quantity - 1)}
-                    disabled={quantity <= 1}
                   >
                     <Minus className="h-4 w-4" />
                   </Button>
-                  <input
-                    type="number"
-                    min="1"
-                    value={quantity}
-                    onChange={(e) =>
-                      handleQuantityChange(Number(e.target.value))
-                    }
-                    className="w-16 rounded-lg border p-2 text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                  />
+                  <span className="w-12 text-center">{quantity}</span>
                   <Button
                     variant="outline"
                     size="icon"
+                    className="h-8 w-8"
                     onClick={() => handleQuantityChange(quantity + 1)}
                   >
                     <Plus className="h-4 w-4" />
@@ -480,52 +459,47 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
               </div>
 
               <div className="flex gap-4">
-                <Button className="flex-1" size="lg" onClick={handleBuyNow}>
+                <Button className="flex-1" onClick={handleBuyNow}>
                   Buy Now
                 </Button>
                 <Button
                   variant="outline"
-                  size="lg"
-                  className="flex-1"
+                  className="flex-1 gap-2"
                   onClick={handleAddToCart}
                 >
-                  <ShoppingCart className="mr-2 h-4 w-4" />
+                  <ShoppingCart className="h-4 w-4" />
                   Add to Cart
                 </Button>
               </div>
             </div>
           </div>
 
-          {/* Product Description */}
-          <div className="space-y-4 rounded-lg border bg-card p-6">
-            <div className="space-y-4">
-              <h2 className="text-xl font-bold">Product Description</h2>
-              <div className="prose max-w-none">
-                <p>{currentProduct.description}</p>
-              </div>
+          <div className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+              {currentProduct.category &&
+                typeof currentProduct.category === "object" && (
+                  <Badge variant="secondary">
+                    {currentProduct.category.name}
+                  </Badge>
+                )}
+              {currentProduct.technology?.map(
+                (tech) =>
+                  typeof tech !== "string" && (
+                    <Badge key={tech.id} variant="outline">
+                      {tech.name}
+                    </Badge>
+                  ),
+              )}
             </div>
           </div>
-
-          {currentProduct.technology &&
-            currentProduct.technology.length > 0 && (
-              <div>
-                <h2 className="mb-2 font-semibold">Technologies</h2>
-                <div className="flex flex-wrap gap-2">
-                  {currentProduct.technology.map((tech, index) => (
-                    <Badge key={index} variant="secondary">
-                      {typeof tech === "string" ? tech : tech.name}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
         </div>
       </div>
 
-      {/* Product Features */}
-      <section className="mb-12">
+      {/* Features Section */}
+      <div className="mt-12">
+        <h2 className="mb-6 text-2xl font-semibold">What&apos;s Included</h2>
         <ProductFeatures />
-      </section>
+      </div>
 
       {/* Additional Information */}
       <section className="mb-12">

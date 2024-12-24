@@ -1,5 +1,7 @@
 import { Metadata } from "next";
 import CategoriesPageClient from "./page.client";
+import configPromise from "@/payload.config";
+import { getPayload } from "payload";
 
 export const metadata: Metadata = {
   title: "Categories",
@@ -17,6 +19,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CategoriesPage() {
-  return <CategoriesPageClient />;
-}
+const getBrowsePage = async () => {
+  const payload = await getPayload({ config: configPromise });
+
+  return await payload.find({
+    collection: "categories",
+  });
+};
+
+const CategoriesPage = async () => {
+  const categories = await getBrowsePage();
+
+  return <CategoriesPageClient categories={categories.docs} />;
+};
+
+export default CategoriesPage;
