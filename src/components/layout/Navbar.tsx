@@ -195,7 +195,7 @@ const Navbar: FC = () => {
               </Button>
             </CartSheet>
 
-            <NotificationsSheet>
+            {/* <NotificationsSheet>
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-5 w-5" />
                 {notifications.length > 0 && (
@@ -204,7 +204,7 @@ const Navbar: FC = () => {
                   </span>
                 )}
               </Button>
-            </NotificationsSheet>
+            </NotificationsSheet> */}
 
             {isLoading ? null : user ? (
               <DropdownMenu>
