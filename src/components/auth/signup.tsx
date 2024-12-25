@@ -240,7 +240,7 @@ export const SignUp = () => {
             </Button>
           </form>
         </Form>
-        <div className="relative">
+        {/* <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t dark:border-neutral-800" />
           </div>
@@ -265,7 +265,7 @@ export const SignUp = () => {
           >
             Facebook
           </Button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
