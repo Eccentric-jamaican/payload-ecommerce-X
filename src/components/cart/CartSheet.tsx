@@ -205,21 +205,25 @@ export const CartSheet: FC<CartSheetProps> = ({ children }) => {
                 </Button>
               ) : (
                 <div className="space-y-3">
-                  <Button className="w-full" asChild size="lg">
-                    <Link
-                      href={`/signin?redirect=${encodeURIComponent("/cart")}`}
-                    >
-                      Login to Checkout
-                    </Link>
-                  </Button>
+                  <SheetClose asChild>
+                    <Button className="w-full" asChild size="lg">
+                      <Link
+                        href={`/signin?redirect=${encodeURIComponent("/cart")}`}
+                      >
+                        Login to Checkout
+                      </Link>
+                    </Button>
+                  </SheetClose>
                   <p className="text-center text-sm text-muted-foreground">
                     Don&apos;t have an account?{" "}
-                    <Link
-                      href={`/signup?redirect=${encodeURIComponent("/cart")}`}
-                      className="font-medium text-primary hover:underline"
-                    >
-                      Sign up
-                    </Link>
+                    <SheetClose asChild>
+                      <Link
+                        href={`/signup?redirect=${encodeURIComponent("/cart")}`}
+                        className="font-medium text-primary hover:underline"
+                      >
+                        Sign up
+                      </Link>
+                    </SheetClose>
                   </p>
                 </div>
               )}

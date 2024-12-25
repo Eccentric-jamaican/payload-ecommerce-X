@@ -233,7 +233,7 @@ export const SignUp = () => {
             />
             <Button
               type="submit"
-              className="w-full rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+              className="w-full rounded-lg bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:text-white dark:hover:bg-blue-600"
               disabled={isLoading}
             >
               {isLoading ? "Creating account..." : "Create Account"}
