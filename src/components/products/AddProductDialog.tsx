@@ -124,7 +124,7 @@ export const AddProductDialog: FC<AddProductDialogProps> = ({ onSuccess }) => {
 
         setCategories(categoriesData.docs || []);
         setTechnologies(technologiesData.docs || []);
-      } catch (error) {
+      } catch (error: Error | unknown) {
         console.error("Failed to fetch form data:", error);
         toast({
           title: "Error",
@@ -161,7 +161,7 @@ export const AddProductDialog: FC<AddProductDialogProps> = ({ onSuccess }) => {
 
       form.reset();
       onSuccess?.();
-    } catch (error) {
+    } catch (error: Error | unknown) {
       console.error("Error creating product:", error);
       toast({
         title: "Error",

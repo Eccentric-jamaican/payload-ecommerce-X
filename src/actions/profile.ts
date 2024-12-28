@@ -72,7 +72,7 @@ export async function updateProfile(data: UpdateProfileData) {
 
     revalidatePath("/profile");
     return { user: updatedUser };
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Profile update error:", error);
     throw error;
   }
@@ -117,7 +117,7 @@ export async function changePassword(data: ChangePasswordData) {
     });
 
     revalidatePath("/profile");
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Password change error:", error);
     throw error;
   }

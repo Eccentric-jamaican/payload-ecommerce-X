@@ -5,12 +5,13 @@ import configPromise from "@/payload.config";
 import { headers } from "next/headers";
 import { getAuthToken } from "./auth";
 import { CartItem } from "@/providers/CartProvider";
+import { Product } from "@/payload-types";
 
 export async function saveCart(items: CartItem[]) {
   try {
     const token = await getAuthToken();
     if (!token) {
-      throw new Error("Unauthorized");
+      return { success: false, error: "User not logged in" };
     }
 
     const headersList = await headers();
@@ -21,7 +22,7 @@ export async function saveCart(items: CartItem[]) {
     });
 
     if (!user) {
-      throw new Error("Unauthorized");
+      return { success: false, error: "User not authenticated" };
     }
 
     // Find existing cart for user
@@ -61,7 +62,7 @@ export async function saveCart(items: CartItem[]) {
     }
 
     return { success: true };
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Save cart error:", error);
     return {
       success: false,
@@ -99,20 +100,24 @@ export async function loadCart() {
       depth: 2, // Load product details
     });
 
-    if (existingCarts.docs.length > 0) {
-      const cart = existingCarts.docs[0];
-      return {
-        success: true,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        data: cart.items?.map((item: any) => ({
-          product: item.product,
-          quantity: item.quantity,
-        })),
-      };
+    if (existingCarts.docs.length === 0) {
+      return { success: true, data: [] };
     }
 
-    return { success: true, data: [] };
-  } catch (error) {
+    const cart = existingCarts.docs[0];
+    const cartItems = cart.items?.map(
+      (item: {
+        product: string | Product;
+        quantity: number;
+        id?: string | null;
+      }) => ({
+        product: item.product,
+        quantity: item.quantity,
+      }),
+    );
+
+    return { success: true, data: cartItems };
+  } catch (error: Error | unknown) {
     console.error("Load cart error:", error);
     return {
       success: false,

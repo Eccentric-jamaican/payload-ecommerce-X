@@ -1,6 +1,6 @@
 "use client";
 
-import { getAuthToken } from "@/actions/auth";
+import { handleCheckout as gotoCheckout } from "@/actions/checkout";
 import { DiscountCode } from "@/components/cart/DiscountCode";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,53 +37,18 @@ const CartPageClient = () => {
 
   const handleCheckout = async () => {
     try {
-      if (!user) {
-        toast({
-          title: "Error",
-          description: "Please log in to checkout",
-          variant: "destructive",
-        });
-        return;
-      }
+      const url = await gotoCheckout(items);
 
-      const token = await getAuthToken();
-      if (!token) {
-        toast({
-          title: "Error",
-          description: "Authentication error. Please try logging in again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `JWT ${token}`,
-        },
-        body: JSON.stringify({
-          cartItems: items,
-          discount: discount,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to create checkout session");
-      }
-
-      if (!data.url) {
+      if (!url) {
         throw new Error("No checkout URL returned");
       }
 
-      window.location.href = data.url;
-    } catch (error) {
-      console.error("Checkout error:", error);
+      window.location.href = url;
+    } catch (error: Error | unknown) {
       toast({
-        title: "Error",
-        description: "Failed to initiate checkout. Please try again.",
+        title: "Checkout Error",
+        description:
+          error instanceof Error ? error.message : "Failed to checkout",
         variant: "destructive",
       });
     }
@@ -204,10 +169,10 @@ const CartPageClient = () => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100"
+                        className="h-8 w-8 text-muted-foreground hover:text-red-500"
                         onClick={() => removeItem(item.product.id)}
                       >
-                        <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -224,7 +189,10 @@ const CartPageClient = () => {
               <h2 className="flex items-center justify-between text-lg font-semibold">
                 <span>Order Summary</span>
                 <Badge variant="secondary" className="font-medium">
-                  {items.length} {items.length === 1 ? "item" : "items"}
+                  {items.reduce((total, item) => total + item.quantity, 0)}{" "}
+                  {items.reduce((total, item) => total + item.quantity, 0) === 1
+                    ? "item"
+                    : "items"}
                 </Badge>
               </h2>
             </div>

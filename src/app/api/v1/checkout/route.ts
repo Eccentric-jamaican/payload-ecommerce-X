@@ -9,6 +9,10 @@ import { getServerUrl } from "@/lib/utils";
 export async function POST(req: Request) {
   try {
     const { cartItems, discount } = await req.json();
+    if (cartItems.length === 0) {
+      return NextResponse.json({ error: "No items provided" }, { status: 400 });
+    }
+
     const authHeader = req.headers.get("authorization");
 
     if (!cartItems?.length) {
@@ -27,7 +31,7 @@ export async function POST(req: Request) {
           }),
         });
         user = authUser;
-      } catch (error) {
+      } catch (error: Error | unknown) {
         console.error("Auth error:", error);
       }
     }
@@ -96,7 +100,7 @@ export async function POST(req: Request) {
               },
             ],
           };
-        } catch (error) {
+        } catch (error: Error | unknown) {
           console.error("Failed to create/retrieve coupon:", error);
           // Create a one-time coupon for this session
           const coupon = await stripe.coupons.create({
@@ -146,7 +150,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ url: session.url });
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Checkout error:", error);
     return NextResponse.json(
       { error: "Failed to create checkout session" },
@@ -175,7 +179,7 @@ async function getOrCreatePercentageCoupon(
     const existingCoupon = await stripe.coupons.retrieve(couponId);
     return existingCoupon.id;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (error) {
+  } catch (error: Error | unknown) {
     // Create new coupon if it doesn't exist
     const coupon = await stripe.coupons.create({
       id: couponId,

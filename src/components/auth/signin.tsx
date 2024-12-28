@@ -59,7 +59,7 @@ export const SignIn = () => {
     try {
       await login(formData);
       router.push(redirectUrl);
-    } catch (error) {
+    } catch (error: Error | unknown) {
       console.error("Login error:", error);
       setError("Invalid email or password.");
     }

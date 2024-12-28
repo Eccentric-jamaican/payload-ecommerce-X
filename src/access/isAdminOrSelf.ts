@@ -1,14 +1,16 @@
-import type { Access, FieldAccess, User } from "payload";
+import type { Transaction, User } from "@payload-types";
+import type { Access } from "payload";
 
-export const isAdminOrSelf: Access = ({ req: { user } }) => {
-  // Need to be logged in
+export const isAdminOrSelf: Access<User> = ({
+  req: { user },
+}: {
+  req: { user: User | null };
+}) => {
   if (user) {
-    // If user has role of 'admin'
     if (user.role === "admin") {
       return true;
     }
 
-    // If any other type of user, only provide access to themselves
     return {
       id: {
         equals: user.id,
@@ -16,18 +18,22 @@ export const isAdminOrSelf: Access = ({ req: { user } }) => {
     };
   }
 
-  // Reject everyone else
   return false;
 };
 
-export const isAdminOrSelfFieldLevel: FieldAccess = ({ req: { user }, id }) => {
-  // Return true or false based on if the user has an admin role
+export const isAdminOrSelfFieldLevel = ({
+  req: { user },
+  id,
+}: {
+  req: { user: User | null };
+  id: string;
+}) => {
   if (user?.role === "admin") return true;
   if (user?.id === id) return true;
   return false;
 };
 
-export const isAdminOrSelfTransaction = ({
+export const isAdminOrSelfTransaction: Access<Transaction> = ({
   req: { user },
 }: {
   req: { user: User | null };
@@ -41,11 +47,13 @@ export const isAdminOrSelfTransaction = ({
   };
 };
 
-export const isAdminOrSelfTransactionFieldLevel: FieldAccess = ({
+export const isAdminOrSelfTransactionFieldLevel = ({
   req: { user },
   id,
+}: {
+  req: { user: User | null };
+  id: string;
 }) => {
-  // Return true or false based on if the user has an admin role
   if (user?.role === "admin") return true;
   if (user?.id === id) return true;
   return false;

@@ -24,7 +24,6 @@ import {
 import { useAuth } from "@/providers/AuthProvider";
 import { useCart } from "@/providers/CartProvider";
 import {
-  Bell,
   BookOpen,
   Code2,
   Download,
@@ -41,13 +40,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { FC } from "react";
-import { NotificationsSheet } from "../notifications/NotificationsSheet";
-import { useNotifications } from "@/providers/NotificationsProvider";
 
 const Navbar: FC = () => {
   const { user, logout, isLoading } = useAuth();
   const { items } = useCart();
-  const { notifications } = useNotifications();
 
   const mainNavItems = [
     {

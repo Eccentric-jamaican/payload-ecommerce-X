@@ -17,7 +17,8 @@ import { useCart } from "@/providers/CartProvider";
 import type { CartItem } from "@/providers/CartProvider";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/providers/AuthProvider";
-import { getAuthToken } from "@/actions/auth";
+import { handleCheckout as gotoCheckout } from "@/actions/checkout";
+import { formatPrice } from "@/lib/utils";
 
 interface CartItemProps {
   item: CartItem;
@@ -48,7 +49,7 @@ const CartItemComponent: FC<CartItemProps> = ({ item }) => {
       <div className="flex flex-1 flex-col">
         <h3 className="text-sm font-medium">{item.product.name}</h3>
         <p className="text-sm text-muted-foreground">
-          £{item.product.price.toFixed(2)} x {item.quantity}
+          {formatPrice(item.product.price)} x {item.quantity}
         </p>
         <div className="mt-1 flex items-center gap-2">
           <Button
@@ -95,52 +96,18 @@ export const CartSheet: FC<CartSheetProps> = ({ children }) => {
 
   const handleCheckout = async () => {
     try {
-      if (!user) {
-        toast({
-          title: "Error",
-          description: "Please log in to checkout",
-          variant: "destructive",
-        });
-        return;
-      }
+      const url = await gotoCheckout(items);
 
-      const token = await getAuthToken();
-      if (!token) {
-        toast({
-          title: "Error",
-          description: "Authentication error. Please try logging in again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `JWT ${token}`,
-        },
-        body: JSON.stringify({
-          cartItems: items,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to create checkout session");
-      }
-
-      if (!data.url) {
+      if (!url) {
         throw new Error("No checkout URL returned");
       }
 
-      window.location.href = data.url;
-    } catch (error) {
-      console.error("Checkout error:", error);
+      window.location.href = url;
+    } catch (error: Error | unknown) {
       toast({
-        title: "Error",
-        description: "Failed to initiate checkout. Please try again.",
+        title: "Checkout Error",
+        description:
+          error instanceof Error ? error.message : "Failed to checkout",
         variant: "destructive",
       });
     }
@@ -187,7 +154,7 @@ export const CartSheet: FC<CartSheetProps> = ({ children }) => {
             <div className="mb-4 flex items-center justify-between">
               <span className="text-sm font-medium">Subtotal</span>
               <span className="text-sm font-medium">
-                £{subtotal.toFixed(2)}
+                {formatPrice(subtotal)}
               </span>
             </div>
             <p className="mb-4 text-sm text-muted-foreground">
@@ -227,6 +194,11 @@ export const CartSheet: FC<CartSheetProps> = ({ children }) => {
                   </p>
                 </div>
               )}
+              <SheetClose asChild>
+                <Button variant="outline" className="w-full" asChild size="lg">
+                  <Link href={`/cart`}>Goto Cart</Link>
+                </Button>
+              </SheetClose>
               <SheetClose asChild>
                 <Button variant="outline" className="w-full">
                   Continue Shopping

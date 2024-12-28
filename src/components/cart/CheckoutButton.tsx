@@ -19,7 +19,7 @@ export const CheckoutButton: FC = () => {
       // Get auth token if user is logged in
       const token = await getAuthToken();
 
-      const response = await fetch("/api/checkout", {
+      const response = await fetch("/api/v1/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,7 +39,7 @@ export const CheckoutButton: FC = () => {
 
       // Redirect to Stripe Checkout
       window.location.href = data.url;
-    } catch (error) {
+    } catch (error: Error | unknown) {
       console.error("Checkout error:", error);
       toast({
         title: "Error",

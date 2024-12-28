@@ -105,7 +105,7 @@ export const EditProductDialog: FC<EditProductDialogProps> = ({
 
         setCategories(categoriesData.docs);
         setTechnologies(technologiesData.docs);
-      } catch (error) {
+      } catch (error: Error | unknown) {
         console.error("Error fetching data:", error);
         toast({
           title: "Error",
@@ -184,7 +184,7 @@ export const EditProductDialog: FC<EditProductDialogProps> = ({
 
       form.reset();
       onSuccess?.(result.data);
-    } catch (error) {
+    } catch (error: Error | unknown) {
       console.error("Error updating product:", error);
       toast({
         title: "Error",

@@ -11,7 +11,7 @@ export async function GET(request: Request) {
 
     const result = await checkAbandonedCarts(authHeader);
     return NextResponse.json(result);
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Cron job error:", error);
     return NextResponse.json(
       { error: "Internal server error" },

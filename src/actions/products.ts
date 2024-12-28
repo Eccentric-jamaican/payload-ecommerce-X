@@ -36,9 +36,13 @@ export async function getUserProducts() {
     });
 
     return products.docs;
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Get products error:", error);
-    throw error;
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to create product",
+    };
   }
 }
 
@@ -78,9 +82,13 @@ export async function deleteProduct(productId: string) {
     });
 
     return { success: true };
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Delete product error:", error);
-    throw error;
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to create product",
+    };
   }
 }
 
@@ -125,9 +133,13 @@ export async function updateProductStatus(
     });
 
     return updatedProduct;
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Update product status error:", error);
-    throw error;
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to create product",
+    };
   }
 }
 
@@ -190,12 +202,12 @@ export async function createProduct(data: {
 
     revalidatePath("/products");
     return { success: true, data: product };
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Error creating product:", error);
     return {
       success: false,
-      // @ts-expect-error - Type is unknown/not defined
-      error: error.message || "Failed to create product",
+      error:
+        error instanceof Error ? error.message : "Failed to create product",
     };
   }
 }
@@ -250,7 +262,7 @@ export async function updateProduct(
       success: true,
       data: updatedProduct,
     };
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Error updating product:", error);
     return {
       success: false,

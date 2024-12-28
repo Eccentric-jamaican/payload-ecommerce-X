@@ -21,7 +21,7 @@ export const DiscountCode: FC = () => {
       setIsLoading(true);
       await applyDiscount(code.trim());
       setCode("");
-    } catch (error) {
+    } catch (error: Error | unknown) {
       setError(error instanceof Error ? error.message : "Failed to apply code");
     } finally {
       setIsLoading(false);

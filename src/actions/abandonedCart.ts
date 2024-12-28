@@ -142,7 +142,7 @@ export async function checkAbandonedCarts(authHeader: string) {
     }
 
     return { success: true };
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Check abandoned carts error:", error);
     return {
       success: false,

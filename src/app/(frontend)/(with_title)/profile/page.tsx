@@ -51,7 +51,7 @@ export default async function ProfilePage() {
         });
         transactions = result.docs;
       }
-    } catch (error) {
+    } catch (error: Error | unknown) {
       console.error("Error fetching transactions:", error);
     }
   }

@@ -20,6 +20,7 @@ import { fileURLToPath } from "url";
 import Carts from "./collections/Carts";
 import { DiscountCodes } from "./collections/DiscountCodes";
 import { ProductFiles } from "./collections/ProductFiles";
+import { Wishlist } from "./collections/Wishlist";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -46,6 +47,7 @@ export default buildConfig({
     ProductFiles,
     Carts,
     DiscountCodes,
+    Wishlist,
   ],
   globals: [SiteSettings],
   editor: lexicalEditor(),
@@ -142,7 +144,7 @@ export default buildConfig({
   //           { message: "product and transaction found. well done." },
   //           { status: 200 },
   //         );
-  //       } catch (error) {
+  //       } catch (error: Error | unknown) {
   //         console.error(error);
   //         return Response.json(
   //           { message: "Internal Server Error" },

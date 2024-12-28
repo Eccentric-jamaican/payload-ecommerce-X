@@ -5,11 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { formatDate, cn } from "@/lib/utils";
+import { formatDate, cn, formatPrice } from "@/lib/utils";
 import { Product } from "@/payload-types";
 import { useAuth } from "@/providers/AuthProvider";
 import { useCart } from "@/providers/CartProvider";
-import { getAuthToken } from "@/actions/auth";
 
 import {
   Minus,
@@ -28,6 +27,7 @@ import {
 import Image from "next/image";
 import { FC, useState, useEffect, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
+import { handleCheckout } from "@/actions/checkout";
 
 interface ExtendedProduct extends Product {
   images?: Array<{ url: string }>;
@@ -283,46 +283,18 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
 
   const handleBuyNow = async () => {
     try {
-      const token = await getAuthToken();
-      if (!token) {
-        toast({
-          title: "Error",
-          description: "Authentication error. Please try logging in again.",
-          variant: "destructive",
-        });
-        return;
+      const url = await handleCheckout([{ product, quantity }]);
+
+      if (!url) {
+        throw new Error("No checkout URL returned");
       }
 
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `JWT ${token}`,
-        },
-        body: JSON.stringify({
-          items: [
-            {
-              productId: product.id,
-              quantity: quantity,
-            },
-          ],
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Checkout session creation failed");
-      }
-
-      const { url } = await response.json();
-
-      // Redirect to Stripe Checkout
       window.location.href = url;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+    } catch (error: Error | unknown) {
       toast({
         title: "Checkout Error",
         description:
-          "There was a problem initiating checkout. Please try again.",
+          error instanceof Error ? error.message : "Failed to checkout",
         variant: "destructive",
       });
     }
@@ -418,7 +390,7 @@ const ProductPageClient: FC<ProductPageClientProps> = ({ product }) => {
             <div className="mb-6">
               <div className="mb-4 flex items-baseline gap-4">
                 <span className="text-3xl font-bold">
-                  £{product.price.toFixed(2)}
+                  {formatPrice(product.price)}
                 </span>
                 {product.compareAtPrice && (
                   <span className="text-lg text-muted-foreground line-through">

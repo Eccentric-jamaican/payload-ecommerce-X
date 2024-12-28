@@ -15,6 +15,7 @@ import {
   signup as signupAction,
   checkAuth as checkAuthAction,
 } from "@/actions/auth";
+import { useCart } from "@/providers/CartProvider";
 
 interface AuthContextType {
   user: User | null;
@@ -27,18 +28,11 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within a AuthProvider");
-  }
-  return context;
-};
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const { syncCartWithServer } = useCart();
 
   const checkAuth = useCallback(async () => {
     try {
@@ -46,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { user: authUser } = await checkAuthAction();
         setUser(authUser);
       }
-    } catch (error) {
+    } catch (error: Error | unknown) {
       console.error("Error checking authentication:", error);
     } finally {
       setIsLoading(false);
@@ -65,7 +59,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const { user: loggedInUser } = await loginAction(email, password);
       setUser(loggedInUser);
-    } catch (error) {
+
+      // Sync cart after successful login
+      try {
+        await syncCartWithServer();
+      } catch (error) {
+        console.error("Failed to sync cart after login:", error);
+      }
+    } catch (error: Error | unknown) {
       console.error("Login error:", error);
       throw error;
     } finally {
@@ -79,7 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await logoutAction();
       setUser(null);
       router.push("/");
-    } catch (error) {
+    } catch (error: Error | unknown) {
       console.error("Logout error:", error);
       throw error;
     } finally {
@@ -103,7 +104,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       setUser(newUser);
-    } catch (error) {
+
+      // Sync cart after successful signup
+      try {
+        await syncCartWithServer();
+      } catch (error) {
+        console.error("Failed to sync cart after signup:", error);
+      }
+    } catch (error: Error | unknown) {
       console.error("Signup error:", error);
       throw error;
     } finally {
@@ -122,3 +130,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within a AuthProvider");
+  }
+  return context;
+};

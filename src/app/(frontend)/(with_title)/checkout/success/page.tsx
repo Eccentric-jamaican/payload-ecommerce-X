@@ -77,7 +77,7 @@ async function getSessionAndCreateTransaction(sessionId: string) {
           id: existingCarts.docs[0].id,
         });
       }
-    } catch (error) {
+    } catch (error: Error | unknown) {
       console.error("Failed to clear cart:", error);
     }
   }
@@ -96,7 +96,7 @@ export default async function CheckoutSuccessPage({
 
   try {
     await getSessionAndCreateTransaction(sessionId);
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Error processing successful checkout:", error);
     // Still show success page to user, but log the error
   }

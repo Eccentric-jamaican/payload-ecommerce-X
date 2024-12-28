@@ -48,7 +48,7 @@ export async function uploadAvatar(file: File) {
     });
 
     return { user: updatedUser };
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Avatar upload error:", error);
     throw error;
   }

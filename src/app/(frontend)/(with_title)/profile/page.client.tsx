@@ -175,7 +175,7 @@ const ProfilePageClient: FC<ProfilePageClientProps> = ({
         description: "Your profile has been updated successfully.",
       });
       router.refresh();
-    } catch (error) {
+    } catch (error: Error | unknown) {
       console.error("Profile update error:", error);
       toast({
         title: "Error",
@@ -199,7 +199,7 @@ const ProfilePageClient: FC<ProfilePageClientProps> = ({
         description: "Your password has been changed successfully.",
       });
       passwordForm.reset();
-    } catch (error) {
+    } catch (error: Error | unknown) {
       console.error("Password change error:", error);
       toast({
         title: "Error",
@@ -253,7 +253,7 @@ const ProfilePageClient: FC<ProfilePageClientProps> = ({
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
-    } catch (error) {
+    } catch (error: Error | unknown) {
       console.error("Avatar upload error:", error);
       toast({
         title: "Error",

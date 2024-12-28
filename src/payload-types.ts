@@ -22,6 +22,7 @@ export interface Config {
     'product-files': ProductFile;
     carts: Cart;
     'discount-codes': DiscountCode;
+    wishlists: Wishlist;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -43,6 +44,7 @@ export interface Config {
     'product-files': ProductFilesSelect<false> | ProductFilesSelect<true>;
     carts: CartsSelect<false> | CartsSelect<true>;
     'discount-codes': DiscountCodesSelect<false> | DiscountCodesSelect<true>;
+    wishlists: WishlistsSelect<false> | WishlistsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -540,6 +542,17 @@ export interface DiscountCode {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wishlists".
+ */
+export interface Wishlist {
+  id: string;
+  user: string | User;
+  products?: (string | Product)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -588,6 +601,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'discount-codes';
         value: string | DiscountCode;
+      } | null)
+    | ({
+        relationTo: 'wishlists';
+        value: string | Wishlist;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -892,6 +909,16 @@ export interface DiscountCodesSelect<T extends boolean = true> {
   endDate?: T;
   isActive?: T;
   appliesTo?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wishlists_select".
+ */
+export interface WishlistsSelect<T extends boolean = true> {
+  user?: T;
+  products?: T;
   updatedAt?: T;
   createdAt?: T;
 }

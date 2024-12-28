@@ -5,7 +5,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const response = await handleStripeWebhook(req);
     return NextResponse.json(response);
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Webhook error:", error);
     return NextResponse.json(
       {

@@ -124,7 +124,7 @@ export async function POST(req: Request) {
         discountAmount: Math.round(discountAmount * 100) / 100,
       },
     });
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Error validating discount code:", error);
     return NextResponse.json(
       { error: "Failed to validate discount code" },

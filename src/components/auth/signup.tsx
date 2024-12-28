@@ -81,7 +81,7 @@ export const SignUp = () => {
     try {
       await signup(formData);
       router.push(redirectUrl);
-    } catch (error) {
+    } catch (error: Error | unknown) {
       console.error("Signup error:", error);
       setError("Failed to create account. Please try again.");
     }

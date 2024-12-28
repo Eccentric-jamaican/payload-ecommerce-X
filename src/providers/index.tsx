@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "./AuthProvider";
 import { CartProvider } from "./CartProvider";
 import { NotificationsProvider } from "./NotificationsProvider";
+import { WishlistProvider } from "./WishlistProvider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -14,11 +15,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      <NotificationsProvider>
+      <CartProvider>
         <AuthProvider>
-          <CartProvider>{children}</CartProvider>
+          <NotificationsProvider>
+            <WishlistProvider>{children}</WishlistProvider>
+          </NotificationsProvider>
         </AuthProvider>
-      </NotificationsProvider>
+      </CartProvider>
     </ThemeProvider>
   );
 }

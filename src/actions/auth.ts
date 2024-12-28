@@ -54,7 +54,7 @@ export async function login(
       token: result.token,
       exp: result.exp,
     };
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Login error:", error);
     throw error;
   }
@@ -99,7 +99,7 @@ export async function signup(data: {
       token: loginResult.token,
       exp: loginResult.exp,
     };
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Signup error:", error);
     throw error;
   }
@@ -126,7 +126,7 @@ export async function logout(): Promise<{ success: boolean }> {
 
     await deleteCookie();
     return { success: true };
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Logout error:", error);
     throw error;
   }
@@ -176,7 +176,7 @@ export async function changePassword(
     });
 
     return { success: true };
-  } catch (error) {
+  } catch (error: Error | unknown) {
     if (error instanceof Error) {
       throw new Error(error.message);
     }
@@ -199,7 +199,7 @@ export async function checkAuth(): Promise<{ user: User | null }> {
     });
 
     return { user: user as User };
-  } catch (error) {
+  } catch (error: Error | unknown) {
     console.error("Check auth error:", error);
     return { user: null };
   }
