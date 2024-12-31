@@ -29,9 +29,9 @@ const WishlistPageClient = () => {
           <div className="grid grid-cols-2 gap-6 sm:gap-8 lg:grid-cols-4">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="aspect-[3/4] w-full rounded-lg bg-gray-200" />
-                <div className="mt-4 h-4 w-3/4 rounded bg-gray-200" />
-                <div className="mt-2 h-4 w-1/2 rounded bg-gray-200" />
+                <div className="aspect-[3/4] w-full rounded-lg bg-muted" />
+                <div className="mt-4 h-4 w-3/4 rounded bg-muted" />
+                <div className="mt-2 h-4 w-1/2 rounded bg-muted" />
               </div>
             ))}
           </div>
@@ -41,15 +41,14 @@ const WishlistPageClient = () => {
 
   return (
     <main className="container relative min-h-[calc(100vh-4rem)]">
-      <div className="absolute inset-0 bg-dot-pattern" />
+      <div className="absolute inset-0 bg-dot-pattern opacity-50 dark:opacity-25" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background via-background/30 to-background" />
       {/* Header */}
       <div className="relative">
         <div className="pt-12">
-          <h1 className="text-4xl font-bold md:text-5xl">Browse Categories</h1>
+          <h1 className="text-4xl font-bold md:text-5xl">Your Wishlist</h1>
           <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-            Explore our curated collection of digital assets across various
-            categories
+            Keep track of your favorite digital assets in one place
           </p>
         </div>
       </div>
@@ -57,7 +56,7 @@ const WishlistPageClient = () => {
         {items.length === 0 ? (
           <div className="py-12 text-center">
             <h2 className="mb-4 text-2xl font-bold">Your wishlist is empty</h2>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Start adding products to your wishlist while shopping!
             </p>
           </div>
@@ -66,7 +65,7 @@ const WishlistPageClient = () => {
             {items.map((product) => (
               <Card
                 key={product.id}
-                className="group overflow-hidden border bg-card/50 transition-all duration-500 hover:shadow-lg"
+                className="group overflow-hidden border border-border/50 bg-card/50 transition-all duration-500 hover:shadow-xl hover:shadow-primary/5 dark:border-border/30"
               >
                 <CardContent className="p-0">
                   <Link href={`/products/${product.id}`}>

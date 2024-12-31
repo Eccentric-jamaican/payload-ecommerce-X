@@ -1,23 +1,22 @@
 "use client";
 
-import { FC, useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Category, Product } from "@/payload-types";
+import { useCart } from "@/providers/CartProvider";
 import {
-  Search,
-  TrendingUp,
-  Star,
   ArrowRight,
-  ShoppingBag,
   Check,
+  Search,
+  ShoppingBag,
+  Star,
+  TrendingUp,
 } from "lucide-react";
 import Image from "next/image";
-import { Category, Product } from "@/payload-types";
 import Link from "next/link";
-import { useCart } from "@/providers/CartProvider";
-import { formatPrice } from "@/lib/utils";
+import { FC, useEffect, useRef } from "react";
 
 interface HomePageClientProps {
   initialCategories: Category[];
@@ -102,68 +101,89 @@ const HomePageClient: FC<HomePageClientProps> = ({
             </div>
             <div className="animation-delay-200 animate-fade-in-up">
               <h1 className="text-3xl font-bold tracking-tight text-white md:text-5xl lg:text-7xl xl:text-8xl">
-                Thousands Of Design Assets Ready To{" "}
-                <span className="relative inline-block">
-                  <span className="relative z-10">Download</span>
-                  <span
-                    className="absolute inset-0 z-0 -skew-y-2 bg-gradient-to-r from-purple-500 to-pink-500"
-                    aria-hidden="true"
-                  />
+                Premium Templates{" "}
+                <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                  For Modern Developers
                 </span>
               </h1>
             </div>
             <div className="animation-delay-400 animate-fade-in-up">
               <p className="max-w-2xl text-xl leading-relaxed text-gray-300">
-                Discover curated products that blend style with innovation. Join
-                thousands of satisfied customers worldwide and transform your
-                projects.
+                Start your next project with our professionally crafted
+                templates. Save weeks of development time and focus on what
+                matters most.
               </p>
             </div>
             <div className="animation-delay-600 flex animate-fade-in-up flex-wrap gap-4 pt-6">
               <Button
                 size="lg"
-                className="transform bg-white text-black transition-all duration-300 hover:scale-105 hover:bg-gray-100"
+                className="group relative overflow-hidden bg-primary px-8 text-white transition-all hover:bg-primary/90"
               >
-                Shop Now
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <span className="relative z-10 flex items-center gap-2">
+                  Start Browsing
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </span>
+                <div className="absolute inset-0 -z-0 translate-y-[100%] bg-gradient-to-r from-primary/80 to-primary transition-transform duration-300 group-hover:translate-y-0" />
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="transform border-white/30 bg-transparent text-white transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:text-white"
+                className="border-primary/20 bg-white/5 text-white backdrop-blur-sm transition-colors hover:border-primary/40 hover:bg-white/10"
               >
                 View Collections
               </Button>
+            </div>
+
+            {/* Trust Indicators */}
+            <div className="animation-delay-800 animate-fade-in-up pt-12">
+              <div className="flex flex-wrap items-center gap-8 text-sm text-gray-400">
+                <div className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-primary" />
+                  <span>Lifetime Updates</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-primary" />
+                  <span>Premium Support</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-primary" />
+                  <span>Ready-to-Deploy</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Search and Stats Section */}
       <section className="relative -mt-16">
-        <div className="container mx-auto overflow-visible pb-24">
-          <Card className="shadow-2xl">
+        <div className="container mx-auto overflow-visible px-4 pb-24">
+          <Card className="overflow-hidden border-none bg-gradient-to-br from-card to-card/95 shadow-2xl">
             <CardContent className="p-8">
               <div className="grid gap-8 md:grid-cols-[2fr,1fr,1fr,1fr]">
                 <div className="flex items-center gap-4">
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       type="search"
-                      placeholder="Search for products..."
-                      className="h-12 w-full pl-10 pr-4 text-base placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-primary"
+                      placeholder="Search templates, components..."
+                      className="h-12 border-none bg-muted/50 pl-10 pr-4 text-base placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-primary"
                     />
                   </div>
-                  <Button className="shrink-0 transform transition-all duration-300 hover:scale-105">
+                  <Button
+                    size="lg"
+                    className="h-12 bg-primary px-8 text-white transition-all hover:bg-primary/90"
+                  >
                     Search
                   </Button>
                 </div>
                 {stats.map((stat, index) => (
                   <div
                     key={stat.label}
-                    className="flex animate-fade-in-up items-center gap-4"
+                    className="flex animate-fade-in-up items-center gap-4 rounded-lg bg-muted/30 p-4 backdrop-blur-sm transition-transform hover:scale-105"
                     style={{ animationDelay: `${(index + 1) * 100}ms` }}
                   >
-                    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 transition-transform duration-300 hover:scale-110">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
                       {stat.icon}
                     </div>
                     <div>
@@ -182,16 +202,21 @@ const HomePageClient: FC<HomePageClientProps> = ({
         </div>
       </section>
 
-      <section className="relative bg-dot-pattern py-24">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/30 to-background" />
-        <div className="container relative mx-auto">
+      {/* Categories Section */}
+      <section className="relative py-24">
+        <div className="container mx-auto px-4">
           <div className="mb-16 text-center">
+            <Badge
+              variant="secondary"
+              className="mb-4 bg-primary/10 text-primary"
+            >
+              Browse Categories
+            </Badge>
             <h2 className="mb-4 text-4xl font-bold md:text-5xl">
-              Trending Categories
+              Find What You Need
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-              Explore our most popular categories and discover high-quality
-              digital assets
+              Explore our curated collection of templates and components
             </p>
           </div>
           <div
@@ -200,9 +225,9 @@ const HomePageClient: FC<HomePageClientProps> = ({
           >
             {initialCategories.map((category) => (
               <Link href={`/categories/${category.slug}`} key={category.id}>
-                <Card className="category-card group overflow-hidden border-0 bg-card opacity-0 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10">
+                <Card className="category-card group relative overflow-hidden border-none bg-gradient-to-br from-card to-card/95 opacity-0 shadow-lg transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10">
                   <CardContent className="p-0">
-                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                    <div className="relative aspect-[4/3] overflow-hidden">
                       {category.icon &&
                       typeof category.icon !== "string" &&
                       category.icon.url ? (
@@ -214,16 +239,16 @@ const HomePageClient: FC<HomePageClientProps> = ({
                           sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
                         />
                       ) : (
-                        <div className="flex h-full items-center justify-center">
-                          <span className="text-4xl text-muted-foreground/30">
+                        <div className="flex h-full items-center justify-center bg-primary/5">
+                          <span className="text-4xl text-primary/40">
                             {category.name[0]}
                           </span>
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     </div>
                     <div className="p-6">
-                      <h3 className="text-lg font-semibold transition-colors duration-300 group-hover:text-primary">
+                      <h3 className="text-lg font-semibold text-foreground transition-colors duration-300 group-hover:text-primary">
                         {category.name}
                       </h3>
                       <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
@@ -239,15 +264,21 @@ const HomePageClient: FC<HomePageClientProps> = ({
         </div>
       </section>
 
-      <section className="relative bg-dot-pattern py-24">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/30 to-background" />
-        <div className="container relative mx-auto">
+      {/* Featured Products Section */}
+      <section className="relative bg-muted/30 py-24">
+        <div className="container mx-auto px-4">
           <div className="mb-16 text-center">
+            <Badge
+              variant="secondary"
+              className="mb-4 bg-primary/10 text-primary"
+            >
+              New Arrivals
+            </Badge>
             <h2 className="mb-4 text-4xl font-bold md:text-5xl">
-              Featured Products
+              Featured Templates
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-              Discover our handpicked selection of premium digital assets
+              Hand-picked collection of our best-selling templates
             </p>
           </div>
           <div
@@ -257,32 +288,44 @@ const HomePageClient: FC<HomePageClientProps> = ({
             {initialProducts.map((product) => (
               <Card
                 key={product.id}
-                className="product-card group overflow-hidden border-0 bg-card opacity-0 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10"
+                className="product-card group relative overflow-hidden border-none bg-gradient-to-br from-card to-card/95 opacity-0 shadow-lg transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10"
               >
                 <CardContent className="p-0">
                   <Link href={`/products/${product.id}`}>
-                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                    <div className="relative aspect-[4/3] overflow-hidden">
                       {product.previewImages?.[0]?.image &&
                       typeof product.previewImages[0].image !== "string" &&
                       product.previewImages[0].image.url ? (
-                        <Image
-                          src={product.previewImages[0].image.url}
-                          alt={product.name}
-                          fill
-                          className="object-cover transition-all duration-700 group-hover:scale-110"
-                          sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
-                        />
+                        <>
+                          <Image
+                            src={product.previewImages[0].image.url}
+                            alt={product.name}
+                            fill
+                            className="object-cover transition-all duration-700 group-hover:scale-110"
+                            sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
+                          />
+                          {/* {product.compareAtPrice && (
+                            <Badge className="absolute left-4 top-4 bg-green-500/90 text-white">
+                              {Math.round(
+                                ((product.compareAtPrice - product.price) /
+                                  product.compareAtPrice) *
+                                  100,
+                              )}
+                              % OFF
+                            </Badge>
+                          )} */}
+                        </>
                       ) : (
-                        <div className="flex h-full items-center justify-center">
-                          <span className="text-4xl text-muted-foreground/30">
+                        <div className="flex h-full items-center justify-center bg-primary/5">
+                          <span className="text-4xl text-primary/40">
                             {product.name[0]}
                           </span>
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                       <Button
                         size="icon"
-                        className="absolute right-4 top-4 h-8 w-8 translate-y-2 rounded-full opacity-0 shadow-lg backdrop-blur-md transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
+                        className="absolute right-4 top-4 h-8 w-8 translate-y-2 rounded-full opacity-0 shadow-lg backdrop-blur-sm transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
                         onClick={(e) => {
                           e.preventDefault();
                           handleCartAction(product);
@@ -297,22 +340,47 @@ const HomePageClient: FC<HomePageClientProps> = ({
                       </Button>
                     </div>
                   </Link>
-                  <div className="p-6">
+                  <div className="space-y-4 p-6">
                     <Link
                       href={`/products/${product.id}`}
                       className="group/title"
                     >
-                      <h3 className="text-lg font-semibold transition-colors duration-300 group-hover/title:text-primary">
+                      <h3 className="text-lg font-semibold text-foreground transition-colors duration-300 group-hover/title:text-primary">
                         {product.name}
                       </h3>
                     </Link>
-                    <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+                    <p className="line-clamp-2 text-sm text-muted-foreground">
                       {product.description}
                     </p>
-                    <div className="mt-4 flex items-center justify-between">
-                      <span className="text-lg font-semibold text-foreground">
-                        {formatPrice(product.price)}
-                      </span>
+                    <div className="flex items-center justify-between">
+                      {/* <div className="space-y-1">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-xl font-bold text-foreground">
+                            {formatPrice(product.price)}
+                          </span>
+                          {product.compareAtPrice && (
+                            <span className="text-sm text-muted-foreground line-through">
+                              {formatPrice(product.compareAtPrice)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 text-yellow-500">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={cn(
+                                "h-3 w-3",
+                                star <= (product.rating || 0)
+                                  ? "fill-current"
+                                  : "fill-muted stroke-muted text-muted",
+                              )}
+                            />
+                          ))}
+                          <span className="ml-1 text-xs text-muted-foreground">
+                            ({product.reviewCount || 0})
+                          </span>
+                        </div>
+                      </div> */}
                       <Badge variant="secondary" className="font-medium">
                         {product.productType.split("-").join(" ")}
                       </Badge>

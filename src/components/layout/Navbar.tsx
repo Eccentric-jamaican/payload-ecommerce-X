@@ -28,13 +28,13 @@ import {
   Code2,
   Download,
   FileText,
-  Heart,
   HelpCircle,
   Layers,
   LogOut,
   Menu,
   MessageSquare,
   ShoppingCart,
+  Star,
   TagIcon,
   User,
 } from "lucide-react";
@@ -51,6 +51,7 @@ const Navbar: FC = () => {
       items: [
         { label: "All Products", href: "/products" },
         { label: "Categories", href: "/categories" },
+        { label: "Technologies", href: "/technologies" },
         { label: "New Arrivals", href: "/products?sort=newest" },
         { label: "Popular", href: "/products?sort=popular" },
         { label: "On Sale", href: "/products?sort=sale" },
@@ -248,8 +249,14 @@ const Navbar: FC = () => {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
+                      <Link href="/purchases" className="cursor-pointer">
+                        <Download className="mr-2 h-4 w-4" />
+                        Purchases
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
                       <Link href="/wishlist" className="cursor-pointer">
-                        <Heart className="mr-2 h-4 w-4" />
+                        <Star className="mr-2 h-4 w-4" />
                         Wishlist
                       </Link>
                     </DropdownMenuItem>
@@ -260,7 +267,7 @@ const Navbar: FC = () => {
                       <DropdownMenuGroup>
                         <DropdownMenuItem asChild>
                           <Link
-                            href="/admin/products"
+                            href="/admin/collections/products"
                             className="cursor-pointer"
                           >
                             <Layers className="mr-2 h-4 w-4" />
@@ -269,7 +276,7 @@ const Navbar: FC = () => {
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link
-                            href="/admin/categories"
+                            href="/admin/collections/categories"
                             className="cursor-pointer"
                           >
                             <TagIcon className="mr-2 h-4 w-4" />
@@ -278,7 +285,7 @@ const Navbar: FC = () => {
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link
-                            href="/admin/transactions"
+                            href="/admin/collections/transactions"
                             className="cursor-pointer"
                           >
                             <Code2 className="mr-2 h-4 w-4" />

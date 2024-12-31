@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 
 const protectedRoutes = [
   "/profile",
+  "/purchases",
   "wishlist",
   "checkout",
   "/settings",
@@ -26,6 +27,7 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/profile/:path*",
+    "/purchases/:path*",
     "/wishlist/:path*",
     "/checkout/:path*",
     "/settings/:path*",

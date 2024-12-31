@@ -24,6 +24,7 @@ const getBrowsePage = async () => {
 
   return await payload.find({
     collection: "categories",
+    limit: 0,
   });
 };
 

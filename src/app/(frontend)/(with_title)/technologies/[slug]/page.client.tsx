@@ -1,6 +1,6 @@
 "use client";
 
-import { Category, Product } from "@/payload-types";
+import { Technology, Product } from "@/payload-types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, ChevronLeft, ShoppingBag } from "lucide-react";
@@ -9,11 +9,11 @@ import Link from "next/link";
 import { useCart } from "@/providers/CartProvider";
 import { formatPrice } from "@/lib/utils";
 
-const CategoryPageClient = ({
-  category,
+const TechnologyPageClient = ({
+  technology,
   products,
 }: {
-  category: Category;
+  technology: Technology;
   products: Product[];
 }) => {
   const { addItem, items, removeItem } = useCart();
@@ -30,7 +30,7 @@ const CategoryPageClient = ({
     }
   };
 
-  if (!category) {
+  if (!technology) {
     return (
       <div className="container mx-auto py-12">
         <div className="text-center">
@@ -59,13 +59,13 @@ const CategoryPageClient = ({
             Back to Home
           </Link>
           <div className="flex items-center gap-4">
-            {category.icon &&
-            typeof category.icon !== "string" &&
-            category.icon.url ? (
+            {technology.icon &&
+            typeof technology.icon !== "string" &&
+            technology.icon.url ? (
               <div className="h-16 w-16 overflow-hidden rounded-lg">
                 <Image
-                  src={category.icon.url}
-                  alt={category.name}
+                  src={technology.icon.url}
+                  alt={technology.name}
                   width={64}
                   height={64}
                   className="h-full w-full object-cover"
@@ -73,14 +73,14 @@ const CategoryPageClient = ({
               </div>
             ) : (
               <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-primary/10 text-3xl text-primary">
-                {category.name[0]}
+                {technology.name[0]}
               </div>
             )}
             <div>
-              <h1 className="text-3xl font-bold">{category.name}</h1>
-              {category.description && (
+              <h1 className="text-3xl font-bold">{technology.name}</h1>
+              {technology.description && (
                 <p className="mt-1 text-muted-foreground">
-                  {category.description}
+                  {technology.description}
                 </p>
               )}
             </div>
@@ -93,7 +93,7 @@ const CategoryPageClient = ({
         {products.length === 0 ? (
           <div className="text-center">
             <p className="text-muted-foreground">
-              No products found in this category.
+              No products found in this technology.
             </p>
           </div>
         ) : (
@@ -165,4 +165,4 @@ const CategoryPageClient = ({
   );
 };
 
-export default CategoryPageClient;
+export default TechnologyPageClient;
