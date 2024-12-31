@@ -1,8 +1,7 @@
 import { FC } from "react";
-import configPromise from "@/payload.config";
-import { getPayload } from "payload";
 import ProductPageClient from "./page.client";
 import { Metadata } from "next";
+import { getProduct, getAllProducts } from "@/actions/products";
 
 interface ProductPageProps {
   params: Promise<{
@@ -10,20 +9,58 @@ interface ProductPageProps {
   }>;
 }
 
-const getProduct = async (id: string) => {
-  const payload = await getPayload({ config: configPromise });
-  const product = await payload.findByID({
-    collection: "products",
+export async function generateStaticParams() {
+  const { data: products } = await getAllProducts();
+
+  if (!products) {
+    return [];
+  }
+
+  const params = products.map(({ id }) => ({
     id,
-  });
-  return product;
+  }));
+
+  return params;
+}
+
+const ProductPage: FC<ProductPageProps> = async ({ params }) => {
+  const { id } = await params;
+  const { data: product } = await getProduct(id);
+
+  if (!product) {
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold">Product Not Found</h2>
+          <p className="text-muted-foreground">
+            The product you&apos;re looking for doesn&apos;t exist or has been
+            removed.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (product.status === "draft") {
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold">Product Not Found</h2>
+        </div>
+      </div>
+    );
+  }
+
+  return <ProductPageClient product={product} />;
 };
+
+export default ProductPage;
 
 export async function generateMetadata({
   params,
 }: ProductPageProps): Promise<Metadata> {
   const { id } = await params;
-  const product = await getProduct(id);
+  const { data: product } = await getProduct(id);
 
   if (!product) {
     return {
@@ -67,36 +104,3 @@ export async function generateMetadata({
     },
   };
 }
-
-const ProductPage: FC<ProductPageProps> = async ({ params }) => {
-  const { id } = await params;
-  const product = await getProduct(id);
-
-  if (!product) {
-    return (
-      <div className="flex h-96 items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold">Product Not Found</h2>
-          <p className="text-muted-foreground">
-            The product you&apos;re looking for doesn&apos;t exist or has been
-            removed.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (product.status === "draft") {
-    return (
-      <div className="flex h-96 items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold">Product Not Found</h2>
-        </div>
-      </div>
-    );
-  }
-
-  return <ProductPageClient product={product} />;
-};
-
-export default ProductPage;

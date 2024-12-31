@@ -7,6 +7,41 @@ interface CategoryPageProps {
   params: Promise<{ slug: string }>;
 }
 
+export async function generateStaticParams() {
+  const payload = await getPayload({ config: configPromise });
+  const categories = (
+    await payload.find({
+      collection: "categories",
+    })
+  ).docs;
+
+  if (!categories) {
+    return [];
+  }
+
+  const params = categories.map(({ slug }) => ({
+    slug,
+  }));
+
+  return params;
+}
+
+const CategoryPage = async ({ params }: CategoryPageProps) => {
+  const { slug } = await params;
+  const payload = await getPayload({ config: configPromise });
+
+  const category = await getCategory(payload, slug);
+  if (!category) {
+    throw new Error("Category not found");
+  }
+
+  const products = await getProducts(payload, category.id);
+
+  return <CategoryPageClient category={category} products={products} />;
+};
+
+export default CategoryPage;
+
 const getCategory = async (payload: BasePayload, slug: string) => {
   const category = await payload.find({
     collection: "categories",
@@ -51,19 +86,3 @@ export async function generateMetadata({
     },
   };
 }
-
-const CategoryPage = async ({ params }: CategoryPageProps) => {
-  const { slug } = await params;
-  const payload = await getPayload({ config: configPromise });
-
-  const category = await getCategory(payload, slug);
-  if (!category) {
-    throw new Error("Category not found");
-  }
-
-  const products = await getProducts(payload, category.id);
-
-  return <CategoryPageClient category={category} products={products} />;
-};
-
-export default CategoryPage;
