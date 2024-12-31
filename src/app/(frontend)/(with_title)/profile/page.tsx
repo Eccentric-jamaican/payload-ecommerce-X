@@ -4,6 +4,14 @@ import { cookies } from "next/headers";
 import ProfilePageClient from "./page.client";
 import { Transaction } from "@/payload-types";
 
+const ProfilePage = async () => {
+  const transactions = await getTransactions();
+  // @ts-expect-error - TODO: fix this
+  return <ProfilePageClient initialTransactions={transactions} />;
+};
+
+export default ProfilePage;
+
 export const metadata = {
   title: "Profile",
   description:
@@ -24,7 +32,7 @@ export const metadata = {
   },
 };
 
-export default async function ProfilePage() {
+const getTransactions = async () => {
   const payload = await getPayload({ config: configPromise });
   const cookieStore = await cookies();
   const token = cookieStore.get("payload-token");
@@ -56,6 +64,5 @@ export default async function ProfilePage() {
     }
   }
 
-  // @ts-expect-error - TODO: fix this
-  return <ProfilePageClient initialTransactions={transactions} />;
-}
+  return transactions;
+};
