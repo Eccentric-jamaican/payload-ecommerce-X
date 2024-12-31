@@ -271,3 +271,45 @@ export async function updateProduct(
     };
   }
 }
+
+export const getProduct = async (id: string) => {
+  try {
+    const payload = await getPayload({ config: configPromise });
+    const product = await payload.findByID({
+      collection: "products",
+      id,
+    });
+
+    return {
+      success: true,
+      data: product,
+    };
+  } catch (error: Error | unknown) {
+    console.error("Error getting product:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to get product",
+    };
+  }
+};
+
+export const getAllProducts = async () => {
+  try {
+    const payload = await getPayload({ config: configPromise });
+    const products = await payload.find({
+      collection: "products",
+      limit: 0,
+    });
+
+    return {
+      success: true,
+      data: products.docs,
+    };
+  } catch (error: Error | unknown) {
+    console.error("Error getting products:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to get products",
+    };
+  }
+};
