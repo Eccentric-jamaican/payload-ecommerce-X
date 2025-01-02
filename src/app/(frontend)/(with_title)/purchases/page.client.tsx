@@ -2,6 +2,14 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { formatPrice } from "@/lib/utils";
 import { Transaction } from "@/payload-types";
 import { Download, ExternalLink } from "lucide-react";
@@ -79,7 +87,7 @@ const PurchasesPageClient = ({
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {new Date(transaction.createdAt).toLocaleDateString(
-                      "en-US",
+                      "en-GB",
                       {
                         year: "numeric",
                         month: "long",
@@ -100,56 +108,65 @@ const PurchasesPageClient = ({
               </div>
             </div>
 
-            {/* Products Grid */}
-            <div className="grid grid-cols-1 gap-6 p-6 sm:grid-cols-2 lg:grid-cols-4">
-              {transaction.products.map((product) =>
-                typeof product === "string" ? null : (
-                  <Card
-                    key={product.id}
-                    className="group overflow-hidden border border-border/50 bg-card transition-all hover:shadow-xl hover:shadow-primary/5 dark:border-border/30"
-                  >
-                    <CardContent className="p-0">
-                      <Link href={`/products/${product.id}`}>
-                        <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                          {product.previewImages?.[0]?.image &&
-                          typeof product.previewImages[0].image !== "string" &&
-                          product.previewImages[0].image.url ? (
-                            <Image
-                              src={product.previewImages[0].image.url}
-                              alt={product.name}
-                              fill
-                              className="object-cover transition-all duration-500 group-hover:scale-105"
-                              sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
-                            />
-                          ) : (
-                            <div className="flex h-full items-center justify-center">
-                              <span className="text-4xl font-medium text-muted-foreground/50">
-                                {product.name[0]}
-                              </span>
+            {/* Products Table */}
+            <div className="overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Product</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead className="text-right">Price</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {transaction.products.map((product) =>
+                    typeof product === "string" ? null : (
+                      <TableRow key={product.id} className="group">
+                        <TableCell>
+                          <div className="flex items-center gap-4">
+                            <div className="relative h-16 w-16 overflow-hidden rounded-lg bg-muted">
+                              {product.previewImages?.[0]?.image &&
+                              typeof product.previewImages[0].image !==
+                                "string" &&
+                              product.previewImages[0].image.url ? (
+                                <Image
+                                  src={product.previewImages[0].image.url}
+                                  alt={product.name}
+                                  fill
+                                  className="object-cover"
+                                  sizes="64px"
+                                />
+                              ) : (
+                                <div className="flex h-full items-center justify-center">
+                                  <span className="text-2xl font-medium text-muted-foreground/50">
+                                    {product.name[0]}
+                                  </span>
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      </Link>
-                      <div className="space-y-4 p-4">
-                        <div>
-                          <Link
-                            href={`/products/${product.id}`}
-                            className="group/title inline-flex items-center gap-1.5"
-                          >
-                            <h3 className="line-clamp-1 text-lg font-medium transition-colors group-hover/title:text-primary">
-                              {product.name}
-                            </h3>
-                            <ExternalLink className="h-4 w-4 opacity-0 transition-opacity group-hover/title:opacity-100" />
-                          </Link>
+                            <Link
+                              href={`/products/${product.id}`}
+                              className="group/title inline-flex items-center gap-1.5"
+                            >
+                              <span className="font-medium transition-colors group-hover/title:text-primary">
+                                {product.name}
+                              </span>
+                              <ExternalLink className="h-4 w-4 opacity-0 transition-opacity group-hover/title:opacity-100" />
+                            </Link>
+                          </div>
+                        </TableCell>
+                        <TableCell>
                           <p className="line-clamp-2 text-sm text-muted-foreground">
                             {product.description}
                           </p>
-                        </div>
-
-                        <div className="flex items-center justify-between border-t border-border/40 pt-4 dark:border-border/20">
+                        </TableCell>
+                        <TableCell className="text-right">
                           <p className="font-medium text-primary">
                             {formatPrice(product.price)}
                           </p>
+                        </TableCell>
+                        <TableCell className="text-right">
                           <Link
                             href={`/products/${product.id}/download`}
                             className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
@@ -157,12 +174,12 @@ const PurchasesPageClient = ({
                             <Download className="h-4 w-4" />
                             Download
                           </Link>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ),
-              )}
+                        </TableCell>
+                      </TableRow>
+                    ),
+                  )}
+                </TableBody>
+              </Table>
             </div>
           </div>
         ))}

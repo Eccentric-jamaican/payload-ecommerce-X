@@ -40,54 +40,77 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { FC } from "react";
+import { DesktopNavigation } from "./DesktopNavigation";
+
+const mainNavItems = [
+  {
+    title: "Browse",
+    items: [
+      {
+        label: "All Products",
+        href: "/products",
+        description: "See our range of curated templates.",
+      },
+      {
+        label: "Categories",
+        href: "/categories",
+        description: "Browse our products by category.",
+      },
+      {
+        label: "Technologies",
+        href: "/technologies",
+        description: "Explore our products by technology.",
+      },
+      {
+        label: "New Arrivals",
+        href: "/products?sort=newest",
+        description: "",
+      },
+      { label: "Popular", href: "/products?sort=popular", description: "" },
+      { label: "On Sale", href: "/products?sort=sale", description: "" },
+    ],
+  },
+  {
+    title: "Resources",
+    items: [
+      {
+        label: "Documentation",
+        href: "/docs",
+        icon: <BookOpen className="h-4 w-4" />,
+        description: "Find our documentation.",
+      },
+      {
+        label: "Help Center",
+        href: "/help",
+        icon: <HelpCircle className="h-4 w-4" />,
+        description: "Get help with our products.",
+      },
+      {
+        label: "Blog",
+        href: "/blog",
+        icon: <FileText className="h-4 w-4" />,
+        description: "Read our blog.",
+      },
+      {
+        label: "Community",
+        href: "/community",
+        icon: <MessageSquare className="h-4 w-4" />,
+        description: "Join our community.",
+      },
+    ],
+  },
+];
+
+export type NavItems = typeof mainNavItems;
 
 const Navbar: FC = () => {
   const { user, logout, isLoading } = useAuth();
   const { items } = useCart();
 
-  const mainNavItems = [
-    {
-      title: "Browse",
-      items: [
-        { label: "All Products", href: "/products" },
-        { label: "Categories", href: "/categories" },
-        { label: "Technologies", href: "/technologies" },
-        { label: "New Arrivals", href: "/products?sort=newest" },
-        { label: "Popular", href: "/products?sort=popular" },
-        { label: "On Sale", href: "/products?sort=sale" },
-      ],
-    },
-    {
-      title: "Resources",
-      items: [
-        {
-          label: "Documentation",
-          href: "/docs",
-          icon: <BookOpen className="h-4 w-4" />,
-        },
-        {
-          label: "Help Center",
-          href: "/help",
-          icon: <HelpCircle className="h-4 w-4" />,
-        },
-        {
-          label: "Blog",
-          href: "/blog",
-          icon: <FileText className="h-4 w-4" />,
-        },
-        {
-          label: "Community",
-          href: "/community",
-          icon: <MessageSquare className="h-4 w-4" />,
-        },
-      ],
-    },
-  ];
-
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/75 backdrop-blur-lg">
-      <div className="container mx-auto">
-        <div className="flex h-16 items-center justify-between">
+    <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between gap-6">
           {/* Mobile Menu */}
           <Sheet>
             <SheetTrigger asChild>
@@ -101,30 +124,40 @@ const Navbar: FC = () => {
               </SheetHeader>
               <div className="flex flex-grow flex-col">
                 <div className="mt-6 space-y-6">
-                  {mainNavItems.map((category) => (
-                    <div key={category.title} className="space-y-3">
-                      <h3 className="text-sm font-medium text-muted-foreground">
+                  {mainNavItems.map((category) =>
+                    "href" in category ? (
+                      <Link
+                        key={category.title}
+                        href={category.href!}
+                        className="flex items-center text-sm font-medium"
+                      >
                         {category.title}
-                      </h3>
-                      <div className="flex flex-col space-y-2">
-                        {category.items.map((item) => (
-                          <SheetClose key={item.href} asChild>
-                            <Link
-                              href={item.href}
-                              className="flex items-center text-sm font-medium"
-                            >
-                              {"icon" in item
-                                ? item.icon && (
-                                    <span className="mr-2">{item.icon}</span>
-                                  )
-                                : null}
-                              {item.label}
-                            </Link>
-                          </SheetClose>
-                        ))}
+                      </Link>
+                    ) : (
+                      <div key={category.title} className="space-y-3">
+                        <h3 className="text-sm font-medium text-muted-foreground">
+                          {category.title}
+                        </h3>
+                        <div className="flex flex-col space-y-2">
+                          {category.items.map((item) => (
+                            <SheetClose key={item.href} asChild>
+                              <Link
+                                href={item.href}
+                                className="flex items-center text-sm font-medium"
+                              >
+                                {"icon" in item
+                                  ? item.icon && (
+                                      <span className="mr-2">{item.icon}</span>
+                                    )
+                                  : null}
+                                {item.label}
+                              </Link>
+                            </SheetClose>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
               </div>
               <div className="mt-10 flex flex-col">
@@ -141,51 +174,34 @@ const Navbar: FC = () => {
           </Sheet>
 
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              <span className="text-xl font-bold text-primary">
+            <Link
+              href="/"
+              className="group flex items-center space-x-2 transition-opacity hover:opacity-90"
+            >
+              <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-xl font-semibold tracking-tight text-transparent">
                 Marketplace
               </span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex md:items-center md:space-x-6">
-            {mainNavItems.map((category) => (
-              <DropdownMenu key={category.title}>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 text-base">
-                    {category.title}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56">
-                  <DropdownMenuGroup>
-                    {category.items.map((item) => (
-                      <DropdownMenuItem key={item.href} asChild>
-                        <Link href={item.href} className="flex items-center">
-                          {"icon" in item
-                            ? item.icon && (
-                                <span className="mr-2">{item.icon}</span>
-                              )
-                            : null}
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ))}
+          <div className="hidden md:flex md:items-center md:gap-1">
+            <DesktopNavigation navItems={mainNavItems} />
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div className="hidden md:flex">
               <ThemeToggle />
             </div>
             <CartSheet>
-              <Button variant="ghost" size="icon" className="relative">
-                <ShoppingCart className="h-5 w-5" />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative rounded-full hover:bg-accent/50 hover:text-primary"
+              >
+                <ShoppingCart className="h-[18px] w-[18px]" />
                 {items.length > 0 && (
-                  <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-medium text-primary-foreground ring-2 ring-background">
+                  <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground shadow-sm ring-2 ring-background">
                     {items.length}
                   </span>
                 )}
@@ -223,7 +239,11 @@ const Navbar: FC = () => {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuContent
+                  className="w-56 animate-in data-[side=bottom]:slide-in-from-top-1 data-[side=top]:slide-in-from-bottom-1"
+                  align="end"
+                  forceMount
+                >
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">

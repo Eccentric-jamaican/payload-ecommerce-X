@@ -114,7 +114,7 @@ export default async function CheckoutSuccessPage({
         </p>
         <div className="flex justify-center gap-4">
           <Button asChild>
-            <Link href="/account/downloads">View Downloads</Link>
+            <Link href="/purchases">View Purchases</Link>
           </Button>
           <Button asChild variant="outline">
             <Link href="/products">Continue Shopping</Link>

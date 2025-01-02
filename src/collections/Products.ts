@@ -281,7 +281,7 @@ export const Products: CollectionConfig = {
                 {
                   name: "file",
                   type: "upload",
-                  relationTo: "media",
+                  relationTo: "product-files",
                   required: true,
                   label: "File Upload",
                 },

@@ -112,7 +112,7 @@ const CartPageClient = () => {
                               sizes="96px"
                             />
                           ) : (
-                            <div className="flex h-24 w-24 items-center justify-center bg-gray-100">
+                            <div className="flex h-24 w-24 items-center justify-center bg-muted">
                               <span className="text-xs text-muted-foreground">
                                 {item.product.name[0]}
                               </span>
