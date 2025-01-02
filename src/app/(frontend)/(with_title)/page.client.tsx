@@ -108,7 +108,7 @@ const HomePageClient: FC<HomePageClientProps> = ({
               </h1>
             </div>
             <div className="animation-delay-400 animate-fade-in-up">
-              <p className="max-w-2xl text-xl leading-relaxed text-gray-300">
+              <p className="max-w-2xl text-base leading-relaxed text-gray-300 md:text-xl">
                 Start your next project with our professionally crafted
                 templates. Save weeks of development time and focus on what
                 matters most.
