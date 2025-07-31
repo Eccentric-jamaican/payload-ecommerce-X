@@ -7,6 +7,7 @@ import { Technologies } from "@/collections/Technologies";
 import { Transactions } from "@/collections/Transactions";
 import { Users } from "@/collections/Users";
 import { SiteSettings } from "@/globals/SiteSettings";
+import { Banner } from "@/globals/Banner";
 import { mongooseAdapter } from "@payloadcms/db-mongodb";
 import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
 import { stripePlugin } from "@payloadcms/plugin-stripe";
@@ -21,6 +22,7 @@ import Carts from "./collections/Carts";
 import { DiscountCodes } from "./collections/DiscountCodes";
 import { ProductFiles } from "./collections/ProductFiles";
 import { Wishlist } from "./collections/Wishlist";
+import Blogs from "./collections/Blogs";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -48,8 +50,12 @@ export default buildConfig({
     Carts,
     DiscountCodes,
     Wishlist,
+    Blogs,
   ],
-  globals: [SiteSettings],
+  globals: [
+    SiteSettings,
+    Banner,
+  ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {

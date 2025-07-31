@@ -3,6 +3,7 @@ import Navbar from "@/components/layout/Navbar";
 import { Toaster } from "@/components/ui/toaster";
 import { Providers } from "@/providers";
 import { Metadata } from "next";
+import { BannerCarousel } from "@/components/layout/BannerCarousel";
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
 import "./globals.css";
@@ -52,11 +53,12 @@ export default function RootLayout({ children, modal }: LayoutProps) {
       <body>
         <Providers>
           <div className="min-h-screen bg-background antialiased">
+            <BannerCarousel />
             <Navbar />
             <main>{children}</main>
+            {modal}
             <Footer />
             <Toaster />
-            {modal}
           </div>
         </Providers>
       </body>

@@ -179,7 +179,7 @@ const Navbar: FC = () => {
               className="group flex items-center space-x-2 transition-opacity hover:opacity-90"
             >
               <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-xl font-semibold tracking-tight text-transparent">
-                Marketplace
+                Adult Play-Ground
               </span>
             </Link>
           </div>

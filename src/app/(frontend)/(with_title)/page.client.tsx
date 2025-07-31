@@ -6,14 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Category, Product } from "@/payload-types";
 import { useCart } from "@/providers/CartProvider";
-import {
-  ArrowRight,
-  Check,
-  Search,
-  ShoppingBag,
-  Star,
-  TrendingUp,
-} from "lucide-react";
+import { Check, ArrowRight, Search, ShoppingBag, Star, TrendingUp } from 'lucide-react'
+import { RotatingText } from '@/components/ui/rotating-text';
 import Image from "next/image";
 import Link from "next/link";
 import { FC, useEffect, useRef } from "react";
@@ -100,10 +94,10 @@ const HomePageClient: FC<HomePageClientProps> = ({
               </Badge>
             </div>
             <div className="animation-delay-200 animate-fade-in-up">
-              <h1 className="text-3xl font-bold tracking-tight text-white md:text-5xl lg:text-7xl xl:text-8xl">
-                Premium Templates{" "}
+              <h1 className="flex flex-col text-3xl font-bold tracking-tight text-white md:text-5xl lg:text-7xl xl:text-8xl">
+                <RotatingText />
                 <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-                  For Modern Developers
+                  Just for you
                 </span>
               </h1>
             </div>
@@ -275,7 +269,7 @@ const HomePageClient: FC<HomePageClientProps> = ({
               New Arrivals
             </Badge>
             <h2 className="mb-4 text-4xl font-bold md:text-5xl">
-              Featured Templates
+              Featured Products
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
               Hand-picked collection of our best-selling templates
