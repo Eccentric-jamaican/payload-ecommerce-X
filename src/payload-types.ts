@@ -13,6 +13,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    pages: Page;
     products: Product;
     categories: Category;
     technologies: Technology;
@@ -36,6 +37,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     technologies: TechnologiesSelect<false> | TechnologiesSelect<true>;
@@ -430,6 +432,69 @@ export interface ProductFile {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: string;
+  title: string;
+  /**
+   * Used for the page URL, e.g. "about-us".
+   */
+  slug: string;
+  /**
+   * Optional summary shown in admin listings and page previews.
+   */
+  heroPreview?: {
+    eyebrow?: string | null;
+    heading?: string | null;
+    subheading?: string | null;
+    backgroundImage?: (string | null) | Media;
+  };
+  /**
+   * Add flexible content blocks to construct the page. More block types can be added over time.
+   */
+  sections?:
+    | {
+        content: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'richText';
+      }[]
+    | null;
+  /**
+   * Suggested max 60 characters.
+   */
+  metaTitle?: string | null;
+  /**
+   * Suggested max 160 characters.
+   */
+  metaDescription?: string | null;
+  ogImage?: (string | null) | Media;
+  status?: ('draft' | 'published') | null;
+  /**
+   * Optional date for when this page went live.
+   */
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "reviews".
  */
 export interface Review {
@@ -605,6 +670,10 @@ export interface PayloadLockedDocument {
         value: string | Media;
       } | null)
     | ({
+        relationTo: 'pages';
+        value: string | Page;
+      } | null)
+    | ({
         relationTo: 'products';
         value: string | Product;
       } | null)
@@ -769,6 +838,41 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  heroPreview?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        subheading?: T;
+        backgroundImage?: T;
+      };
+  sections?:
+    | T
+    | {
+        richText?:
+          | T
+          | {
+              content?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
+  metaTitle?: T;
+  metaDescription?: T;
+  ogImage?: T;
+  status?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1013,15 +1117,102 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * Manage global branding, navigation, and contact details used throughout the site.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings".
  */
 export interface SiteSetting {
   id: string;
   /**
-   * Email address for customer queries
+   * Displayed in the site header and footer.
+   */
+  logo?: (string | null) | Media;
+  /**
+   * Hex or CSS color value used for primary accents.
+   */
+  primaryColor: string;
+  /**
+   * Applied to secondary buttons or highlights.
+   */
+  accentColor: string;
+  textColor: string;
+  backgroundColor: string;
+  /**
+   * CSS font stack for headings and body copy.
+   */
+  fontFamily: string;
+  headingFontWeight?: ('400' | '500' | '600' | '700') | null;
+  /**
+   * Primary email for inbound enquiries.
    */
   supportEmail: string;
+  /**
+   * Optional email for sales-specific enquiries.
+   */
+  salesEmail?: string | null;
+  primaryPhone?: string | null;
+  secondaryPhone?: string | null;
+  address?: string | null;
+  cta: {
+    label: string;
+    href: string;
+    /**
+     * Optional line displayed under the main CTA.
+     */
+    subtext?: string | null;
+  };
+  primaryNavigation?:
+    | {
+        label: string;
+        /**
+         * Can be an absolute URL or relative path (e.g. /about).
+         */
+        url: string;
+        openInNewTab?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional secondary navigation (e.g. top-right links).
+   */
+  utilityNavigation?:
+    | {
+        label: string;
+        url: string;
+        openInNewTab?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  footerColumns?:
+    | {
+        heading: string;
+        links?:
+          | {
+              label: string;
+              url: string;
+              openInNewTab?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * List of social media or external resources.
+   */
+  socialLinks?:
+    | {
+        platform: string;
+        url: string;
+        /**
+         * Used by the frontend to match an icon (e.g. linkedin, twitter).
+         */
+        icon?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  footerNote?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1049,7 +1240,64 @@ export interface Banner {
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
+  logo?: T;
+  primaryColor?: T;
+  accentColor?: T;
+  textColor?: T;
+  backgroundColor?: T;
+  fontFamily?: T;
+  headingFontWeight?: T;
   supportEmail?: T;
+  salesEmail?: T;
+  primaryPhone?: T;
+  secondaryPhone?: T;
+  address?: T;
+  cta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        subtext?: T;
+      };
+  primaryNavigation?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        openInNewTab?: T;
+        id?: T;
+      };
+  utilityNavigation?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        openInNewTab?: T;
+        id?: T;
+      };
+  footerColumns?:
+    | T
+    | {
+        heading?: T;
+        links?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+              openInNewTab?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  socialLinks?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        icon?: T;
+        id?: T;
+      };
+  footerNote?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

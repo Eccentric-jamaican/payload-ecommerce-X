@@ -21,10 +21,6 @@ const config: Config = {
           sm: "1rem",
           xl: "1rem",
         },
-        screens: {
-          xl: "100rem",
-          sm: "100rem",
-        },
       },
       borderRadius: {
         lg: "var(--radius)",

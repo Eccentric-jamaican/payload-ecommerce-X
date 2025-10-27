@@ -9,6 +9,22 @@ const nextConfig: NextConfig = {
     // dynamicIO: true,
     // ppr: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "upload.wikimedia.org",
+      },
+      {
+        protocol: "https",
+        hostname: "www.medaccess.org",
+      },
+    ],
+  },
 };
 
 export default withPayload(nextConfig);

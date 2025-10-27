@@ -1,205 +1,275 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
-import Link from "next/link";
-import { FC } from "react";
+import { Button } from '@/components/ui/button';
+import type { Media, SiteSettings as SiteSettingsType } from '@/payload-types';
+import {
+  Facebook,
+  Instagram,
+  Linkedin,
+  Mail,
+  MapPin,
+  Phone,
+  Twitter,
+  Youtube,
+} from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
-const Footer: FC = () => {
+type FooterColumn = NonNullable<SiteSettingsType['footerColumns']>[number];
+
+interface FooterProps {
+  logo?: SiteSettingsType['logo'];
+  address?: SiteSettingsType['address'];
+  supportEmail?: SiteSettingsType['supportEmail'];
+  salesEmail?: SiteSettingsType['salesEmail'];
+  primaryPhone?: SiteSettingsType['primaryPhone'];
+  secondaryPhone?: SiteSettingsType['secondaryPhone'];
+  cta?: SiteSettingsType['cta'];
+  footerColumns?: SiteSettingsType['footerColumns'];
+  socialLinks?: SiteSettingsType['socialLinks'];
+  footerNote?: SiteSettingsType['footerNote'];
+}
+
+const LOGO_FALLBACK_TEXT = 'Alphamed Global';
+
+const SOCIAL_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  facebook: Facebook,
+  twitter: Twitter,
+  x: Twitter,
+  instagram: Instagram,
+  youtube: Youtube,
+  linkedin: Linkedin,
+};
+
+function resolveMedia(media?: SiteSettingsType['logo']): Media | null {
+  if (!media) return null;
+  if (typeof media === 'object' && media !== null && 'url' in media) {
+    return media as Media;
+  }
+  return null;
+}
+
+function FooterColumnLinks({ column }: { column: FooterColumn }) {
+  if (!column?.links?.length) return null;
+
   return (
-    <footer className="relative border-t bg-dot-pattern">
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/30 to-background" />
-      <div className="container relative py-12 md:py-16">
-        {/* Newsletter Section */}
-        <div className="mb-16 grid gap-8 rounded-2xl border bg-card/50 p-8 backdrop-blur-sm lg:grid-cols-2 lg:gap-12">
-          <div>
-            <h3 className="text-2xl font-semibold sm:text-3xl">
-              Stay in the loop
-            </h3>
-            <p className="mt-3 text-muted-foreground">
-              Subscribe to our newsletter for updates, exclusive offers, and
-              early access to new products.
-            </p>
-          </div>
-          <div className="flex items-center">
-            <div className="flex w-full max-w-md gap-3">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 bg-background/50 h-11"
-              />
-              <Button className="h-11 px-6">Subscribe</Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Footer Content */}
-        <div className="mb-16 grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <h4 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              About
-            </h4>
-            <ul className="space-y-2.5">
-              <li>
-                <Link
-                  href="/about"
-                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
-                >
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/careers"
-                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
-                >
-                  Careers
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/press"
-                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
-                >
-                  Press
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              Support
-            </h4>
-            <ul className="space-y-2.5">
-              <li>
-                <Link
-                  href="/help"
-                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
-                >
-                  Help Center
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
-                >
-                  Contact Us
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/faq"
-                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
-                >
-                  FAQ
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              Legal
-            </h4>
-            <ul className="space-y-2.5">
-              <li>
-                <Link
-                  href="/privacy"
-                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
-                >
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/terms"
-                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
-                >
-                  Terms of Service
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/cookies"
-                  className="text-sm text-foreground/70 transition-colors hover:text-foreground"
-                >
-                  Cookie Policy
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="mb-4 text-sm font-medium uppercase tracking-wider">
-              Connect
-            </h4>
-            <div className="mb-6 flex space-x-3">
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-9 w-9 rounded-full hover:bg-primary hover:text-primary-foreground"
+    <div>
+      {column.heading ? (
+        <h4 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+          {column.heading}
+        </h4>
+      ) : null}
+      <ul className="space-y-2.5 text-sm text-foreground/70">
+        {column.links.map((link) => {
+          if (!link?.label || !link?.url) return null;
+          return (
+            <li key={`${link.label}-${link.url}`}>
+              <Link
+                href={link.url}
+                className="transition-colors hover:text-[var(--brand-primary,#4FB8FF)]"
+                target={link.openInNewTab ? '_blank' : undefined}
+                rel={link.openInNewTab ? 'noreferrer' : undefined}
               >
-                <Facebook className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-9 w-9 rounded-full hover:bg-primary hover:text-primary-foreground"
-              >
-                <Twitter className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-9 w-9 rounded-full hover:bg-primary hover:text-primary-foreground"
-              >
-                <Instagram className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-9 w-9 rounded-full hover:bg-primary hover:text-primary-foreground"
-              >
-                <Youtube className="h-4 w-4" />
-              </Button>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Contact us at:{" "}
-              <a
-                href="mailto:support@marketplace.com"
-                className="text-primary transition-colors hover:text-primary/90 hover:underline"
-              >
-                support@marketplace.com
-              </a>
-            </p>
-          </div>
-        </div>
+                {link.label}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
 
-        {/* Bottom Bar */}
-        <div className="flex flex-col items-center justify-between gap-6 border-t py-8 text-center sm:flex-row sm:gap-4 sm:text-left">
-          <p className="text-sm text-muted-foreground">
-            &copy; 2024 Marketplace. All rights reserved.
-          </p>
-          <div className="flex items-center space-x-6 text-sm">
+function renderContactBlock({
+  supportEmail,
+  salesEmail,
+  primaryPhone,
+  secondaryPhone,
+  address,
+}: {
+  supportEmail?: string | null;
+  salesEmail?: string | null;
+  primaryPhone?: string | null;
+  secondaryPhone?: string | null;
+  address?: string | null;
+}) {
+  if (!supportEmail && !salesEmail && !primaryPhone && !secondaryPhone && !address) {
+    return null;
+  }
+
+  return (
+    <div className="space-y-4 text-sm text-foreground/70">
+      {supportEmail ? (
+        <div className="flex items-start gap-3">
+          <Mail className="mt-0.5 h-4 w-4 text-muted-foreground" />
+          <div>
+            <div className="font-medium text-foreground">Support</div>
             <Link
-              href="/sitemap"
-              className="text-muted-foreground transition-colors hover:text-foreground"
+              href={`mailto:${supportEmail}`}
+              className="transition-colors hover:text-[var(--brand-primary,#4FB8FF)]"
             >
-              Sitemap
-            </Link>
-            <span className="text-muted-foreground/40">•</span>
-            <Link
-              href="/accessibility"
-              className="text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Accessibility
+              {supportEmail}
             </Link>
           </div>
+        </div>
+      ) : null}
+      {salesEmail ? (
+        <div className="flex items-start gap-3">
+          <Mail className="mt-0.5 h-4 w-4 text-muted-foreground" />
+          <div>
+            <div className="font-medium text-foreground">Sales</div>
+            <Link
+              href={`mailto:${salesEmail}`}
+              className="transition-colors hover:text-[var(--brand-primary,#4FB8FF)]"
+            >
+              {salesEmail}
+            </Link>
+          </div>
+        </div>
+      ) : null}
+      {primaryPhone ? (
+        <div className="flex items-start gap-3">
+          <Phone className="mt-0.5 h-4 w-4 text-muted-foreground" />
+          <div>
+            <div className="font-medium text-foreground">Phone</div>
+            <Link
+              href={`tel:${primaryPhone}`}
+              className="transition-colors hover:text-[var(--brand-primary,#4FB8FF)]"
+            >
+              {primaryPhone}
+            </Link>
+          </div>
+        </div>
+      ) : null}
+      {secondaryPhone ? (
+        <div className="flex items-start gap-3">
+          <Phone className="mt-0.5 h-4 w-4 text-muted-foreground" />
+          <div>
+            <div className="font-medium text-foreground">Secondary</div>
+            <Link
+              href={`tel:${secondaryPhone}`}
+              className="transition-colors hover:text-[var(--brand-primary,#4FB8FF)]"
+            >
+              {secondaryPhone}
+            </Link>
+          </div>
+        </div>
+      ) : null}
+      {address ? (
+        <div className="flex items-start gap-3">
+          <MapPin className="mt-0.5 h-4 w-4 text-muted-foreground" />
+          <div>
+            <div className="font-medium text-foreground">Address</div>
+            <p className="whitespace-pre-line">{address}</p>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+export default function Footer({
+  logo,
+  address,
+  supportEmail,
+  salesEmail,
+  primaryPhone,
+  secondaryPhone,
+  cta,
+  footerColumns,
+  socialLinks,
+  footerNote,
+}: FooterProps) {
+  const resolvedLogo = resolveMedia(logo);
+
+  const hasFooterColumns = footerColumns && footerColumns.length > 0;
+  const hasSocialLinks = socialLinks && socialLinks.length > 0;
+
+  return (
+    <footer className="border-t bg-muted/20">
+      <div className="container space-y-12 py-12 md:py-16">
+        {cta?.label && cta.href ? (
+          <div className="flex flex-col items-start justify-between gap-6 rounded-2xl border bg-background p-8 md:flex-row md:items-center">
+            <div>
+              <h3 className="text-2xl font-semibold tracking-tight md:text-3xl">
+                {cta.label}
+              </h3>
+              {cta.subtext ? (
+                <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+                  {cta.subtext}
+                </p>
+              ) : null}
+            </div>
+            <Button asChild size="lg">
+              <Link
+                href={cta.href}
+                target={cta.href.startsWith('http') ? '_blank' : undefined}
+                rel={cta.href.startsWith('http') ? 'noreferrer' : undefined}
+              >
+                Get in touch
+              </Link>
+            </Button>
+          </div>
+        ) : null}
+
+        <div className="grid gap-12 lg:grid-cols-[1.2fr_2fr]">
+          <div className="space-y-6">
+            <Link href="/" className="flex items-center gap-3 text-lg font-semibold">
+              {resolvedLogo?.url ? (
+                <Image
+                  src={resolvedLogo.url}
+                  alt={resolvedLogo.alt ?? LOGO_FALLBACK_TEXT}
+                  width={48}
+                  height={48}
+                  className="h-12 w-12 object-contain"
+                />
+              ) : (
+                <span>{LOGO_FALLBACK_TEXT}</span>
+              )}
+            </Link>
+            {renderContactBlock({
+              supportEmail,
+              salesEmail,
+              primaryPhone,
+              secondaryPhone,
+              address,
+            })}
+          </div>
+
+          {hasFooterColumns ? (
+            <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+              {footerColumns?.map((column, index) => (
+                <FooterColumnLinks key={column?.heading ?? index} column={column} />
+              ))}
+            </div>
+          ) : null}
+        </div>
+
+        <div className="flex flex-col gap-6 border-t pt-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
+          <div>
+            {footerNote ?? '© ' + new Date().getFullYear() + ' Alphamed Global. All rights reserved.'}
+          </div>
+          {hasSocialLinks ? (
+            <div className="flex items-center gap-4">
+              {socialLinks?.map((link) => {
+                if (!link?.platform || !link?.url) return null;
+                const Icon =
+                  SOCIAL_ICONS[link.icon?.toLowerCase() ?? link.platform.toLowerCase()] ?? null;
+                return (
+                  <Link
+                    key={`${link.platform}-${link.url}`}
+                    href={link.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border transition-colors hover:border-transparent hover:bg-[var(--brand-primary,#4FB8FF)] hover:text-white"
+                    aria-label={link.platform}
+                  >
+                    {Icon ? <Icon className="h-4 w-4" /> : link.platform}
+                  </Link>
+                );
+              })}
+            </div>
+          ) : null}
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

@@ -1,6 +1,7 @@
 import { Categories } from "@/collections/Categories";
 import { Media } from "@/collections/Media";
 import { Notifications } from "@/collections/Notifications";
+import { Pages } from "@/collections/Pages";
 import { Products } from "@/collections/Products";
 import { Reviews } from "@/collections/Reviews";
 import { Technologies } from "@/collections/Technologies";
@@ -40,6 +41,7 @@ export default buildConfig({
   collections: [
     Users,
     Media,
+    Pages,
     Products,
     Categories,
     Technologies,
