@@ -442,6 +442,10 @@ export interface Page {
    */
   slug: string;
   /**
+   * Standard keeps media blocks consistent. Alternating flips media/text per section for visual rhythm.
+   */
+  layout?: ('standard' | 'alternating') | null;
+  /**
    * Optional summary shown in admin listings and page previews.
    */
   heroPreview?: {
@@ -454,26 +458,177 @@ export interface Page {
    * Add flexible content blocks to construct the page. More block types can be added over time.
    */
   sections?:
-    | {
-        content: {
-          root: {
-            type: string;
-            children: {
-              type: string;
-              version: number;
+    | (
+        | {
+            /**
+             * Primary headline shown prominently on the page.
+             */
+            heading: string;
+            /**
+             * Support copy that appears beneath the heading.
+             */
+            subheading?: string | null;
+            cta?: {
+              label?: string | null;
+              url?: string | null;
+            };
+            /**
+             * Choose how the hero image is positioned relative to the copy.
+             */
+            layoutStyle?: ('split' | 'overlay') | null;
+            /**
+             * Optional backdrop that displays beside or behind the hero copy.
+             */
+            backgroundImage?: (string | null) | Media;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            heading: string;
+            description?: string | null;
+            slides?:
+              | {
+                  title: string;
+                  description?: string | null;
+                  cta?: {
+                    label?: string | null;
+                    url?: string | null;
+                  };
+                  image?: (string | null) | Media;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'featureCarousel';
+          }
+        | {
+            heading: string;
+            body?: {
+              root: {
+                type: string;
+                children: {
+                  type: string;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
               [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'richText';
-      }[]
+            } | null;
+            media: string | Media;
+            cta?: {
+              label?: string | null;
+              url?: string | null;
+            };
+            /**
+             * Overrides the automatic left/right alternation if needed.
+             */
+            mediaPosition?: ('auto' | 'image-left' | 'image-right') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'mediaText';
+          }
+        | {
+            heading: string;
+            description?: string | null;
+            cta?: {
+              label?: string | null;
+              url?: string | null;
+            };
+            testimonials?:
+              | {
+                  quote: string;
+                  name: string;
+                  title?: string | null;
+                  rating?: number | null;
+                  avatar?: (string | null) | Media;
+                  id?: string | null;
+                }[]
+              | null;
+            logos?:
+              | {
+                  name: string;
+                  logo: string | Media;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'partnerShowcase';
+          }
+        | {
+            heading: string;
+            description?: string | null;
+            cta?: {
+              label?: string | null;
+              url?: string | null;
+            };
+            highlights?:
+              | {
+                  title: string;
+                  description?: string | null;
+                  icon?: ('stethoscope' | 'shield-check' | 'package') | null;
+                  cta?: {
+                    label?: string | null;
+                    url?: string | null;
+                  };
+                  image?: (string | null) | Media;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'productHighlights';
+          }
+        | {
+            eyebrow?: string | null;
+            heading: string;
+            description?: string | null;
+            cta?: {
+              label?: string | null;
+              url?: string | null;
+            };
+            viewAllUrl?: string | null;
+            members?:
+              | {
+                  name: string;
+                  title: string;
+                  bio?: string | null;
+                  linkedinUrl?: string | null;
+                  image?: (string | null) | Media;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'teamShowcase';
+          }
+        | {
+            content: {
+              root: {
+                type: string;
+                children: {
+                  type: string;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richText';
+          }
+      )[]
     | null;
   /**
    * Suggested max 60 characters.
@@ -846,6 +1001,7 @@ export interface MediaSelect<T extends boolean = true> {
 export interface PagesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
+  layout?: T;
   heroPreview?:
     | T
     | {
@@ -857,6 +1013,146 @@ export interface PagesSelect<T extends boolean = true> {
   sections?:
     | T
     | {
+        hero?:
+          | T
+          | {
+              heading?: T;
+              subheading?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                  };
+              layoutStyle?: T;
+              backgroundImage?: T;
+              id?: T;
+              blockName?: T;
+            };
+        featureCarousel?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              slides?:
+                | T
+                | {
+                    title?: T;
+                    description?: T;
+                    cta?:
+                      | T
+                      | {
+                          label?: T;
+                          url?: T;
+                        };
+                    image?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        mediaText?:
+          | T
+          | {
+              heading?: T;
+              body?: T;
+              media?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                  };
+              mediaPosition?: T;
+              id?: T;
+              blockName?: T;
+            };
+        partnerShowcase?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                  };
+              testimonials?:
+                | T
+                | {
+                    quote?: T;
+                    name?: T;
+                    title?: T;
+                    rating?: T;
+                    avatar?: T;
+                    id?: T;
+                  };
+              logos?:
+                | T
+                | {
+                    name?: T;
+                    logo?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        productHighlights?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                  };
+              highlights?:
+                | T
+                | {
+                    title?: T;
+                    description?: T;
+                    icon?: T;
+                    cta?:
+                      | T
+                      | {
+                          label?: T;
+                          url?: T;
+                        };
+                    image?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        teamShowcase?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              description?: T;
+              cta?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                  };
+              viewAllUrl?: T;
+              members?:
+                | T
+                | {
+                    name?: T;
+                    title?: T;
+                    bio?: T;
+                    linkedinUrl?: T;
+                    image?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
         richText?:
           | T
           | {

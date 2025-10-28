@@ -41,5 +41,5 @@ export default async function PageRoute({ params }: PageParams) {
     notFound();
   }
 
-  return <PageRenderer sections={page.sections} />;
+  return <PageRenderer sections={page.sections} layout={page.layout ?? 'standard'} />;
 }

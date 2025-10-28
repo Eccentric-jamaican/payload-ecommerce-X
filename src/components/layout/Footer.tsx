@@ -1,256 +1,224 @@
-import { Button } from '@/components/ui/button';
-import type { Media, SiteSettings as SiteSettingsType } from '@/payload-types';
-import {
-  Facebook,
-  Instagram,
-  Linkedin,
-  Mail,
-  MapPin,
-  Phone,
-  Twitter,
-  Youtube,
-} from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-
-type FooterColumn = NonNullable<SiteSettingsType['footerColumns']>[number];
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import type { Media, SiteSettings as SiteSettingsType } from "@/payload-types";
+import { Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 interface FooterProps {
-  logo?: SiteSettingsType['logo'];
-  address?: SiteSettingsType['address'];
-  supportEmail?: SiteSettingsType['supportEmail'];
-  salesEmail?: SiteSettingsType['salesEmail'];
-  primaryPhone?: SiteSettingsType['primaryPhone'];
-  secondaryPhone?: SiteSettingsType['secondaryPhone'];
-  cta?: SiteSettingsType['cta'];
-  footerColumns?: SiteSettingsType['footerColumns'];
-  socialLinks?: SiteSettingsType['socialLinks'];
-  footerNote?: SiteSettingsType['footerNote'];
+  logo?: SiteSettingsType["logo"];
+  supportEmail?: SiteSettingsType["supportEmail"];
+  primaryPhone?: SiteSettingsType["primaryPhone"];
+  footerColumns?: SiteSettingsType["footerColumns"];
+  socialLinks?: SiteSettingsType["socialLinks"];
+  footerNote?: SiteSettingsType["footerNote"];
+  cta?: SiteSettingsType["cta"];
 }
 
-const LOGO_FALLBACK_TEXT = 'Alphamed Global';
+type ColumnItem = {
+  label: string;
+  href?: string;
+  external?: boolean;
+};
+
+type ColumnData = {
+  heading: string;
+  items: ColumnItem[];
+};
+
+const LOGO_FALLBACK_TEXT = "Alphamed Global";
 
 const SOCIAL_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   facebook: Facebook,
+  instagram: Instagram,
+  linkedin: Linkedin,
   twitter: Twitter,
   x: Twitter,
-  instagram: Instagram,
   youtube: Youtube,
-  linkedin: Linkedin,
 };
 
-function resolveMedia(media?: SiteSettingsType['logo']): Media | null {
+function resolveMedia(media?: SiteSettingsType["logo"]): Media | null {
   if (!media) return null;
-  if (typeof media === 'object' && media !== null && 'url' in media) {
+  if (typeof media === "object" && media !== null && "url" in media) {
     return media as Media;
   }
   return null;
 }
 
-function FooterColumnLinks({ column }: { column: FooterColumn }) {
-  if (!column?.links?.length) return null;
+function mapFooterColumns(
+  footerColumns: SiteSettingsType["footerColumns"],
+  supportEmail?: string | null,
+  primaryPhone?: string | null,
+): ColumnData[] {
+  const columns: ColumnData[] = [];
+
+  footerColumns?.forEach((column) => {
+    if (!column) return;
+    const items: ColumnItem[] = [];
+    column.links?.forEach((link) => {
+      if (!link?.label || !link.url) return;
+      items.push({
+        label: link.label,
+        href: link.url,
+        external: link.openInNewTab ?? false,
+      });
+    });
+
+    columns.push({ heading: column.heading || "", items });
+  });
+
+  const contactItems: ColumnItem[] = [];
+  if (supportEmail) {
+    contactItems.push({ label: supportEmail, href: `mailto:${supportEmail}` });
+  }
+  if (primaryPhone) {
+    contactItems.push({ label: primaryPhone, href: `tel:${primaryPhone}` });
+  }
+
+  if (contactItems.length > 0) {
+    columns.push({ heading: "Connect", items: contactItems });
+  }
+
+  return columns;
+}
+
+const Column = ({ heading, items }: ColumnData) => {
+  if (!items.length) return null;
 
   return (
-    <div>
-      {column.heading ? (
-        <h4 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-          {column.heading}
-        </h4>
+    <div className="space-y-2">
+      {heading ? (
+        <h4 className="text-sm font-semibold text-[#0B0B0F]">{heading}</h4>
       ) : null}
-      <ul className="space-y-2.5 text-sm text-foreground/70">
-        {column.links.map((link) => {
-          if (!link?.label || !link?.url) return null;
-          return (
-            <li key={`${link.label}-${link.url}`}>
+      <ul className="space-y-2 text-sm text-[#3F4354]">
+        {items.map((item) => (
+          <li key={`${heading}-${item.label}`}>
+            {item.href ? (
               <Link
-                href={link.url}
-                className="transition-colors hover:text-[var(--brand-primary,#4FB8FF)]"
-                target={link.openInNewTab ? '_blank' : undefined}
-                rel={link.openInNewTab ? 'noreferrer' : undefined}
+                href={item.href}
+                target={item.external ? "_blank" : undefined}
+                rel={item.external ? "noreferrer" : undefined}
+                className="transition-colors hover:text-[#0B0B0F]"
               >
-                {link.label}
+                {item.label}
               </Link>
-            </li>
-          );
-        })}
+            ) : (
+              <span>{item.label}</span>
+            )}
+          </li>
+        ))}
       </ul>
     </div>
   );
-}
-
-function renderContactBlock({
-  supportEmail,
-  salesEmail,
-  primaryPhone,
-  secondaryPhone,
-  address,
-}: {
-  supportEmail?: string | null;
-  salesEmail?: string | null;
-  primaryPhone?: string | null;
-  secondaryPhone?: string | null;
-  address?: string | null;
-}) {
-  if (!supportEmail && !salesEmail && !primaryPhone && !secondaryPhone && !address) {
-    return null;
-  }
-
-  return (
-    <div className="space-y-4 text-sm text-foreground/70">
-      {supportEmail ? (
-        <div className="flex items-start gap-3">
-          <Mail className="mt-0.5 h-4 w-4 text-muted-foreground" />
-          <div>
-            <div className="font-medium text-foreground">Support</div>
-            <Link
-              href={`mailto:${supportEmail}`}
-              className="transition-colors hover:text-[var(--brand-primary,#4FB8FF)]"
-            >
-              {supportEmail}
-            </Link>
-          </div>
-        </div>
-      ) : null}
-      {salesEmail ? (
-        <div className="flex items-start gap-3">
-          <Mail className="mt-0.5 h-4 w-4 text-muted-foreground" />
-          <div>
-            <div className="font-medium text-foreground">Sales</div>
-            <Link
-              href={`mailto:${salesEmail}`}
-              className="transition-colors hover:text-[var(--brand-primary,#4FB8FF)]"
-            >
-              {salesEmail}
-            </Link>
-          </div>
-        </div>
-      ) : null}
-      {primaryPhone ? (
-        <div className="flex items-start gap-3">
-          <Phone className="mt-0.5 h-4 w-4 text-muted-foreground" />
-          <div>
-            <div className="font-medium text-foreground">Phone</div>
-            <Link
-              href={`tel:${primaryPhone}`}
-              className="transition-colors hover:text-[var(--brand-primary,#4FB8FF)]"
-            >
-              {primaryPhone}
-            </Link>
-          </div>
-        </div>
-      ) : null}
-      {secondaryPhone ? (
-        <div className="flex items-start gap-3">
-          <Phone className="mt-0.5 h-4 w-4 text-muted-foreground" />
-          <div>
-            <div className="font-medium text-foreground">Secondary</div>
-            <Link
-              href={`tel:${secondaryPhone}`}
-              className="transition-colors hover:text-[var(--brand-primary,#4FB8FF)]"
-            >
-              {secondaryPhone}
-            </Link>
-          </div>
-        </div>
-      ) : null}
-      {address ? (
-        <div className="flex items-start gap-3">
-          <MapPin className="mt-0.5 h-4 w-4 text-muted-foreground" />
-          <div>
-            <div className="font-medium text-foreground">Address</div>
-            <p className="whitespace-pre-line">{address}</p>
-          </div>
-        </div>
-      ) : null}
-    </div>
-  );
-}
+};
 
 export default function Footer({
   logo,
-  address,
   supportEmail,
-  salesEmail,
   primaryPhone,
-  secondaryPhone,
-  cta,
   footerColumns,
   socialLinks,
   footerNote,
+  cta,
 }: FooterProps) {
   const resolvedLogo = resolveMedia(logo);
+  const columns = mapFooterColumns(footerColumns, supportEmail, primaryPhone);
+  const showColumns = columns.length > 0;
+  const newsletterTitle = cta?.label || "Subscribe";
+  const newsletterCopy =
+    cta?.subtext || "Select topics and stay current with our latest insights.";
 
-  const hasFooterColumns = footerColumns && footerColumns.length > 0;
-  const hasSocialLinks = socialLinks && socialLinks.length > 0;
+  const flattenedLinks = columns.flatMap((column) => column.items);
 
   return (
-    <footer className="border-t bg-muted/20">
-      <div className="container space-y-12 py-12 md:py-16">
-        {cta?.label && cta.href ? (
-          <div className="flex flex-col items-start justify-between gap-6 rounded-2xl border bg-background p-8 md:flex-row md:items-center">
-            <div>
-              <h3 className="text-2xl font-semibold tracking-tight md:text-3xl">
-                {cta.label}
-              </h3>
-              {cta.subtext ? (
-                <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-                  {cta.subtext}
-                </p>
-              ) : null}
-            </div>
-            <Button asChild size="lg">
-              <Link
-                href={cta.href}
-                target={cta.href.startsWith('http') ? '_blank' : undefined}
-                rel={cta.href.startsWith('http') ? 'noreferrer' : undefined}
-              >
-                Get in touch
-              </Link>
-            </Button>
-          </div>
-        ) : null}
-
-        <div className="grid gap-12 lg:grid-cols-[1.2fr_2fr]">
-          <div className="space-y-6">
-            <Link href="/" className="flex items-center gap-3 text-lg font-semibold">
+    <footer className="bg-[#F4F6FB]">
+      <div className="mx-auto w-full max-w-6xl space-y-12 px-4 py-16 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
+          <div className="flex-1 space-y-8">
+            <Link href="/" className="inline-flex items-center gap-3 text-lg font-semibold">
               {resolvedLogo?.url ? (
                 <Image
                   src={resolvedLogo.url}
                   alt={resolvedLogo.alt ?? LOGO_FALLBACK_TEXT}
-                  width={48}
+                  width={140}
                   height={48}
-                  className="h-12 w-12 object-contain"
+                  className="h-12 w-auto object-contain"
                 />
               ) : (
-                <span>{LOGO_FALLBACK_TEXT}</span>
+                <span className="text-2xl font-semibold text-[#0B0B0F]">
+                  {LOGO_FALLBACK_TEXT}
+                </span>
               )}
             </Link>
-            {renderContactBlock({
-              supportEmail,
-              salesEmail,
-              primaryPhone,
-              secondaryPhone,
-              address,
-            })}
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold text-[#0B0B0F]">{newsletterTitle}</h3>
+              <p className="max-w-md text-sm text-[#3F4354] md:text-base">{newsletterCopy}</p>
+            </div>
+            <form
+              action="#"
+              method="post"
+              className="flex w-full max-w-md flex-col gap-3 sm:flex-row"
+            >
+              <Input
+                type="email"
+                name="email"
+                placeholder="Email address"
+                required
+                className="h-12 rounded-none border border-[#1B1B21] bg-white text-sm text-[#0B0B0F] focus-visible:border-[#1B1B21] focus-visible:ring-0 sm:flex-1"
+              />
+              <Button
+                type="submit"
+                className="h-12 rounded-none bg-[#2456FF] px-6 text-sm font-medium text-white transition hover:bg-[#1c43d9]"
+              >
+                Submit
+              </Button>
+            </form>
           </div>
 
-          {hasFooterColumns ? (
-            <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-              {footerColumns?.map((column, index) => (
-                <FooterColumnLinks key={column?.heading ?? index} column={column} />
-              ))}
+          {showColumns ? (
+            <div className="flex flex-1 flex-col gap-8">
+              <div className="flex flex-wrap gap-x-10 gap-y-8 text-sm text-[#0B0B0F]">
+                {columns.map((column, index) => (
+                  <div
+                    key={`${column.heading || column.items[0]?.label || "column"}-${index}`}
+                    className="min-w-[140px]"
+                  >
+                    <Column {...column} />
+                  </div>
+                ))}
+              </div>
             </div>
           ) : null}
         </div>
 
-        <div className="flex flex-col gap-6 border-t pt-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
-          <div>
-            {footerNote ?? '© ' + new Date().getFullYear() + ' Alphamed Global. All rights reserved.'}
-          </div>
-          {hasSocialLinks ? (
-            <div className="flex items-center gap-4">
+        <div className="space-y-6 border-t border-[#D5D7E1] pt-8 text-sm text-[#3F4354]">
+          {flattenedLinks.length > 0 ? (
+            <div className="flex flex-wrap gap-x-6 gap-y-3">
+              {flattenedLinks.map((item) =>
+                item.href ? (
+                  <Link
+                    key={`footer-inline-${item.label}`}
+                    href={item.href}
+                    target={item.external ? "_blank" : undefined}
+                    rel={item.external ? "noreferrer" : undefined}
+                    className="transition-colors hover:text-[#0B0B0F]"
+                  >
+                    {item.label}
+                  </Link>
+                ) : (
+                  <span key={`footer-inline-${item.label}`}>{item.label}</span>
+                ),
+              )}
+            </div>
+          ) : null}
+
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="text-xs text-[#5B5F72]">
+              {footerNote || `© ${new Date().getFullYear()} Alphamed Global Limited. All rights reserved.`}
+            </div>
+            <div className="flex items-center gap-4 text-[#0B0B0F]">
               {socialLinks?.map((link) => {
-                if (!link?.platform || !link?.url) return null;
+                if (!link?.platform || !link.url) return null;
                 const Icon =
                   SOCIAL_ICONS[link.icon?.toLowerCase() ?? link.platform.toLowerCase()] ?? null;
                 return (
@@ -259,7 +227,7 @@ export default function Footer({
                     href={link.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex h-9 w-9 items-center justify-center rounded-full border transition-colors hover:border-transparent hover:bg-[var(--brand-primary,#4FB8FF)] hover:text-white"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#0B0B0F] transition-colors hover:bg-[#0B0B0F] hover:text-white"
                     aria-label={link.platform}
                   >
                     {Icon ? <Icon className="h-4 w-4" /> : link.platform}
@@ -267,9 +235,10 @@ export default function Footer({
                 );
               })}
             </div>
-          ) : null}
+          </div>
         </div>
       </div>
     </footer>
   );
 }
+

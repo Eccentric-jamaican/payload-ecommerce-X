@@ -1,21 +1,31 @@
 import type { Page } from '@/payload-types';
-import { blockComponents } from '@/components/page-blocks';
+import { blockComponents, type PageLayout } from '@/components/page-blocks';
+import type { ComponentType } from 'react';
 
 type PageBlock = NonNullable<Page['sections']>[number];
 
 interface PageRendererProps {
   sections?: Page['sections'];
+  layout?: PageLayout | null;
 }
 
-export function PageRenderer({ sections }: PageRendererProps) {
+export function PageRenderer({ sections, layout = 'standard' }: PageRendererProps) {
   if (!sections?.length) {
     return null;
   }
 
+  const resolvedLayout: PageLayout =
+    layout === 'alternating' || layout === 'standard' ? layout : 'standard';
+
   return (
     <>
       {sections.map((block, index) => {
-        const Component = blockComponents[block.blockType as PageBlock['blockType']];
+        const blockType = block.blockType as PageBlock['blockType'];
+        const Component = blockComponents[blockType] as ComponentType<{
+          block: PageBlock;
+          index: number;
+          layout: PageLayout;
+        }>;
 
         if (!Component) {
           console.warn(`No renderer found for block type "${block.blockType}"`);
@@ -25,11 +35,13 @@ export function PageRenderer({ sections }: PageRendererProps) {
         return (
           <Component
             key={block.id ?? `${block.blockType}-${index}`}
-            block={block as Extract<PageBlock, { blockType: typeof block.blockType }>}
+            block={block as PageBlock}
             index={index}
+            layout={resolvedLayout}
           />
         );
       })}
     </>
   );
 }
+

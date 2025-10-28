@@ -50,6 +50,20 @@ export const Pages: CollectionConfig = {
               },
             },
             {
+              name: 'layout',
+              type: 'select',
+              label: 'Layout',
+              defaultValue: 'standard',
+              options: [
+                { label: 'Standard', value: 'standard' },
+                { label: 'Alternating', value: 'alternating' },
+              ],
+              admin: {
+                description:
+                  'Standard keeps media blocks consistent. Alternating flips media/text per section for visual rhythm.',
+              },
+            },
+            {
               name: 'heroPreview',
               type: 'group',
               label: 'Hero Preview',
