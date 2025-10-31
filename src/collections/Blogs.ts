@@ -60,6 +60,15 @@ const Blogs: CollectionConfig = {
       required: true,
     },
     {
+      name: 'topics',
+      type: 'relationship',
+      relationTo: 'blog-topics',
+      hasMany: true,
+      admin: {
+        description: 'Tag this article with relevant topics to power filtering.',
+      },
+    },
+    {
       name: 'content',
       type: 'richText',
       required: true,

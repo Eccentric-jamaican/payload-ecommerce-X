@@ -1,18 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { Media, SiteSettings as SiteSettingsType } from "@/payload-types";
+import type { Media, SiteSetting } from "@/payload-types";
 import { Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 interface FooterProps {
-  logo?: SiteSettingsType["logo"];
-  supportEmail?: SiteSettingsType["supportEmail"];
-  primaryPhone?: SiteSettingsType["primaryPhone"];
-  footerColumns?: SiteSettingsType["footerColumns"];
-  socialLinks?: SiteSettingsType["socialLinks"];
-  footerNote?: SiteSettingsType["footerNote"];
-  cta?: SiteSettingsType["cta"];
+  logo?: SiteSetting["logo"];
+  supportEmail?: SiteSetting["supportEmail"];
+  primaryPhone?: SiteSetting["primaryPhone"];
+  footerColumns?: SiteSetting["footerColumns"];
+  socialLinks?: SiteSetting["socialLinks"];
+  footerNote?: SiteSetting["footerNote"];
+  cta?: SiteSetting["cta"];
 }
 
 type ColumnItem = {
@@ -37,7 +37,7 @@ const SOCIAL_ICONS: Record<string, React.ComponentType<{ className?: string }>> 
   youtube: Youtube,
 };
 
-function resolveMedia(media?: SiteSettingsType["logo"]): Media | null {
+function resolveMedia(media?: SiteSetting["logo"]): Media | null {
   if (!media) return null;
   if (typeof media === "object" && media !== null && "url" in media) {
     return media as Media;
@@ -46,7 +46,7 @@ function resolveMedia(media?: SiteSettingsType["logo"]): Media | null {
 }
 
 function mapFooterColumns(
-  footerColumns: SiteSettingsType["footerColumns"],
+  footerColumns: SiteSetting["footerColumns"],
   supportEmail?: string | null,
   primaryPhone?: string | null,
 ): ColumnData[] {

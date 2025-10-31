@@ -4,7 +4,7 @@ import { BannerCarousel } from '@/components/layout/BannerCarousel';
 import { Toaster } from '@/components/ui/toaster';
 import { getSiteSettings } from '@/lib/getSiteSettings';
 import { Providers } from '@/providers';
-import type { SiteSettings as SiteSettingsType } from '@/payload-types';
+import type { SiteSetting } from '@/payload-types';
 import { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import type { CSSProperties, ReactNode } from 'react';
@@ -95,30 +95,30 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://payload-templates.vercel.app"),
+  metadataBase: new URL('https://alphamed.global'),
   title: {
-    default: "Payload Templates - Digital Assets Marketplace",
-    template: "%s | Payload Templates",
+    default: 'Alphamed Global Limited',
+    template: '%s | Alphamed Global',
   },
   description:
-    "Discover and download high-quality digital assets and templates.",
-  keywords: ["digital assets", "templates", "marketplace", "design resources"],
-  authors: [{ name: "Payload Templates" }],
-  creator: "Payload Templates",
+    'Integrated procurement and distribution for government and private healthcare networks across Africa.',
+  keywords: ['medical supplies', 'procurement', 'healthcare logistics'],
+  authors: [{ name: 'Alphamed Global Limited' }],
+  creator: 'Alphamed Global Limited',
   openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://payload-templates.vercel.app",
-    siteName: "Payload Templates",
-    title: "Payload Templates - Digital Assets Marketplace",
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://alphamed.global',
+    siteName: 'Alphamed Global Limited',
+    title: 'Alphamed Global Limited',
     description:
-      "Discover and download high-quality digital assets and templates.",
+      'Integrated procurement and distribution for government and private healthcare networks across Africa.',
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Payload Templates - Digital Assets Marketplace",
+    card: 'summary_large_image',
+    title: 'Alphamed Global Limited',
     description:
-      "Discover and download high-quality digital assets and templates.",
+      'Integrated procurement and distribution for government and private healthcare networks across Africa.',
   },
   robots: {
     index: true,
@@ -128,11 +128,10 @@ export const metadata: Metadata = {
 
 interface LayoutProps {
   children: ReactNode;
-  modal: ReactNode;
 }
 
 const DEFAULT_BRAND_SETTINGS: Pick<
-  SiteSettingsType,
+  SiteSetting,
   'primaryColor' | 'accentColor' | 'textColor' | 'backgroundColor' | 'fontFamily'
 > = {
   primaryColor: '#4FB8FF',
@@ -149,7 +148,7 @@ const DEFAULT_HSL = {
   accent: hexToHsl(DEFAULT_BRAND_SETTINGS.accentColor)!,
 };
 
-export default async function RootLayout({ children, modal }: LayoutProps) {
+export default async function RootLayout({ children }: LayoutProps) {
   const siteSettings = await getSiteSettings();
 
   const {
@@ -185,7 +184,7 @@ export default async function RootLayout({ children, modal }: LayoutProps) {
   const secondaryForeground = adjustLightness(textHsl, -10);
   const mutedForeground = adjustLightness(textHsl, 10);
 
-  const bodyStyle: CSSProperties = {
+  const bodyStyle: CSSProperties & Record<string, string | number> = {
     '--brand-primary': primaryColor,
     '--brand-accent': accentColor,
     '--brand-text': textColor,
@@ -236,14 +235,11 @@ export default async function RootLayout({ children, modal }: LayoutProps) {
               primaryPhone={primaryPhone}
             />
             <main>{children}</main>
-            {modal}
+
             <Footer
               logo={logo}
-              address={address}
               supportEmail={supportEmail}
-              salesEmail={salesEmail}
               primaryPhone={primaryPhone}
-              secondaryPhone={secondaryPhone}
               cta={cta}
               footerColumns={footerColumns}
               socialLinks={socialLinks}

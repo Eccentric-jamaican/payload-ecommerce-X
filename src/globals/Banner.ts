@@ -1,28 +1,15 @@
 import type { GlobalConfig } from 'payload';
-
-interface User {
-  role: 'admin' | 'user';
-  [key: string]: unknown;
-}
-
-interface AccessArgs {
-  req: {
-    user?: User;
-  };
-}
+import { isAdmin } from '@/access/admin';
 
 export const Banner: GlobalConfig = {
   slug: 'banner',
   label: 'Banner Messages',
   admin: {
-    description: 'Manage banner messages that appear at the top of the site',
     group: 'Site',
   },
   access: {
-    read: (): boolean => true, // Publicly accessible
-    update: ({ req: { user } }: AccessArgs): boolean => {
-      return user?.role === 'admin';
-    },
+    read: () => true,
+    update: isAdmin,
   },
   fields: [
     {
@@ -30,7 +17,7 @@ export const Banner: GlobalConfig = {
       type: 'array',
       label: 'Banner Messages',
       minRows: 1,
-      maxRows: 5, // Limit number of banners
+      maxRows: 5,
       labels: {
         singular: 'Banner',
         plural: 'Banners',
@@ -41,7 +28,6 @@ export const Banner: GlobalConfig = {
           type: 'text',
           required: true,
           label: 'Banner Text',
-          description: 'Supports emojis and basic text formatting',
         },
         {
           name: 'backgroundColor',

@@ -4,29 +4,23 @@ import HomePageClient from './page.client';
 import { getPayload } from 'payload';
 
 export const metadata: Metadata = {
-  title: 'Digital Assets Marketplace',
+  title: 'Alphamed Global Limited',
   description:
-    'Discover curated products that blend style with innovation. Join thousands of satisfied customers worldwide.',
+    'Integrated procurement and distribution for government and private healthcare networks across Africa.',
   openGraph: {
-    title: 'Digital Assets Marketplace',
+    title: 'Alphamed Global Limited',
     description:
-      'Discover curated products that blend style with innovation. Join thousands of satisfied customers worldwide.',
+      'Integrated procurement and distribution for government and private healthcare networks across Africa.',
   },
   twitter: {
-    title: 'Digital Assets Marketplace',
+    title: 'Alphamed Global Limited',
     description:
-      'Discover curated products that blend style with innovation. Join thousands of satisfied customers worldwide.',
+      'Integrated procurement and distribution for government and private healthcare networks across Africa.',
   },
 };
 
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise });
-
-  const products = await payload.find({
-    collection: 'products',
-    limit: 8,
-    sort: '-createdAt',
-  });
 
   const pages = await payload.find({
     collection: 'pages',
@@ -41,10 +35,5 @@ export default async function HomePage() {
 
   const homePage = pages.docs[0] ?? null;
 
-  return (
-    <HomePageClient
-      initialProducts={products.docs}
-      sections={homePage?.sections ?? null}
-    />
-  );
+  return <HomePageClient sections={homePage?.sections ?? null} />;
 }

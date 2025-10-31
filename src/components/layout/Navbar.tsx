@@ -2,28 +2,28 @@
 
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import type { Media, SiteSettings as SiteSettingsType } from '@/payload-types';
+import type { Media, SiteSetting } from '@/payload-types';
 import { cn } from '@/lib/utils';
 import { ChevronDown, Menu } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo } from 'react';
 
-type NavigationItem = NonNullable<SiteSettingsType['primaryNavigation']>[number];
-type UtilityItem = NonNullable<SiteSettingsType['utilityNavigation']>[number];
+type NavigationItem = NonNullable<SiteSetting['primaryNavigation']>[number];
+type UtilityItem = NonNullable<SiteSetting['utilityNavigation']>[number];
 
 interface NavbarProps {
-  logo?: SiteSettingsType['logo'];
-  primaryNavigation?: SiteSettingsType['primaryNavigation'];
-  utilityNavigation?: SiteSettingsType['utilityNavigation'];
-  cta?: SiteSettingsType['cta'];
-  supportEmail?: SiteSettingsType['supportEmail'];
-  primaryPhone?: SiteSettingsType['primaryPhone'];
+  logo?: SiteSetting['logo'];
+  primaryNavigation?: SiteSetting['primaryNavigation'];
+  utilityNavigation?: SiteSetting['utilityNavigation'];
+  cta?: SiteSetting['cta'];
+  supportEmail?: SiteSetting['supportEmail'];
+  primaryPhone?: SiteSetting['primaryPhone'];
 }
 
 const LOGO_FALLBACK_TEXT = 'Alphamed Global';
 
-function resolveMedia(media?: SiteSettingsType['logo']): Media | null {
+function resolveMedia(media?: SiteSetting['logo']): Media | null {
   if (!media) return null;
   if (typeof media === 'object' && media !== null && 'url' in media) {
     return media as Media;

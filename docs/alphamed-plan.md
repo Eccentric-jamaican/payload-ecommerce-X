@@ -1,117 +1,55 @@
 # Alphamed Global CMS & Frontend Plan
 
 ## Project Goals
-- Deliver a production-ready Alphamed Global Limited website where non-technical admins control all content via Payload CMS.
-- Support dynamic page/section composition so the client can adapt messaging as the company evolves.
-- Keep branding tokens configurable to accommodate future design refinements without code changes.
+- Deliver a production-ready Alphamed Global Limited website where non-technical editors manage all content through Payload CMS.
+- Support dynamic page/section composition so the team can evolve messaging without deployments.
+- Keep brand tokens (color, typography, CTAs) configurable from Site Settings for future redesigns.
 
-## Branding Defaults (Editable Later)
-- Primary color default: `#4FB8FF` (medical light blue).
-- Text black default: `#111827` (soft black).
-- Font family: Poppins (Medium weight for headings, regular for body).
-- Expose colors, typography, and CTA details in a `siteSettings` global to allow runtime overrides.
+## Current Content Model
+- `users` — admin/editor accounts with email+password auth.
+- `media` — centralized asset library for images and documents.
+- `pages` — flexible static pages driven by a blocks array (hero, carousels, partner strip, team, etc.).
+- `blogs` — long-form articles with Lexical rich text, featured media, author attribution, and scheduling support.
+- `products` — catalogue entries with gallery, specs, key uses, CTA controls, and publication status.
+- `categories`, `clinical-areas`, `product-families` — supporting taxonomies for product filters and grouping.
+- `notifications` — admin broadcast messages.
+- Globals: `siteSettings` (branding, navigation, footer content, CTAs) and `banner` (stackable announcement messages).
 
-## Content Architecture
+## Blog Experience
+- Listing (`/blog`) pulls hero copy, social links, filters (topic + date), and newsletter CTA from Site Settings.
+- Blog posts (`/blog/[slug]`) render hero metadata, featured images, and Lexical content with structured typography (headings, lists, quotes, media uploads).
+- Editors can tag posts with topics via the `blog-topics` collection to power filtering and chips.
 
-### Collections
-- `pages` – each entry represents a route (home, about, products, etc.) with a flexible `sections` blocks array.
-- `products` – contains product detail data; drives `/products` listing and dynamic `/products/[slug]` pages.
-- `blogPosts` – optional thought leadership / investor updates with authors, tags, and publish scheduling.
-- `testimonials` – reusable quotes linked to pages/sections where needed.
-- `teamMembers` – name, title, bio, portrait, optional social links.
-- `faqs` – question/answer pairs; can be grouped by topic for reuse.
-- `partners` – logo, name, link; reused in About and other pages.
-- `awards` – award name, description, logo, year.
-- `jobs` – positions for Careers page with location, department, apply link.
-- `siteSettings` (global) – navigation menus, footer content, brand tokens, global contact info, default CTAs, social links.
-- `media` (upload collection) – central library for images/documents (enable cropping/focal point selection).
+## Product Catalogue
+- **Schema**: `products` tracks name, slug, SKU, status (draft/published/discontinued), short+rich descriptions, media gallery (min. one upload), optional YouTube embed, key uses, technical specs, stock flag, CTA label/url, and relationships to `categories`, `clinical-areas`, and optional `product-families`. Drafts/versioning are enabled for approvals.
+- **Taxonomies**: `categories`, `clinical-areas`, `product-families` auto-generate slugs for URL-safe filtering; admins can add/remove items freely.
+- **Listing**: `/products` presents a hero summary, total count, procurement CTA, and a three-column grid. Filters for category and clinical area update the Payload query directly.
+- **Detail View**: `/products/[slug]` showcases hero metadata (stock badge, family, code), gallery, additional imagery, key uses, technical specs stack, Lexical description, optional YouTube embed, and CTA button.
 
-### Blocks (for `pages.sections`)
-- `hero`: background image/video, eyebrow, heading (rich text), subheading, CTA buttons.
-- `featureVideo`: YouTube/Vimeo URL or uploaded video, optional caption.
-- `featureCards`: repeater of card items (image, title, description, CTA link); optional slider toggle.
-- `featureList`: checklist style features with icon/image + copy.
-- `benefits`: headline, supporting text, list of benefit items (title, description, optional icon).
-- `testimonials`: select testimonial entries, layout toggle (grid, slider).
-- `team`: select team members, optional max per row, background color choice.
-- `ctaBanner`: headline, supporting text, CTA button(s), contact phone/email override.
-- `faq`: select FAQ entries or inline FAQs per page.
-- `timeline`: list of milestones (year/date, title, description, media).
-- `logosStrip`: choose partners/awards; allow light/dark mode logos.
-- `productHighlight`: reference a product, override hero image/copy per usage.
-- `productList`: renders filtered list of products (e.g., by category tag).
-- `howItWorks`: ordered steps with title, description, icon/image.
-- `contactDetails`: address, phone, email, map embed.
-- `contactForm`: toggles form rendering and determines recipients.
+## Page Composition
+1. Editors create a page, pick a layout variant, and add blocks to the `sections` field.
+2. Each block exposes the core editable fields (headline, copy, CTAs, imagery).
+3. `page.client.tsx` maps blocks to React components. Unknown blocks are skipped safely so new ones can ship without breaking rendering.
+4. Every page resolves via `/{slug}`; the legacy home continues to consume CMS-driven sections under the hood.
 
-### Page Routing
-- Static routes (`/`, `/about`, `/contact`, `/investors`, `/careers`, `/team`) – each tied to a `pages` document by slug.
-- `/products` – listing page driven by `products` collection + blocks.
-- `/products/[slug]` – dynamic product detail; fallback 404 if product hidden/unpublished.
-- `/blog` and `/blog/[slug]` – optional blog listing/detail.
+## Site Settings Integration
+- `layout.tsx` fetches Site Settings server-side and injects CSS custom properties for brand theming.
+- `Navbar` and `Footer` read navigation arrays, CTAs, and contact info from Site Settings.
+- `BannerCarousel` renders the rotating announcement stack from the `banner` global.
 
-## Implementation Steps
-1. **Create Collections in Payload**
-   - Define TypeScript schemas inside `src/payload` (e.g., `collections/Products.ts`) with appropriate fields, access control, and admin UI grouping.
-   - Enable `drafts`/`versioning` where beneficial (products, pages).
+## Editorial Workflows
+- Versioning/drafts enabled on `pages`, `blogs`, and `products` so editors can stage updates.
+- Hero blocks support animated headings, background imagery, and CTA controls.
+- Carousels (“See Alphamed in action”, “Who we are”) let editors reorder slides, toggle view-all links, and apply deep links.
+- Team showcase adapts between single-row and three-column layouts based on member counts.
 
-2. **Build Global `siteSettings`**
-   - Fields for brand colors, typography choices, primary CTA text/link, contact info, nav/footer menus (array of link groups), social links.
-   - Expose via Payload REST/GraphQL; configure Next.js to fetch settings server-side.
+## Maintenance Notes
+- Run `pnpm generate:types` after schema changes so `payload-types.ts` stays in sync (expect the SMTP warning if env vars are unset).
+- Validate with `pnpm exec tsc --noEmit` prior to commits; the project blocks on type errors.
+- Update `next.config.mjs` remote image hosts if brand assets move to new CDNs.
 
-3. **Implement Blocks**
-   - Create a central `blocks/index.ts` exporting each Payload block config.
-   - Mirror the blocks in React components under `src/components/blocks/*`.
-   - Ensure each block supports optional enable/disable, ordering, and per-instance styling toggles (background variant, padding).
-
-4. **Frontend Wiring**
-   - Configure Next.js layout to load `siteSettings` at build/request time and inject CSS variables for colors/typography.
-   - Build page template that iterates over `page.sections`, rendering the corresponding block component.
-   - Set up dynamic routes for `products/[slug]` and optional `blog/[slug]`.
-
-5. **Navigation & Footer**
-   - Use `siteSettings` menus to render header/footer links.
-   - Include fallbacks if menus empty to avoid blank nav.
-
-6. **Media Handling**
-   - Enable Payload `Media` collection with image resizing (e.g., 300x300 thumbnails, 1200px hero).
-   - Allow blocks to reference either `media` upload or external URL for videos.
-
-7. **Deployment Prep**
-   - Ensure environment variables cover Mongo connection, Payload secret, Next.js public URL.
-   - Update `Dockerfile` and non-Docker deployment docs to reflect build pipeline.
-
-## Editor Experience Considerations
-- Group related fields in Payload tabs (Content, Media, SEO) for clarity.
-- Provide preview fields (e.g., generated slug, preview URL).
-- Add default values for CTA phone/email from `siteSettings` to minimize duplicate entry.
-- Consider access control roles (e.g., Marketing Editors vs. Admins) before launch.
-
-## Next Steps for You
-1. Review and confirm collections/blocks align with Alphamed requirements.
-2. Decide whether blog/jobs are in scope for MVP; remove if unnecessary.
-3. Gather brand assets and prepare initial content to seed the CMS.
-4. Let me know which collection/block implementation you want help with first—then I’ll give you the exact code steps to follow (or draft them if you prefer).
-
-## Site Settings Integration Checklist
-- Create/update `src/globals/SiteSettings.ts` with tabs for Branding, Contact, Navigation, and Footer content.
-- Add helper `src/lib/getSiteSettings.ts` that uses `getPayload` (with `depth: 2`) and wraps the call in `cache(...)` for reuse.
-- Convert `src/app/(frontend)/layout.tsx` to `async`, fetch site settings, and inject CSS variables + pass props to layout components (Navbar/Footer).
-- Replace hard-coded navigation/footer components with prop-driven versions that read from Site Settings (see `src/components/layout/Navbar.tsx` and `Footer.tsx`).
-- After schema changes run `pnpm generate:types` so Payload updates `payload-types.ts` for type safety.
-
-## Pages Collection Checklist
-- `src/collections/Pages.ts` defines slug, hero preview, versioning with drafts, SEO fields, and a flexible `sections` blocks array.
-- Starter block stored at `src/blocks/RichTextBlock.ts`, exported via `src/blocks/index.ts` for easy expansion.
-- Register the collection in `src/payload.config.ts` under the `collections` array.
-- Regenerate payload types (`pnpm generate:types`) after modifying schemas.
-- Future iterations: add new block configs to `src/blocks`, export them as part of `pageBlocks`, and implement matching React components in the frontend.
-
-## Page Rendering Checklist
-- Helper `src/lib/getPageBySlug.ts` fetches published pages (and slugs) with caching.
-- `src/lib/buildPageMetadata.ts` maps page meta fields to Next.js metadata objects.
-- Block components live under `src/components/page-blocks`; currently only `RichTextBlock` is implemented using Payload’s Lexical renderer.
-- `src/components/page/PageRenderer.tsx` iterates over sections, warning (and skipping) if a block has no renderer—add new block components to `blockComponents` as you expand the system.
-- Routes:
-  * `/` (`src/app/(frontend)/(with_title)/page.tsx`) remains the legacy marketplace homepage (not CMS-driven).
-  * `/{slug}` (`src/app/(frontend)/[slug]/page.tsx`) renders CMS-managed pages, 404s on missing slugs; `generateStaticParams` prebuilds published slugs with ISR (`revalidate = 60`).
+## Open Questions / Future Enhancements
+1. Additional block library: benefits lists, timelines, resource downloads, contact forms, etc.
+2. Broader content collections (awards, partners, testimonials, careers) if reuse demands it.
+3. Authentication scope: keep public sign-up or restrict to invited editors only?
+4. Deployment runbook covering environments with/without Docker.

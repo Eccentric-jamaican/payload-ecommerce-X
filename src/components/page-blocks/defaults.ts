@@ -38,7 +38,7 @@ export const defaultFeatureSection: {
       title: "Documents & Contracts",
       description: "Generate contracts and procurement paperwork that can be signed digitally.",
       ctaLabel: "See document workflows",
-      href: "/products",
+      href: "/contact",
       image: {
         src: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1600&q=80",
         alt: "Team collaborating on contracts",
@@ -132,15 +132,15 @@ export const defaultProductSection = {
   heading: "Equip every facility with Alphamed",
   description:
     "From consumables to high-dependency equipment, our curated product range keeps your teams ready for any patient need. Browse the catalogue or jump straight into a conversation with our procurement specialists.",
-  ctaLabel: "View all products",
-  ctaUrl: "/products",
+  ctaLabel: "Connect with procurement",
+  ctaUrl: "/contact",
   highlights: [
     {
       id: "clinical",
       title: "Clinical Essentials",
       description: "Reliable PPE, wound care, and consumables ready to deploy across each ward.",
       ctaLabel: "Browse essentials",
-      href: "/products?category=clinical",
+      href: "/contact",
       icon: "stethoscope" as const,
     },
     {
@@ -148,7 +148,7 @@ export const defaultProductSection = {
       title: "Cold Chain & Logistics",
       description: "Temperature-controlled storage and tracking to keep vaccines and medicines safe.",
       ctaLabel: "View cold chain",
-      href: "/products?category=logistics",
+      href: "/contact",
       icon: "shield-check" as const,
     },
     {
@@ -157,7 +157,7 @@ export const defaultProductSection = {
       description:
         "High-spec imaging, diagnostics, and surgical tools sourced from trusted manufacturers.",
       ctaLabel: "Explore equipment",
-      href: "/products?category=equipment",
+      href: "/contact",
       icon: "package" as const,
     },
   ],

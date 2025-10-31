@@ -240,6 +240,109 @@ export const SiteSettings: GlobalConfig = {
           ],
         },
         {
+          label: 'Blog',
+          fields: [
+            {
+              type: 'group',
+              name: 'blogHero',
+              label: 'Blog Hero',
+              fields: [
+                {
+                  name: 'heading',
+                  type: 'text',
+                  label: 'Hero Heading',
+                  required: true,
+                  defaultValue: 'New at Alphamed Blog',
+                },
+                {
+                  name: 'subheading',
+                  type: 'textarea',
+                  label: 'Hero Description',
+                  required: true,
+                  defaultValue:
+                    'A collection of stories about our people, our capabilities and our products.',
+                },
+              ],
+            },
+            {
+              name: 'blogSocialLinks',
+              type: 'array',
+              label: 'Hero Social Links',
+              admin: {
+                description: 'Links rendered below the hero copy (e.g. Instagram, LinkedIn).',
+              },
+              fields: [
+                {
+                  name: 'platform',
+                  type: 'select',
+                  label: 'Platform',
+                  required: true,
+                  options: [
+                    { label: 'Instagram', value: 'instagram' },
+                    { label: 'LinkedIn', value: 'linkedin' },
+                  ],
+                },
+                {
+                  name: 'url',
+                  type: 'text',
+                  label: 'Profile URL',
+                  required: true,
+                },
+              ],
+            },
+            {
+              type: 'group',
+              name: 'blogNewsletter',
+              label: 'Newsletter Card',
+              fields: [
+                {
+                  name: 'enabled',
+                  type: 'checkbox',
+                  label: 'Show newsletter callout on listing page',
+                  defaultValue: false,
+                },
+                {
+                  name: 'title',
+                  type: 'text',
+                  label: 'Headline',
+                  admin: {
+                    condition: (_, siblingData) => Boolean(siblingData?.enabled),
+                  },
+                },
+                {
+                  name: 'description',
+                  type: 'textarea',
+                  label: 'Supporting Copy',
+                  admin: {
+                    condition: (_, siblingData) => Boolean(siblingData?.enabled),
+                  },
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'ctaLabel',
+                      type: 'text',
+                      label: 'CTA Label',
+                      admin: {
+                        condition: (_, siblingData) => Boolean(siblingData?.enabled),
+                      },
+                    },
+                    {
+                      name: 'ctaUrl',
+                      type: 'text',
+                      label: 'CTA URL',
+                      admin: {
+                        condition: (_, siblingData) => Boolean(siblingData?.enabled),
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
           label: 'Footer',
           fields: [
             {
