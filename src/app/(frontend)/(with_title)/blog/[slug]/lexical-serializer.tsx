@@ -13,6 +13,9 @@ interface LexicalNode {
   url?: string;
   rel?: string;
   target?: string;
+  relationTo?: string;
+  value?: unknown;
+  fields?: Record<string, unknown>;
 }
 
 interface LexicalContent {
@@ -66,48 +69,64 @@ const serializeNode = (node: LexicalNode, index: number): React.ReactNode => {
       
     case 'paragraph':
       return (
-        <p key={index} className="mb-4">
+        <p key={index} className="mb-6 text-lg leading-8 text-[#2F3140]">
           {node.children?.map((child, childIndex) => serializeNode(child, childIndex))}
         </p>
       );
       
-    case 'heading':
-      const HeadingTag = (node.tag || 'h2') as keyof JSX.IntrinsicElements;
-      const headingClasses = {
-        h1: 'text-3xl font-bold mb-4 mt-8',
-        h2: 'text-2xl font-bold mb-3 mt-6',
-        h3: 'text-xl font-bold mb-2 mt-4',
-        h4: 'text-lg font-bold mb-2 mt-3',
-        h5: 'text-base font-bold mb-2 mt-2',
-        h6: 'text-sm font-bold mb-2 mt-2',
+    case 'heading': {
+      type HeadingTagName = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+      const headingClasses: Record<HeadingTagName, string> = {
+        h1: 'text-4xl md:text-5xl font-semibold tracking-tight text-[#0B0B0F] leading-tight mt-16 mb-8 first:mt-0',
+        h2: 'text-3xl md:text-4xl font-semibold tracking-tight text-[#0B0B0F] leading-tight mt-14 mb-6',
+        h3: 'text-2xl md:text-3xl font-semibold tracking-tight text-[#0B0B0F] mt-12 mb-5',
+        h4: 'text-xl md:text-2xl font-semibold tracking-tight text-[#0B0B0F] mt-10 mb-4',
+        h5: 'text-lg md:text-xl font-semibold tracking-tight text-[#0B0B0F] mt-8 mb-3',
+        h6: 'text-base md:text-lg font-semibold tracking-tight text-[#0B0B0F] mt-6 mb-3',
       };
-      
-      return (
-        <HeadingTag key={index} className={headingClasses[node.tag as keyof typeof headingClasses] || headingClasses.h2}>
-          {node.children?.map((child, childIndex) => serializeNode(child, childIndex))}
-        </HeadingTag>
+      const tag = (node.tag as HeadingTagName) ?? 'h2';
+      const headingTag: HeadingTagName = headingClasses[tag] ? tag : 'h2';
+
+      return React.createElement(
+        headingTag,
+        {
+          key: index,
+          className: headingClasses[headingTag],
+        },
+        node.children?.map((child, childIndex) => serializeNode(child, childIndex)),
       );
+    }
       
-    case 'list':
-      const ListTag = node.tag === 'ol' ? 'ol' : 'ul';
-      const listClasses = node.tag === 'ol' ? 'list-decimal list-inside mb-4' : 'list-disc list-inside mb-4';
-      
-      return (
-        <ListTag key={index} className={listClasses}>
-          {node.children?.map((child, childIndex) => serializeNode(child, childIndex))}
-        </ListTag>
+    case 'list': {
+      const listTag = node.tag === 'ol' ? 'ol' : 'ul';
+      const listClasses =
+        listTag === 'ol'
+          ? 'mb-6 ml-6 list-decimal space-y-3 text-lg leading-8 text-[#2F3140]'
+          : 'mb-6 ml-6 list-disc space-y-3 text-lg leading-8 text-[#2F3140]';
+
+      return React.createElement(
+        listTag,
+        {
+          key: index,
+          className: listClasses,
+        },
+        node.children?.map((child, childIndex) => serializeNode(child, childIndex)),
       );
+    }
       
     case 'listitem':
       return (
-        <li key={index} className="mb-1">
+        <li key={index} className="pl-2">
           {node.children?.map((child, childIndex) => serializeNode(child, childIndex))}
         </li>
       );
       
     case 'quote':
       return (
-        <blockquote key={index} className="border-l-4 border-gray-300 pl-4 italic mb-4">
+        <blockquote
+          key={index}
+          className="my-10 rounded-r-3xl border-l-4 border-[#55B948] bg-[#F4FBF5] px-6 py-5 text-lg leading-8 text-[#1E2A22]"
+        >
           {node.children?.map((child, childIndex) => serializeNode(child, childIndex))}
         </blockquote>
       );
@@ -119,7 +138,7 @@ const serializeNode = (node: LexicalNode, index: number): React.ReactNode => {
           href={node.url} 
           target={node.target || '_self'}
           rel={node.rel}
-          className="text-blue-600 hover:text-blue-800 underline"
+          className="font-medium text-[#2450D3] underline decoration-2 underline-offset-[6px] transition hover:text-[#163AA3]"
         >
           {node.children?.map((child, childIndex) => serializeNode(child, childIndex))}
         </a>
@@ -127,6 +146,48 @@ const serializeNode = (node: LexicalNode, index: number): React.ReactNode => {
       
     case 'linebreak':
       return <br key={index} />;
+      
+    case 'horizontalrule':
+      return <hr key={index} className="my-12 border-t border-[#E4E7EF]" />;
+
+    case 'upload': {
+      if (
+        node.relationTo === 'media' &&
+        node.value &&
+        typeof node.value === 'object' &&
+        'url' in node.value
+      ) {
+        const media = node.value as {
+          url?: string | null;
+          alt?: string | null;
+          width?: number | null;
+          height?: number | null;
+          caption?: string | null;
+        };
+        if (!media.url) return null;
+
+        return (
+          <figure
+            key={index}
+            className="my-12 overflow-hidden rounded-3xl bg-[#F7F9FC] p-6"
+          >
+            <img
+              src={media.url}
+              alt={media.alt ?? ''}
+              className="mx-auto block h-auto w-full max-w-3xl rounded-2xl object-cover"
+              width={media.width ?? undefined}
+              height={media.height ?? undefined}
+            />
+            {media.caption ? (
+              <figcaption className="mt-4 text-center text-sm text-[#4F5563]">
+                {media.caption}
+              </figcaption>
+            ) : null}
+          </figure>
+        );
+      }
+      return null;
+    }
       
     default:
       // For unknown node types, try to render children if they exist

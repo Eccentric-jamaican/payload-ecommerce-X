@@ -7,7 +7,7 @@ import type { FeatureCard } from "@/components/home/FeatureCarousel";
 import { TeamCarousel } from "@/components/team/TeamCarousel";
 import type { TeamMemberSlide } from "@/components/team/TeamCarousel";
 import { Button } from "@/components/ui/button";
-import type { Page, Product } from "@/payload-types";
+import type { Page } from "@/payload-types";
 import { ArrowRight, Package, ShieldCheck, Stethoscope } from 'lucide-react'
 import Image from "next/image";
 import Link from "next/link";
@@ -21,7 +21,6 @@ import {
 } from "@/components/page-blocks/defaults";
 
 interface HomePageClientProps {
-  initialProducts: Product[];
   sections?: Page["sections"] | null;
 }
 
@@ -32,7 +31,7 @@ type PartnerShowcaseBlock = Extract<PageSection, { blockType: "partnerShowcase" 
 type ProductHighlightsBlock = Extract<PageSection, { blockType: "productHighlights" }>;
 type TeamShowcaseBlock = Extract<PageSection, { blockType: "teamShowcase" }>;
 
-const HomePageClient: FC<HomePageClientProps> = ({ initialProducts, sections }) => {
+const HomePageClient: FC<HomePageClientProps> = ({ sections }) => {
   const sectionEntries = (sections ?? []) as PageSection[];
 
   const heroBlock = sectionEntries.find(
@@ -50,12 +49,6 @@ const HomePageClient: FC<HomePageClientProps> = ({ initialProducts, sections }) 
   const teamShowcaseBlock = sectionEntries.find(
     (block): block is TeamShowcaseBlock => block.blockType === "teamShowcase",
   );
-
-  const filteredProducts = initialProducts.filter((product) => {
-    const name = (product.name || "").toLowerCase();
-    return !["male condoms", "female condoms"].includes(name);
-  });
-  const previewProducts = filteredProducts.slice(0, 3);
 
   const heroHeadingSource = heroBlock?.heading?.trim();
   const heroHeadingLinesRaw: string[] =
@@ -454,44 +447,6 @@ const HomePageClient: FC<HomePageClientProps> = ({ initialProducts, sections }) 
             })}
           </div>
 
-          {previewProducts.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-3">
-              {previewProducts.map((product) => (
-                <Link
-                  href={`/products/${product.id}`}
-                  key={product.id}
-                  className="group relative overflow-hidden rounded-[28px] bg-white shadow-[0px_14px_32px_rgba(10,25,58,0.05)]"
-                >
-                  <div className="relative aspect-[4/3]">
-                    {product.previewImages?.[0]?.image &&
-                    typeof product.previewImages[0].image !== "string" &&
-                    product.previewImages[0].image.url ? (
-                      <Image
-                        src={product.previewImages[0].image.url}
-                        alt={product.name}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        sizes="(min-width: 1024px) 25vw, 100vw"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center bg-[#EEF4FF] text-4xl font-semibold text-[#9AA1B5]">
-                        {product.name.charAt(0)}
-                      </div>
-                    )}
-                  </div>
-                  <div className="space-y-3 p-6">
-                    <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-[#6CE269]">
-                      {product.productType.split("-").join(" ")}
-                    </div>
-                    <h3 className="text-lg font-semibold text-[#0B0B0F]">{product.name}</h3>
-                    <p className="line-clamp-2 text-sm text-[#5B5F72]">
-                      {product.description || "Learn how Alphamed keeps critical supplies ready for frontline teams."}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : null}
         </div>
       </section>
 

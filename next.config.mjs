@@ -1,7 +1,7 @@
-﻿import { withPayload } from "@payloadcms/next/withPayload";
-import { NextConfig } from "next";
+import { withPayload } from "@payloadcms/next/withPayload";
 
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   experimental: {
     serverActions: {
       bodySizeLimit: "5mb",
@@ -23,9 +23,12 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "www.medaccess.org",
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
     ],
   },
 };
 
 export default withPayload(nextConfig);
-

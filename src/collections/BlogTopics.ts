@@ -2,16 +2,16 @@ import type { CollectionConfig } from 'payload';
 import { isAdmin } from '@/access/admin';
 import { anyone } from '@/access/anyone';
 
-const Categories: CollectionConfig = {
-  slug: 'categories',
+const BlogTopics: CollectionConfig = {
+  slug: 'blog-topics',
   labels: {
-    singular: 'Category',
-    plural: 'Categories',
+    singular: 'Blog Topic',
+    plural: 'Blog Topics',
   },
   admin: {
-    useAsTitle: 'name',
-    defaultColumns: ['name', 'updatedAt'],
-    group: 'Products',
+    useAsTitle: 'title',
+    defaultColumns: ['title', 'slug'],
+    group: 'Content',
   },
   access: {
     read: anyone,
@@ -21,32 +21,27 @@ const Categories: CollectionConfig = {
   },
   fields: [
     {
-      name: 'name',
-      label: 'Name',
+      name: 'title',
       type: 'text',
+      label: 'Topic Title',
       required: true,
     },
     {
       name: 'slug',
-      label: 'Slug',
       type: 'text',
+      label: 'Topic Slug',
       required: true,
       unique: true,
       admin: {
-        description: 'Used in URLs and filters (e.g. diagnostic-equipment).',
+        description: 'Used in URLs and filters (e.g. supply-chain).',
       },
-    },
-    {
-      name: 'description',
-      label: 'Description',
-      type: 'textarea',
     },
   ],
   hooks: {
     beforeValidate: [
       async ({ data }) => {
-        if (data?.name && !data.slug) {
-          data.slug = data.name
+        if (data?.title && !data.slug) {
+          data.slug = data.title
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/^-+|-+$/g, '');
@@ -57,4 +52,4 @@ const Categories: CollectionConfig = {
   },
 };
 
-export default Categories;
+export default BlogTopics;

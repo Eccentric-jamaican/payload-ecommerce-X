@@ -31,7 +31,7 @@ export const ProductHighlightsBlock: Block = {
           name: 'url',
           type: 'text',
           admin: {
-            placeholder: '/products',
+            placeholder: '/contact',
           },
         },
       ],
@@ -73,7 +73,7 @@ export const ProductHighlightsBlock: Block = {
               name: 'url',
               type: 'text',
               admin: {
-                placeholder: '/products',
+                placeholder: '/contact',
               },
             },
           ],

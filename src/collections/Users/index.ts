@@ -209,17 +209,6 @@ export const Users: CollectionConfig = {
           ],
         },
         {
-          label: "Transactions",
-          fields: [
-            {
-              name: "transactions",
-              type: "join",
-              collection: "transactions",
-              on: "buyer",
-            },
-          ],
-        },
-        {
           label: "Payment Info",
           fields: [
             {

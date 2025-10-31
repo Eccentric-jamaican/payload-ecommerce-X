@@ -2,11 +2,11 @@ import type { CollectionConfig } from 'payload';
 import { isAdmin } from '@/access/admin';
 import { anyone } from '@/access/anyone';
 
-const Categories: CollectionConfig = {
-  slug: 'categories',
+const ProductFamilies: CollectionConfig = {
+  slug: 'product-families',
   labels: {
-    singular: 'Category',
-    plural: 'Categories',
+    singular: 'Product Family',
+    plural: 'Product Families',
   },
   admin: {
     useAsTitle: 'name',
@@ -33,7 +33,7 @@ const Categories: CollectionConfig = {
       required: true,
       unique: true,
       admin: {
-        description: 'Used in URLs and filters (e.g. diagnostic-equipment).',
+        description: 'Used in URLs and internal references.',
       },
     },
     {
@@ -57,4 +57,4 @@ const Categories: CollectionConfig = {
   },
 };
 
-export default Categories;
+export default ProductFamilies;
