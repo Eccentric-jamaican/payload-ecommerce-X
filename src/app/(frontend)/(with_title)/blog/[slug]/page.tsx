@@ -42,24 +42,7 @@ const estimateReadTime = (content: unknown) => {
   return `${minutes} min read`;
 };
 
-export async function generateStaticParams() {
-  const payload = await getPayloadHMR({ config });
-  const posts = await payload.find({
-    collection: "blogs",
-    where: {
-      status: { equals: "published" },
-    },
-    limit: 1000,
-  });
-
-  return posts.docs
-    .map((post) =>
-      typeof post.slug === "string" && post.slug.length > 0
-        ? { slug: post.slug }
-        : null,
-    )
-    .filter(Boolean) as { slug: string }[];
-}
+// Remove generateStaticParams to make pages fully dynamic
 
 export async function generateMetadata({
   params,
