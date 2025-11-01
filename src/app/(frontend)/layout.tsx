@@ -4,7 +4,7 @@ import { BannerCarousel } from '@/components/layout/BannerCarousel';
 import { Toaster } from '@/components/ui/toaster';
 import { getSiteSettings } from '@/lib/getSiteSettings';
 import { Providers } from '@/providers';
-import type { SiteSettings as SiteSettingsType } from '@/payload-types';
+import type { SiteSetting as SiteSettingsType } from '@/payload-types';
 import { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import type { CSSProperties, ReactNode } from 'react';
@@ -164,10 +164,7 @@ export default async function RootLayout({ children, modal }: LayoutProps) {
     utilityNavigation = [],
     cta,
     supportEmail,
-    salesEmail,
     primaryPhone,
-    secondaryPhone,
-    address,
     footerColumns = [],
     socialLinks = [],
     footerNote,
@@ -185,7 +182,9 @@ export default async function RootLayout({ children, modal }: LayoutProps) {
   const secondaryForeground = adjustLightness(textHsl, -10);
   const mutedForeground = adjustLightness(textHsl, 10);
 
-  const bodyStyle: CSSProperties = {
+  const bodyStyle: CSSProperties & {
+    [key: `--${string}`]: string | number | undefined;
+  } = {
     '--brand-primary': primaryColor,
     '--brand-accent': accentColor,
     '--brand-text': textColor,
@@ -239,11 +238,8 @@ export default async function RootLayout({ children, modal }: LayoutProps) {
             {modal}
             <Footer
               logo={logo}
-              address={address}
               supportEmail={supportEmail}
-              salesEmail={salesEmail}
               primaryPhone={primaryPhone}
-              secondaryPhone={secondaryPhone}
               cta={cta}
               footerColumns={footerColumns}
               socialLinks={socialLinks}

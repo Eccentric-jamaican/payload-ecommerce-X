@@ -121,7 +121,7 @@ export const ClientExperiences: FC<ClientExperiencesProps> = ({
                       ))}
                     </div>
                     <blockquote className="text-sm leading-relaxed text-[#0B0B0F]">
-                      "{data.quote}"
+                      &ldquo;{data.quote}&rdquo;
                     </blockquote>
                   </div>
                   <div className="mt-6 flex items-center gap-3">

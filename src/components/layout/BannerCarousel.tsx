@@ -50,7 +50,7 @@ export const BannerCarousel = () => {
           
           {activeBanners.length > 1 && (
             <div className="ml-4 flex space-x-2">
-              {activeBanners.map((_: any, index: number) => (
+              {activeBanners.map((_banner, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentIndex(index)}

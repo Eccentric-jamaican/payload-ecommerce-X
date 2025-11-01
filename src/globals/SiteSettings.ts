@@ -240,6 +240,127 @@ export const SiteSettings: GlobalConfig = {
           ],
         },
         {
+          label: 'Blog',
+          fields: [
+            {
+              type: 'group',
+              name: 'blogHero',
+              label: 'Blog Hero',
+              fields: [
+                {
+                  name: 'heading',
+                  type: 'text',
+                  label: 'Hero Heading',
+                  defaultValue: 'New at Alphamed Blog',
+                },
+                {
+                  name: 'subheading',
+                  type: 'textarea',
+                  label: 'Hero Description',
+                  defaultValue:
+                    'A collection of stories about our people, our capabilities and our products.',
+                },
+              ],
+            },
+            {
+              name: 'blogSocialLinks',
+              label: 'Hero Social Links',
+              type: 'array',
+              fields: [
+                {
+                  name: 'platform',
+                  label: 'Platform',
+                  type: 'select',
+                  options: [
+                    { label: 'Instagram', value: 'instagram' },
+                    { label: 'LinkedIn', value: 'linkedin' },
+                  ],
+                },
+                {
+                  name: 'url',
+                  type: 'text',
+                  label: 'Profile URL',
+                },
+              ],
+            },
+            {
+              type: 'group',
+              name: 'blogNewsletter',
+              label: 'Newsletter Callout',
+              fields: [
+                {
+                  name: 'enabled',
+                  type: 'checkbox',
+                  label: 'Show newsletter card on listing page',
+                  defaultValue: false,
+                },
+                {
+                  name: 'title',
+                  type: 'text',
+                  label: 'Card Heading',
+                  admin: {
+                    condition: (_, siblingData) => Boolean(siblingData?.enabled),
+                  },
+                },
+                {
+                  name: 'description',
+                  type: 'textarea',
+                  label: 'Supporting Copy',
+                  admin: {
+                    condition: (_, siblingData) => Boolean(siblingData?.enabled),
+                  },
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'ctaLabel',
+                      type: 'text',
+                      label: 'CTA Label',
+                      admin: {
+                        condition: (_, siblingData) => Boolean(siblingData?.enabled),
+                      },
+                    },
+                    {
+                      name: 'ctaUrl',
+                      type: 'text',
+                      label: 'CTA URL',
+                      admin: {
+                        condition: (_, siblingData) => Boolean(siblingData?.enabled),
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          label: 'Products',
+          fields: [
+            {
+              type: 'group',
+              name: 'productHero',
+              label: 'Products Hero',
+              fields: [
+                {
+                  name: 'heading',
+                  type: 'text',
+                  label: 'Hero Heading',
+                  defaultValue: 'Equip every facility with Alphamed',
+                },
+                {
+                  name: 'subheading',
+                  type: 'textarea',
+                  label: 'Hero Description',
+                  defaultValue:
+                    'Browse the Alphamed Global catalogue to discover vetted medical supplies, equipment, and logistics solutions.',
+                },
+              ],
+            },
+          ],
+        },
+        {
           label: 'Footer',
           fields: [
             {

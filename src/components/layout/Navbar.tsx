@@ -2,15 +2,15 @@
 
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import type { Media, SiteSettings as SiteSettingsType } from '@/payload-types';
+import type { Media, SiteSetting as SiteSettingsType } from '@/payload-types';
 import { cn } from '@/lib/utils';
 import { ChevronDown, Menu } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo } from 'react';
 
-type NavigationItem = NonNullable<SiteSettingsType['primaryNavigation']>[number];
-type UtilityItem = NonNullable<SiteSettingsType['utilityNavigation']>[number];
+export type NavigationItem = NonNullable<SiteSettingsType['primaryNavigation']>[number];
+export type UtilityItem = NonNullable<SiteSettingsType['utilityNavigation']>[number];
 
 interface NavbarProps {
   logo?: SiteSettingsType['logo'];

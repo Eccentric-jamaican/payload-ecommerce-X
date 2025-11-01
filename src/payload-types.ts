@@ -14,41 +14,29 @@ export interface Config {
     users: User;
     media: Media;
     pages: Page;
-    products: Product;
-    categories: Category;
-    technologies: Technology;
-    transactions: Transaction;
-    reviews: Review;
     notifications: Notification;
-    'product-files': ProductFile;
-    carts: Cart;
-    'discount-codes': DiscountCode;
-    wishlists: Wishlist;
+    categories: Category;
+    'clinical-areas': ClinicalArea;
+    'product-families': ProductFamily;
+    'blog-topics': BlogTopic;
     blogs: Blog;
+    products: Product;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {
-    users: {
-      transactions: 'transactions';
-    };
-  };
+  collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
-    products: ProductsSelect<false> | ProductsSelect<true>;
-    categories: CategoriesSelect<false> | CategoriesSelect<true>;
-    technologies: TechnologiesSelect<false> | TechnologiesSelect<true>;
-    transactions: TransactionsSelect<false> | TransactionsSelect<true>;
-    reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     notifications: NotificationsSelect<false> | NotificationsSelect<true>;
-    'product-files': ProductFilesSelect<false> | ProductFilesSelect<true>;
-    carts: CartsSelect<false> | CartsSelect<true>;
-    'discount-codes': DiscountCodesSelect<false> | DiscountCodesSelect<true>;
-    wishlists: WishlistsSelect<false> | WishlistsSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    'clinical-areas': ClinicalAreasSelect<false> | ClinicalAreasSelect<true>;
+    'product-families': ProductFamiliesSelect<false> | ProductFamiliesSelect<true>;
+    'blog-topics': BlogTopicsSelect<false> | BlogTopicsSelect<true>;
     blogs: BlogsSelect<false> | BlogsSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -130,17 +118,6 @@ export interface User {
         id?: string | null;
       }[]
     | null;
-  transactions?: {
-    docs?: (string | Transaction)[] | null;
-    hasNextPage?: boolean | null;
-  } | null;
-  paymentMethod?: ('creditCard' | 'paypal' | 'bankTransfer') | null;
-  paymentDetails?: {
-    cardNumber?: string | null;
-    expiryDate?: string | null;
-    paypalEmail?: string | null;
-    bankAccount?: string | null;
-  };
   updatedAt: string;
   createdAt: string;
   enableAPIKey?: boolean | null;
@@ -162,262 +139,6 @@ export interface User {
 export interface Media {
   id: string;
   alt: string;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "transactions".
- */
-export interface Transaction {
-  id: string;
-  /**
-   * Stripe session ID used as order ID
-   */
-  orderId: string;
-  /**
-   * The buyer who made the purchase
-   */
-  buyer: string | User;
-  /**
-   * Total amount of the transaction
-   */
-  amount: number;
-  /**
-   * Current status of the transaction
-   */
-  status: 'pending' | 'completed' | 'failed' | 'refunded';
-  /**
-   * Payment method used for the transaction
-   */
-  paymentMethod: 'stripe';
-  /**
-   * Stripe session ID for reference
-   */
-  stripeSessionId?: string | null;
-  /**
-   * Digital product purchased in this transaction
-   */
-  products: (string | Product)[];
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "products".
- */
-export interface Product {
-  id: string;
-  /**
-   * Enter the name of your digital product
-   */
-  name: string;
-  /**
-   * Provide a detailed description of the digital product
-   */
-  description: string;
-  /**
-   * Select the type of digital product
-   */
-  productType:
-    | 'website-template'
-    | 'design-asset'
-    | '3d-model'
-    | 'font'
-    | 'cad-file'
-    | 'ui-kit'
-    | 'github-repo'
-    | 'other';
-  githubDetails?: {
-    /**
-     * GitHub username or organization that owns the repository
-     */
-    repositoryOwner: string;
-    /**
-     * Name of the private GitHub repository
-     */
-    repositoryName: string;
-    /**
-     * GitHub Personal Access Token with repo and admin:org scopes
-     */
-    githubAccessToken: string;
-  };
-  /**
-   * Select the most appropriate category for your product
-   */
-  category: string | Category;
-  /**
-   * Select relevant technologies associated with this product
-   */
-  technology: (string | Technology)[];
-  /**
-   * Select the creator/seller of this digital product
-   */
-  seller: string | User;
-  /**
-   * Current status of the digital product
-   */
-  status: 'draft' | 'active' | 'inactive' | 'rejected';
-  /**
-   * List software, platforms, or versions this product is compatible with
-   */
-  compatibility?:
-    | {
-        /**
-         * Specify compatible software versions (e.g., Figma 2023, Adobe CC 2024)
-         */
-        softwareVersion?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * List all file formats included in the product
-   */
-  supportedFormats?:
-    | {
-        /**
-         * Specify file formats included (e.g., .psd, .sketch, .figma)
-         */
-        format?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Add multiple preview images to showcase your product
-   */
-  previewImages?:
-    | {
-        /**
-         * Upload high-quality preview images showcasing the product
-         */
-        image?: (string | null) | Media;
-        /**
-         * Provide a brief description of what this preview image shows
-         */
-        imageDescription?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Add tags to help users find your product more easily
-   */
-  tags?:
-    | {
-        /**
-         * Add relevant tags to improve searchability
-         */
-        tag?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Upload one or more files for your digital product
-   */
-  productFiles?:
-    | {
-        file: string | ProductFile;
-        /**
-         * Provide a brief description of this specific file
-         */
-        fileDescription?: string | null;
-        /**
-         * Specify the type or purpose of this file
-         */
-        fileType?: ('main' | 'documentation' | 'additional' | 'example') | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Set the price for your digital product (in pennies)
-   */
-  price: number;
-  /**
-   * The type of product to create in Stripe
-   */
-  stripeProductType?: ('product' | 'subscription') | null;
-  /**
-   * Select the licensing terms for this digital product
-   */
-  licensingOptions?: ('single-use' | 'multiple-use' | 'commercial' | 'personal') | null;
-  /**
-   * Can this product be included in sales or promotional discounts?
-   */
-  discountEligibility?: boolean | null;
-  createdAt: string;
-  lastUpdated?: string | null;
-  /**
-   * Number of times this product has been purchased
-   */
-  salesCount?: number | null;
-  /**
-   * Average rating for this digital product
-   */
-  averageRating?: number | null;
-  stripeID?: string | null;
-  skipSync?: boolean | null;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categories".
- */
-export interface Category {
-  id: string;
-  name: string;
-  /**
-   * A URL-friendly identifier for the category (auto-generated if left blank).
-   */
-  slug: string;
-  /**
-   * Optional description of the category.
-   */
-  description?: string | null;
-  /**
-   * Optional icon for the category.
-   */
-  icon?: (string | null) | Media;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "technologies".
- */
-export interface Technology {
-  id: string;
-  name: string;
-  /**
-   * A URL-friendly identifier for the technology (auto-generated if left blank).
-   */
-  slug: string;
-  /**
-   * Optional description of the technology.
-   */
-  description?: string | null;
-  /**
-   * Optional icon for the technology.
-   */
-  icon?: (string | null) | Media;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-files".
- */
-export interface ProductFile {
-  id: string;
-  name: string;
-  description: string;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -650,35 +371,6 @@ export interface Page {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "reviews".
- */
-export interface Review {
-  id: string;
-  /**
-   * The template being reviewed.
-   */
-  template: string | Product;
-  /**
-   * The buyer who left the review.
-   */
-  user: string | User;
-  /**
-   * Rating from 1 (poor) to 5 (excellent).
-   */
-  rating: number;
-  /**
-   * Optional review comment.
-   */
-  comment?: string | null;
-  /**
-   * Approval status of the review.
-   */
-  status: 'pending' | 'approved' | 'rejected';
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "notifications".
  */
 export interface Notification {
@@ -692,86 +384,49 @@ export interface Notification {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "carts".
+ * via the `definition` "categories".
  */
-export interface Cart {
+export interface Category {
   id: string;
-  user: string | User;
-  items?:
-    | {
-        product: string | Product;
-        quantity: number;
-        id?: string | null;
-      }[]
-    | null;
-  lastUpdated?: string | null;
-  abandonedEmailSent?: boolean | null;
+  name: string;
+  slug: string;
+  description?: string | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "discount-codes".
+ * via the `definition` "clinical-areas".
  */
-export interface DiscountCode {
+export interface ClinicalArea {
   id: string;
-  /**
-   * The Stripe coupon ID for this discount code (optional, leave empty for Stripe to create a new coupon)
-   */
-  stripeCouponId?: string | null;
-  code: string;
-  type: 'percentage' | 'fixed';
-  /**
-   * For percentage discounts, enter a number between 0-100. For fixed amounts, enter the discount value.
-   */
-  value: number;
-  /**
-   * Minimum purchase amount required to use this discount code (optional)
-   */
-  minPurchaseAmount?: number | null;
-  /**
-   * Maximum number of times this code can be used (optional)
-   */
-  maxUses?: number | null;
-  usedCount: number;
-  /**
-   * When this discount code becomes valid (optional)
-   */
-  startDate?: string | null;
-  /**
-   * When this discount code expires (optional)
-   */
-  endDate?: string | null;
-  /**
-   * Whether this discount code is currently active
-   */
-  isActive: boolean;
-  /**
-   * Specific categories or products this discount applies to (optional, leave empty for all products)
-   */
-  appliesTo?:
-    | (
-        | {
-            relationTo: 'categories';
-            value: string | Category;
-          }
-        | {
-            relationTo: 'products';
-            value: string | Product;
-          }
-      )[]
-    | null;
+  name: string;
+  slug: string;
+  description?: string | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "wishlists".
+ * via the `definition` "product-families".
  */
-export interface Wishlist {
+export interface ProductFamily {
   id: string;
-  user: string | User;
-  products?: (string | Product)[] | null;
+  name: string;
+  slug: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-topics".
+ */
+export interface BlogTopic {
+  id: string;
+  title: string;
+  slug: string;
+  description?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -811,6 +466,75 @@ export interface Blog {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: string;
+  name: string;
+  /**
+   * Generated from the name if left blank. Used for the product URL.
+   */
+  slug: string;
+  productCode: string;
+  status?: ('draft' | 'published' | 'discontinued') | null;
+  /**
+   * Displayed on product cards. Aim for 1–2 sentences.
+   */
+  shortDescription?: string | null;
+  /**
+   * Full product narrative. Supports headings, lists, quotes, and embedded media.
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  mediaGallery: {
+    asset: string | Media;
+    caption?: string | null;
+    id?: string | null;
+  }[];
+  /**
+   * Optional YouTube video demonstrating the product.
+   */
+  videoUrl?: string | null;
+  keyUses?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  technicalSpecs?:
+    | {
+        label: string;
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  inStock?: boolean | null;
+  cta?: {
+    label?: string | null;
+    url?: string | null;
+  };
+  categories?: (string | Category)[] | null;
+  clinicalAreas?: (string | ClinicalArea)[] | null;
+  productFamily?: (string | null) | ProductFamily;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -829,48 +553,32 @@ export interface PayloadLockedDocument {
         value: string | Page;
       } | null)
     | ({
-        relationTo: 'products';
-        value: string | Product;
+        relationTo: 'notifications';
+        value: string | Notification;
       } | null)
     | ({
         relationTo: 'categories';
         value: string | Category;
       } | null)
     | ({
-        relationTo: 'technologies';
-        value: string | Technology;
+        relationTo: 'clinical-areas';
+        value: string | ClinicalArea;
       } | null)
     | ({
-        relationTo: 'transactions';
-        value: string | Transaction;
+        relationTo: 'product-families';
+        value: string | ProductFamily;
       } | null)
     | ({
-        relationTo: 'reviews';
-        value: string | Review;
-      } | null)
-    | ({
-        relationTo: 'notifications';
-        value: string | Notification;
-      } | null)
-    | ({
-        relationTo: 'product-files';
-        value: string | ProductFile;
-      } | null)
-    | ({
-        relationTo: 'carts';
-        value: string | Cart;
-      } | null)
-    | ({
-        relationTo: 'discount-codes';
-        value: string | DiscountCode;
-      } | null)
-    | ({
-        relationTo: 'wishlists';
-        value: string | Wishlist;
+        relationTo: 'blog-topics';
+        value: string | BlogTopic;
       } | null)
     | ({
         relationTo: 'blogs';
         value: string | Blog;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: string | Product;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -952,16 +660,6 @@ export interface UsersSelect<T extends boolean = true> {
         reviewer?: T;
         date?: T;
         id?: T;
-      };
-  transactions?: T;
-  paymentMethod?: T;
-  paymentDetails?:
-    | T
-    | {
-        cardNumber?: T;
-        expiryDate?: T;
-        paypalEmail?: T;
-        bankAccount?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -1172,122 +870,6 @@ export interface PagesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "products_select".
- */
-export interface ProductsSelect<T extends boolean = true> {
-  name?: T;
-  description?: T;
-  productType?: T;
-  githubDetails?:
-    | T
-    | {
-        repositoryOwner?: T;
-        repositoryName?: T;
-        githubAccessToken?: T;
-      };
-  category?: T;
-  technology?: T;
-  seller?: T;
-  status?: T;
-  compatibility?:
-    | T
-    | {
-        softwareVersion?: T;
-        id?: T;
-      };
-  supportedFormats?:
-    | T
-    | {
-        format?: T;
-        id?: T;
-      };
-  previewImages?:
-    | T
-    | {
-        image?: T;
-        imageDescription?: T;
-        id?: T;
-      };
-  tags?:
-    | T
-    | {
-        tag?: T;
-        id?: T;
-      };
-  productFiles?:
-    | T
-    | {
-        file?: T;
-        fileDescription?: T;
-        fileType?: T;
-        id?: T;
-      };
-  price?: T;
-  stripeProductType?: T;
-  licensingOptions?: T;
-  discountEligibility?: T;
-  createdAt?: T;
-  lastUpdated?: T;
-  salesCount?: T;
-  averageRating?: T;
-  stripeID?: T;
-  skipSync?: T;
-  updatedAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categories_select".
- */
-export interface CategoriesSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  description?: T;
-  icon?: T;
-  createdAt?: T;
-  updatedAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "technologies_select".
- */
-export interface TechnologiesSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  description?: T;
-  icon?: T;
-  createdAt?: T;
-  updatedAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "transactions_select".
- */
-export interface TransactionsSelect<T extends boolean = true> {
-  orderId?: T;
-  buyer?: T;
-  amount?: T;
-  status?: T;
-  paymentMethod?: T;
-  stripeSessionId?: T;
-  products?: T;
-  createdAt?: T;
-  updatedAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "reviews_select".
- */
-export interface ReviewsSelect<T extends boolean = true> {
-  template?: T;
-  user?: T;
-  rating?: T;
-  comment?: T;
-  status?: T;
-  createdAt?: T;
-  updatedAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "notifications_select".
  */
 export interface NotificationsSelect<T extends boolean = true> {
@@ -1300,67 +882,45 @@ export interface NotificationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-files_select".
+ * via the `definition` "categories_select".
  */
-export interface ProductFilesSelect<T extends boolean = true> {
+export interface CategoriesSelect<T extends boolean = true> {
   name?: T;
+  slug?: T;
   description?: T;
   updatedAt?: T;
   createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "carts_select".
+ * via the `definition` "clinical-areas_select".
  */
-export interface CartsSelect<T extends boolean = true> {
-  user?: T;
-  items?:
-    | T
-    | {
-        product?: T;
-        quantity?: T;
-        id?: T;
-      };
-  lastUpdated?: T;
-  abandonedEmailSent?: T;
+export interface ClinicalAreasSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "discount-codes_select".
+ * via the `definition` "product-families_select".
  */
-export interface DiscountCodesSelect<T extends boolean = true> {
-  stripeCouponId?: T;
-  code?: T;
-  type?: T;
-  value?: T;
-  minPurchaseAmount?: T;
-  maxUses?: T;
-  usedCount?: T;
-  startDate?: T;
-  endDate?: T;
-  isActive?: T;
-  appliesTo?: T;
+export interface ProductFamiliesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "wishlists_select".
+ * via the `definition` "blog-topics_select".
  */
-export interface WishlistsSelect<T extends boolean = true> {
-  user?: T;
-  products?: T;
+export interface BlogTopicsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1379,6 +939,52 @@ export interface BlogsSelect<T extends boolean = true> {
   status?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  productCode?: T;
+  status?: T;
+  shortDescription?: T;
+  description?: T;
+  mediaGallery?:
+    | T
+    | {
+        asset?: T;
+        caption?: T;
+        id?: T;
+      };
+  videoUrl?: T;
+  keyUses?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  technicalSpecs?:
+    | T
+    | {
+        label?: T;
+        value?: T;
+        id?: T;
+      };
+  inStock?: T;
+  cta?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+      };
+  categories?: T;
+  clinicalAreas?: T;
+  productFamily?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1480,6 +1086,28 @@ export interface SiteSetting {
         id?: string | null;
       }[]
     | null;
+  blogHero?: {
+    heading?: string | null;
+    subheading?: string | null;
+  };
+  blogSocialLinks?:
+    | {
+        platform?: ('instagram' | 'linkedin') | null;
+        url?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  blogNewsletter?: {
+    enabled?: boolean | null;
+    title?: string | null;
+    description?: string | null;
+    ctaLabel?: string | null;
+    ctaUrl?: string | null;
+  };
+  productHero?: {
+    heading?: string | null;
+    subheading?: string | null;
+  };
   footerColumns?:
     | {
         heading: string;
@@ -1522,6 +1150,9 @@ export interface Banner {
   id: string;
   banners?:
     | {
+        /**
+         * Supports emojis and basic text formatting
+         */
         message: string;
         backgroundColor: 'bg-blue-500' | 'bg-green-500' | 'bg-red-500' | 'bg-yellow-500' | 'bg-purple-500';
         isActive?: boolean | null;
@@ -1570,6 +1201,34 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         url?: T;
         openInNewTab?: T;
         id?: T;
+      };
+  blogHero?:
+    | T
+    | {
+        heading?: T;
+        subheading?: T;
+      };
+  blogSocialLinks?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  blogNewsletter?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        description?: T;
+        ctaLabel?: T;
+        ctaUrl?: T;
+      };
+  productHero?:
+    | T
+    | {
+        heading?: T;
+        subheading?: T;
       };
   footerColumns?:
     | T
