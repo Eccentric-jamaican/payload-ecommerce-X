@@ -22,12 +22,6 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise });
 
-  const products = await payload.find({
-    collection: 'products',
-    limit: 8,
-    sort: '-createdAt',
-  });
-
   const pages = await payload.find({
     collection: 'pages',
     where: {
@@ -42,9 +36,6 @@ export default async function HomePage() {
   const homePage = pages.docs[0] ?? null;
 
   return (
-    <HomePageClient
-      initialProducts={products.docs}
-      sections={homePage?.sections ?? null}
-    />
+    <HomePageClient sections={homePage?.sections ?? null} />
   );
 }

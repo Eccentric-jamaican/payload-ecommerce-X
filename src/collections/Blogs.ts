@@ -1,4 +1,5 @@
 import { CollectionConfig } from 'payload';
+import type { CollectionBeforeChangeHook } from 'payload';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import { isAdmin } from '@/access/admin';
 import { anyone } from '@/access/anyone';
@@ -86,26 +87,20 @@ const Blogs: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [
-      async ({ data, req, operation }: { data: any; req: any; operation: 'create' | 'update' }) => {
-        // Automatically generate slug from title if not provided
-        if (!data.slug && data.title) {
+      (async ({ data, req, operation }) => {
+        if (data && typeof data.title === 'string' && !data.slug) {
           data.slug = data.title
             .toLowerCase()
-            .replace(/[^a-zA-Z0-9]+/g, '-')
+            .replace(/[^a-z0-9]+/g, '-')
             .replace(/^-+|-+$/g, '');
         }
-        
-        if (operation === 'create') {
-          // Automatically set the author to the current user
-          if (req.user) {
-            return {
-              ...data,
-              author: req.user.id,
-            };
-          }
+
+        if (operation === 'create' && req.user && data) {
+          data.author = req.user.id;
         }
+
         return data;
-      },
+      }) as CollectionBeforeChangeHook,
     ],
   },
 };

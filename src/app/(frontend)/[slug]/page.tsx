@@ -5,9 +5,9 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 interface PageParams {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export const revalidate = 60;
@@ -19,7 +19,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
 
   const page = await getPageBySlug(slug);
 
@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 }
 
 export default async function PageRoute({ params }: PageParams) {
-  const { slug } = params;
+  const { slug } = await params;
 
   const page = await getPageBySlug(slug);
 

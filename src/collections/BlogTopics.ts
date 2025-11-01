@@ -2,11 +2,11 @@ import { anyone } from "@/access/anyone";
 import { isAdmin } from "@/access/admin";
 import type { CollectionConfig } from "payload";
 
-const Categories: CollectionConfig = {
-  slug: "categories",
+const BlogTopics: CollectionConfig = {
+  slug: "blog-topics",
   admin: {
-    useAsTitle: "name",
-    defaultColumns: ["name", "slug", "updatedAt"],
+    useAsTitle: "title",
+    defaultColumns: ["title", "slug", "updatedAt"],
     group: "Content",
   },
   access: {
@@ -17,7 +17,7 @@ const Categories: CollectionConfig = {
   },
   fields: [
     {
-      name: "name",
+      name: "title",
       type: "text",
       required: true,
     },
@@ -35,8 +35,8 @@ const Categories: CollectionConfig = {
   hooks: {
     beforeValidate: [
       async ({ data }) => {
-        if (data?.name && !data.slug) {
-          data.slug = data.name
+        if (data?.title && !data.slug) {
+          data.slug = data.title
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, "-")
             .replace(/^-+|-+$/g, "");
@@ -47,4 +47,4 @@ const Categories: CollectionConfig = {
   },
 };
 
-export default Categories;
+export default BlogTopics;

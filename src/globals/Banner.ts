@@ -1,16 +1,5 @@
 import type { GlobalConfig } from 'payload';
 
-interface User {
-  role: 'admin' | 'user';
-  [key: string]: unknown;
-}
-
-interface AccessArgs {
-  req: {
-    user?: User;
-  };
-}
-
 export const Banner: GlobalConfig = {
   slug: 'banner',
   label: 'Banner Messages',
@@ -20,7 +9,7 @@ export const Banner: GlobalConfig = {
   },
   access: {
     read: (): boolean => true, // Publicly accessible
-    update: ({ req: { user } }: AccessArgs): boolean => {
+    update: ({ req: { user } }): boolean => {
       return user?.role === 'admin';
     },
   },
@@ -41,7 +30,9 @@ export const Banner: GlobalConfig = {
           type: 'text',
           required: true,
           label: 'Banner Text',
-          description: 'Supports emojis and basic text formatting',
+          admin: {
+            description: 'Supports emojis and basic text formatting',
+          },
         },
         {
           name: 'backgroundColor',
