@@ -8,7 +8,7 @@ import type { Blog } from "@/payload-types";
 import { getSiteSettings } from "@/lib/getSiteSettings";
 import type { SiteSetting } from "@/payload-types";
 import { Instagram, Linkedin } from "lucide-react";
-import { serializeLexical } from "../lexical-serializer";
+import { serializeLexical } from "@/app/(frontend)/blog/lexical-serializer";
 
 export const runtime = "nodejs";
 export const revalidate = 10;
