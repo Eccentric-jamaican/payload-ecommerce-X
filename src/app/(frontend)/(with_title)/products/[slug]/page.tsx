@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { getPayloadHMR } from "@payloadcms/next/utilities";
+import { getPayload } from "payload";
 import config from "@payload-config";
 import { notFound } from "next/navigation";
 import type { Media, Product } from "@/payload-types";
@@ -32,7 +32,7 @@ interface PageParams {
 }
 
 export async function generateStaticParams() {
-  const payload = await getPayloadHMR({ config });
+  const payload = await getPayload({ config });
   const products = await payload.find({
     collection: "products",
     where: {
@@ -56,7 +56,7 @@ export async function generateMetadata({
   const { slug } = await params;
   if (!slug) return { title: "Product Not Found" };
 
-  const payload = await getPayloadHMR({ config });
+  const payload = await getPayload({ config });
   const productQuery = await payload.find({
     collection: "products",
     depth: 2,
@@ -110,7 +110,7 @@ const ProductDetailPage = async ({ params }: PageParams) => {
   const { slug } = await params;
   if (!slug) notFound();
 
-  const payload = await getPayloadHMR({ config });
+  const payload = await getPayload({ config });
   const productQuery = await payload.find({
     collection: "products",
     depth: 2,

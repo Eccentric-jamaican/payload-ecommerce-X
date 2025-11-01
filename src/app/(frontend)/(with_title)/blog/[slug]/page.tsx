@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { getPayloadHMR } from "@payloadcms/next/utilities";
+import { getPayload } from "payload";
 import config from "@payload-config";
 import { notFound } from "next/navigation";
 import type { Blog } from "@/payload-types";
@@ -50,7 +50,7 @@ export async function generateMetadata({
   const { slug } = await params;
   if (!slug) return { title: "Blog Post Not Found" };
 
-  const payload = await getPayloadHMR({ config });
+  const payload = await getPayload({ config });
   const blog = await payload.find({
     collection: "blogs",
     depth: 2,
@@ -97,7 +97,7 @@ const BlogPostPage = async ({ params }: PageParams) => {
     notFound();
   }
 
-  const payload = await getPayloadHMR({ config });
+  const payload = await getPayload({ config });
   const [siteSettings, blog] = await Promise.all([
     getSiteSettings() as Promise<SiteSetting>,
     payload.find({

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { getPayloadHMR } from "@payloadcms/next/utilities";
+import { getPayload } from "payload";
 import config from "@payload-config";
 import { getSiteSettings } from "@/lib/getSiteSettings";
 import type { Blog, SiteSetting } from "@/payload-types";
@@ -40,7 +40,7 @@ const BlogPage = async ({
 }: {
   searchParams?: Promise<SearchParams>;
 }) => {
-  const payload = await getPayloadHMR({ config });
+  const payload = await getPayload({ config });
   const siteSettings = (await getSiteSettings()) as SiteSetting;
 
   const resolvedSearch = (searchParams ? await searchParams : undefined) ?? {};
