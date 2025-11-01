@@ -1,10 +1,8 @@
 import { fileURLToPath } from "url";
 import path from "path";
-import nodemailer from "nodemailer";
 import sharp from "sharp";
 import { buildConfig } from "payload";
 import { mongooseAdapter } from "@payloadcms/db-mongodb";
-import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 
 import { Users } from "@/collections/Users";
@@ -56,15 +54,4 @@ export default buildConfig({
   }),
   sharp,
   plugins: [],
-  email: nodemailerAdapter({
-    defaultFromAddress: process.env.SMTP_USER || "support@alphamed.global",
-    defaultFromName: "Alphamed Global",
-    transport: nodemailer.createTransport({
-      service: "icloud",
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    }),
-  }),
 });
