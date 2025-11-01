@@ -51,5 +51,7 @@ export const getAllPageSlugs = cache(async (): Promise<string[]> => {
     },
   });
 
-  return result.docs.map((doc) => doc.slug);
+  const slugs = result.docs.map((doc) => doc.slug);
+  const reserved = new Set(["blog", "products", "admin", "api"]);
+  return slugs.filter((s) => !reserved.has(s));
 });

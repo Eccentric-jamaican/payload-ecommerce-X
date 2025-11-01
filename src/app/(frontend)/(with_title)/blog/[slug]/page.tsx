@@ -10,6 +10,7 @@ import type { SiteSetting } from "@/payload-types";
 import { Instagram, Linkedin } from "lucide-react";
 import { serializeLexical } from "../lexical-serializer";
 
+export const runtime = "nodejs";
 export const revalidate = 10;
 
 const iconMap = {
