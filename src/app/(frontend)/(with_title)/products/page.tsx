@@ -18,8 +18,7 @@ export const metadata: Metadata = {
     "Explore Alphamed Global's medical products, from diagnostics to supply-chain infrastructure.",
 };
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 10;
 
 type SearchParams = {
   category?: string | string[];

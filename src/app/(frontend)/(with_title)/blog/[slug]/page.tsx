@@ -10,8 +10,7 @@ import type { SiteSetting } from "@/payload-types";
 import { Instagram, Linkedin } from "lucide-react";
 import { serializeLexical } from "../lexical-serializer";
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 10;
 
 const iconMap = {
   instagram: Instagram,

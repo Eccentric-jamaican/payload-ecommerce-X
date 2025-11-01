@@ -13,8 +13,8 @@ export const metadata: Metadata = {
   description: "Insights and updates from Alphamed Global.",
 };
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// Revalidate every 10 seconds to show fresh content while maintaining good performance
+export const revalidate = 10;
 
 type SearchParams = {
   sort?: string | string[];
