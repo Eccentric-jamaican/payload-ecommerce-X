@@ -13,6 +13,24 @@ import { serializeLexical } from "@/app/(frontend)/blog/lexical-serializer";
 export const runtime = "nodejs";
 export const revalidate = 10;
 
+export async function generateStaticParams() {
+  const payload = await getPayload({ config });
+  const blogs = await payload.find({
+    collection: "blogs",
+    where: {
+      status: { equals: "published" },
+    },
+    limit: 100,
+    depth: 0,
+  });
+
+  return blogs.docs
+    .filter((blog) => blog.slug && typeof blog.slug === "string")
+    .map((blog) => ({
+      slug: blog.slug as string,
+    }));
+}
+
 const iconMap = {
   instagram: Instagram,
   linkedin: Linkedin,
