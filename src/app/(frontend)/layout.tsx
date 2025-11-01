@@ -10,6 +10,8 @@ import { Poppins } from 'next/font/google';
 import type { CSSProperties, ReactNode } from 'react';
 import './globals.css';
 
+export const runtime = 'nodejs';
+
 type Hsl = {
   h: number;
   s: number;
