@@ -7,7 +7,8 @@ import { notFound } from "next/navigation";
 import type { Media, Product } from "@/payload-types";
 import { serializeLexical } from "@/app/(frontend)/(with_title)/blog/lexical-serializer";
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 const formatYouTubeEmbed = (url?: string | null) => {
   if (!url) return null;

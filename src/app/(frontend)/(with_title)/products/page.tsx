@@ -15,10 +15,11 @@ import { ProductCard } from "@/components/products/ProductCard";
 export const metadata: Metadata = {
   title: "Products | Alphamed Global",
   description:
-    "Explore Alphamed Global’s medical products, from diagnostics to supply-chain infrastructure.",
+    "Explore Alphamed Global's medical products, from diagnostics to supply-chain infrastructure.",
 };
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 type SearchParams = {
   category?: string | string[];
