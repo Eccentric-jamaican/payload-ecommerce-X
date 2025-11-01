@@ -88,10 +88,24 @@ const Blogs: CollectionConfig = {
   hooks: {
     beforeChange: [
       (async ({ data, req, operation }) => {
-        if (data && typeof data.title === 'string' && !data.slug) {
+        // Format slug: always clean and normalize, whether auto-generated or manually entered
+        if (data && typeof data.slug === 'string' && data.slug.trim()) {
+          // Clean existing slug: lowercase, replace spaces/special chars with hyphens
+          data.slug = data.slug
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, '-')           // Replace spaces with hyphens
+            .replace(/[^a-z0-9-]+/g, '-')   // Replace special chars with hyphens
+            .replace(/-+/g, '-')            // Collapse multiple hyphens
+            .replace(/^-+|-+$/g, '');       // Remove leading/trailing hyphens
+        } else if (data && typeof data.title === 'string' && !data.slug) {
+          // Auto-generate slug from title if slug is empty
           data.slug = data.title
             .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
+            .trim()
+            .replace(/\s+/g, '-')
+            .replace(/[^a-z0-9-]+/g, '-')
+            .replace(/-+/g, '-')
             .replace(/^-+|-+$/g, '');
         }
 
