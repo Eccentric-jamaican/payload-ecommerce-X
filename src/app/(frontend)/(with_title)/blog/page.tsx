@@ -4,8 +4,7 @@ import Link from "next/link";
 import { getPayloadHMR } from "@payloadcms/next/utilities";
 import config from "@payload-config";
 import { getSiteSettings } from "@/lib/getSiteSettings";
-import type { Blog, BlogTopic, SiteSetting } from "@/payload-types";
-import { BlogFilters } from "@/components/blog/BlogFilters";
+import type { Blog, SiteSetting } from "@/payload-types";
 import { NewsletterCard } from "@/components/blog/NewsletterCard";
 import { Instagram, Linkedin } from "lucide-react";
 
@@ -17,7 +16,6 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 type SearchParams = {
-  topic?: string | string[];
   sort?: string | string[];
 };
 
@@ -25,12 +23,6 @@ const iconMap = {
   instagram: Instagram,
   linkedin: Linkedin,
 } as const;
-
-const resolveSlug = (input?: string | string[]) => {
-  if (typeof input === "string") return input;
-  if (Array.isArray(input)) return input[0];
-  return undefined;
-};
 
 const formatDate = (value?: string | null) => {
   if (!value) return null;
@@ -52,43 +44,17 @@ const BlogPage = async ({
   const siteSettings = (await getSiteSettings()) as SiteSetting;
 
   const resolvedSearch = (searchParams ? await searchParams : undefined) ?? {};
-  const topicSlug = resolveSlug(resolvedSearch.topic);
   const sortOrder =
     typeof resolvedSearch.sort === "string" &&
     resolvedSearch.sort.toLowerCase() === "asc"
       ? "asc"
       : "desc";
 
-  const topicsResult = await payload.find({
-    collection: "blog-topics",
-    sort: "title",
-    limit: 100,
-  });
-
-  const topics = topicsResult.docs.filter(
-    (topic): topic is BlogTopic =>
-      typeof topic === "object" &&
-      topic !== null &&
-      "slug" in topic &&
-      typeof topic.slug === "string",
-  );
-
-  const activeTopic = topicSlug
-    ? topics.find((topic) => topic.slug === topicSlug)
-    : undefined;
-
   const blogsQuery = await payload.find({
     collection: "blogs",
     depth: 2,
     where: {
       status: { equals: "published" },
-      ...(activeTopic
-        ? {
-            topics: {
-              contains: activeTopic.id,
-            },
-          }
-        : {}),
     },
     sort: sortOrder === "asc" ? "publishedDate" : "-publishedDate",
   });
@@ -224,14 +190,6 @@ const BlogPage = async ({
                 Browse all posts
               </span>
             </div>
-            <BlogFilters
-              topics={topics.map((topic) => ({
-                slug: topic.slug,
-                title: topic.title,
-              }))}
-              activeTopicSlug={activeTopic?.slug}
-              sortOrder={sortOrder}
-            />
           </div>
 
           {cardsWithNewsletter.length === 0 ? (
