@@ -5,7 +5,7 @@ import { getPayload } from "payload";
 import config from "@payload-config";
 import { notFound } from "next/navigation";
 import type { Media, Product } from "@/payload-types";
-import { serializeLexical } from "@/app/(frontend)/(with_title)/blog/lexical-serializer";
+import { serializeLexical } from "@/app/blog/lexical-serializer";
 
 export const revalidate = 10;
 
